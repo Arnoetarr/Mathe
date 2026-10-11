@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Akte Pinguin</title>
+<style>
+:root{--paper:#f3ead3;--card:#fbf6e8;--ink:#2b2420;--soft:#6d6052;--line:#cbbc98;--red:#b3261e;--ok:#2e6b3a;--mark:#fff3b0;--grey:#a79c8a;
+--k0:#b3261e;--k1:#2f5d8a;--k2:#2e6b3a;--k3:#a8691b;--pw:100vw}
+@media (prefers-color-scheme:dark){:root{--paper:#1d1a16;--card:#28241e;--ink:#ece1c8;--soft:#a99c86;--line:#4b4336;--red:#e5645a;--ok:#7cc48a;--mark:#4a431f;--grey:#6f6657;
+--k0:#e5645a;--k1:#7fb0de;--k2:#7cc48a;--k3:#e0a659}}
+@media (min-width:1000px){:root{--pw:min(540px,46vw)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:18px 16px 90px}
+h1,h2,h3,.mono,button,select,caption{font-family:"Courier New",Courier,monospace}
+h1{font-size:2rem;margin:.2em 0 0;letter-spacing:.04em;text-transform:uppercase}
+h2{font-size:1.35rem;margin:.2em 0 .1em}
+h3{font-size:.95rem;text-transform:uppercase;letter-spacing:.12em;margin:1.8em 0 .5em;border-bottom:2px solid var(--ink);padding-bottom:3px}
+.sub{color:var(--soft);margin:0 0 1em}
+.mono{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+button{font-size:.95rem;cursor:pointer;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:4px;padding:9px 14px}
+button:hover{background:var(--mark)}
+button.primary{background:var(--ink);color:var(--paper)}
+button.primary:hover{background:var(--red);border-color:var(--red)}
+button.link{border:0;background:none;padding:4px 0;text-decoration:underline}
+button.small{padding:5px 9px;font-size:.82rem}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.cases{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.cases button{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;box-shadow:3px 3px 0 var(--line)}
+.cases .nr{font-size:1.5rem;font-weight:bold}
+.cases .t{font-family:Georgia,serif;font-size:1.05rem}
+.stars{color:var(--red);letter-spacing:2px;font-size:.85rem}
+.stamp{display:inline-block;border:3px solid var(--ok);color:var(--ok);padding:1px 8px;border-radius:4px;transform:rotate(-6deg);font:bold .8rem "Courier New",monospace;letter-spacing:.12em}
+details{background:var(--card);border:1px dashed var(--line);border-radius:4px;padding:8px 14px;margin:0 0 18px}
+summary{cursor:pointer;font-family:"Courier New",monospace}
+details ul{padding-left:1.1em;margin:.6em 0}
+.intro{background:var(--card);border-left:5px solid var(--red);padding:12px 14px;margin:12px 0}
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(138px,1fr))}
+.fc,.fc:hover{border:0;background:none;padding:0;text-align:left;perspective:900px;border-radius:9px;display:block}
+.fc .in{display:grid;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.fc .f,.fc .bk{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:2px solid var(--ink);border-top:9px solid var(--k);border-radius:9px;padding:10px;min-height:132px;box-shadow:3px 3px 0 var(--line);display:flex;flex-direction:column}
+.fc .f{align-items:center;justify-content:center;text-align:center;gap:4px}
+.fc .em{font-size:2.6rem;line-height:1.1}
+.fc b{font-family:"Courier New",monospace;font-size:.98rem}
+.fc .turn{font:.68rem "Courier New",monospace;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;margin-top:auto}
+.fc .bk{transform:rotateY(180deg);font-family:Georgia,serif;font-size:.86rem;line-height:1.4;gap:4px}
+.fc .bk b{color:var(--k)}
+.fc.on .in{transform:rotateY(180deg)}
+@media (prefers-reduced-motion:reduce){.fc .in{transition:none}}
+.k0{--k:var(--k0)}.k1{--k:var(--k1)}.k2{--k:var(--k2)}.k3{--k:var(--k3)}
+h3.kh{border-color:var(--k)}
+ol.clues{padding-left:1.4em;margin:0}
+ol.clues li{padding:5px 4px;cursor:pointer;border-radius:3px}
+ol.clues li.done{text-decoration:line-through;color:var(--soft)}
+.say{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px 12px;margin:6px 0;cursor:pointer}
+.say.done{opacity:.55;text-decoration:line-through}
+.say b{font-family:"Courier New",monospace}
+.note{font-size:.92rem;color:var(--soft);margin:.3em 0 .6em}
+.answer{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+select{font-size:1rem;padding:9px 8px;border:2px solid var(--ink);border-radius:4px;background:var(--card);color:var(--ink);max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.msg{font-family:"Courier New",monospace;margin:.7em 0;min-height:1.4em}
+.msg.bad{color:var(--red)}
+.outro{background:var(--card);border:3px double var(--ok);padding:12px 14px;margin:12px 0}
+.hint{background:var(--mark);padding:8px 12px;border-radius:4px;margin:10px 0}
+footer{margin-top:40px;font-size:.8rem;color:var(--soft);border-top:1px solid var(--line);padding-top:10px}
+/* Notizbuch */
+#fab{position:fixed;right:14px;bottom:14px;z-index:5;box-shadow:3px 3px 0 var(--line);font-weight:bold}
+#nb{position:fixed;z-index:6;left:0;right:0;bottom:0;height:62vh;background:var(--paper);border-top:3px solid var(--ink);display:flex;flex-direction:column;box-shadow:0 -6px 18px rgba(0,0,0,.25)}
+#nb[hidden],#fab[hidden]{display:none}
+.nbh{display:flex;gap:8px;align-items:center;padding:6px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+.nbh b{font-family:"Courier New",monospace;letter-spacing:.08em;text-transform:uppercase;margin-right:auto}
+.nbb{overflow:auto;padding:10px 12px 24px;flex:1;background-image:repeating-linear-gradient(transparent 0 27px,var(--line) 27px 28px);background-attachment:local}
+body.nbo{padding-bottom:62vh}
+@media (min-width:1000px){
+  #nb{left:auto;top:0;height:auto;width:var(--pw);border-top:0;border-left:3px solid var(--ink);box-shadow:-6px 0 18px rgba(0,0,0,.18)}
+  body.nbo{padding-bottom:0;padding-right:var(--pw)}
+}
+table.lg{border-collapse:collapse;background:var(--card)}
+table.lg th{font:normal .74rem/1.15 Georgia,serif;padding:0}
+table.lg th.ct{font:.62rem "Courier New",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--k);padding:2px;text-align:center;background:var(--paper)}
+table.lg th.v{vertical-align:bottom;padding:4px 0 3px;border:1px solid var(--line);border-top:3px solid var(--k)}
+table.lg th.v .vn{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:block;margin:0 auto 3px}
+table.lg th.v .ve{display:block;font-size:1rem;text-align:center}
+table.lg th.r{text-align:left;white-space:nowrap;padding:0 6px 0 5px;max-width:92px;overflow:hidden;text-overflow:ellipsis;border:1px solid var(--line);border-left:3px solid var(--k)}
+table.lg td{padding:0;border:1px solid var(--soft)}
+table.lg .bl{border-left:3px solid var(--ink)}
+table.lg .bt{border-top:3px solid var(--ink)}
+table.lg .br{border-right:3px solid var(--ink)}
+table.lg .bb{border-bottom:3px solid var(--ink)}
+table.lg th.none{background:var(--paper);border:0}
+.c,.c:hover{width:var(--cs);height:var(--cs);padding:0;border:0;border-radius:0;background:var(--card);font:bold calc(var(--cs)*.62)/1 "Courier New",monospace;display:block}
+.c[data-v="1"]{color:var(--red)}
+.c[data-v="2"]{color:var(--ok);background:var(--mark)}
+.c[data-v="3"]{color:var(--grey);font-weight:normal}
+.leg{font-size:.78rem;color:var(--soft);margin:6px 0 16px;background:var(--paper);display:inline-block;padding:0 4px}
+.leg i{font-style:normal;font-weight:bold}
+table.ft{border-collapse:collapse;width:100%;table-layout:fixed;background:var(--card)}
+table.ft th{font:.7rem "Courier New",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--k);border:1px solid var(--ink);border-top:4px solid var(--k);padding:3px}
+table.ft td{border:1px solid var(--ink);padding:0}
+table.ft input{width:100%;border:0;background:transparent;color:var(--ink);font:.88rem Georgia,serif;padding:7px 5px}
+table.ft input:focus{outline:2px solid var(--red);outline-offset:-2px;background:var(--mark)}
+.nbt{font:.72rem "Courier New",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0 0 4px;background:var(--paper);display:inline-block;padding:0 4px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<button id="fab" data-act="nb" hidden>📓 Notizbuch</button>
+<aside id="nb" aria-label="Notizbuch" hidden></aside>
+<script>
+const CASES = [{"id":"f1","level":1,"title":"Der Fischstäbchen-Coup","intro":"Großalarm im Zoo. Aus dem Kiosk sind 37 Fischstäbchen verschwunden, und zwar samt Remoulade. Die Zoodirektorin tobt, die Robben weinen. Drei Tiere wurden zur Tatzeit außerhalb ihrer Gehege gesehen. Wer am Kiosk war, hat die Fischstäbchen auf dem Gewissen.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐧","n":"Pauli","d":"Pinguin. Trägt immer Frack und behauptet, das sei angeboren."},{"e":"🦓","n":"Zacharias","d":"Zebra. Hält sich für ein Pferd im Schlafanzug."},{"e":"🦥","n":"Fridolin","d":"Faultier. Wurde zuletzt 2019 bei einer schnellen Bewegung beobachtet."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🎒","n":"Rucksack","d":"Fassungsvermögen laut Hersteller 20 Liter oder 37 Fischstäbchen."},{"e":"🛒","n":"Einkaufswagen","d":"Braucht einen Euro als Pfand. Rollt immer leicht nach links."},{"e":"☂️","n":"Regenschirm","d":"Gelb mit Entenkopf-Griff. Seit drei Jahren im Fundbüro vermisst."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🏪","n":"Kiosk","d":"Verkauft Pommes, Eis und Fischstäbchen. Die Remoulade kostet extra."},{"e":"🐑","n":"Streichelzoo","d":"Hier darf man die Ziegen kraulen. Die Ziegen kraulen nie zurück."},{"e":"🦩","n":"Flamingoteich","d":"Flaches Wasser, rosa Bewohner, erstaunlich viel Geschnatter."}]}],"clues":["Die Fischstäbchen verschwanden aus dem Kiosk.","Zacharias verbrachte den ganzen Nachmittag im Streichelzoo und ließ sich kraulen.","Wer den Einkaufswagen dabeihatte, wurde am Flamingoteich gesehen.","Pauli hatte keinen Einkaufswagen. Seine Flossen reichen nicht bis zum Griff.","Zacharias trug keinen Rucksack. Er findet, Streifen und Rucksack tragen auf."],"hint":"Fang mit dem Einkaufswagen an. Zacharias war im Streichelzoo, Pauli kommt nicht an den Griff. Wer bleibt übrig?","outro":"Pauli war am Kiosk und stopfte alle 37 Fischstäbchen in seinen Rucksack. Bei der Festnahme sagte er nur: „Ich bin ein Pinguin. Was habt ihr erwartet?“ Fridolin schlief übrigens im Einkaufswagen und hat vom ganzen Fall nichts mitbekommen.","sol":{"who":0,"vals":[0,0]}},{"id":"f2","level":1,"title":"Zwölf Kugeln Stracciatella","intro":"Strandbad Möwenstein, 14 Uhr. In der Eisdiele fehlen zwölf Kugeln Stracciatella. In der leeren Eiswanne klebt ein einzelnes Haar von einem falschen Schnurrbart. Wer den Schnurrbart trug, hat das Eis gefuttert.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐦","n":"Mechthild","d":"Möwe. Hat in drei Strandbädern Pommesverbot."},{"e":"🦀","n":"Karl-Heinz","d":"Krabbe. Geht grundsätzlich seitwärts, auch Problemen aus dem Weg."},{"e":"🦭","n":"Sören","d":"Seehund. Sieht immer unschuldig aus, was ihn verdächtig macht."}]},{"name":"Verkleidung","q":"Welche Verkleidung?","items":[{"e":"🕶️","n":"Sonnenbrille","d":"Verspiegelt und drei Nummern zu groß."},{"e":"🥸","n":"Schnurrbart","d":"Zum Ankleben, Modell „Walross“. Juckt ab der zweiten Stunde."},{"e":"👒","n":"Strohhut","d":"Mit breiter Krempe. Fliegt bei Windstärke 3 davon."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🍦","n":"Eisdiele","d":"Zwölf Sorten, davon elf vorrätig. Ausgerechnet Stracciatella fehlt."},{"e":"🏖️","n":"Strandkorb","d":"Nummer 14, gestreift. Der Bezug knarzt bei jeder Bewegung."},{"e":"🗼","n":"Leuchtturm","d":"Rot-weiß geringelt, 214 Stufen und oben eine schöne Aussicht."}]}],"clues":["In der leeren Eiswanne klebte ein Haar von einem falschen Schnurrbart.","Karl-Heinz trug keinen falschen Schnurrbart. Mit seinen Scheren schneidet er alles ab, was ihm unter die Nase kommt.","Wer die Sonnenbrille trug, saß oben auf dem Leuchtturm.","Sören war nicht auf dem Leuchtturm. 214 Stufen sind nichts für Flossen.","Karl-Heinz war auch nicht auf dem Leuchtturm. Seitwärts kommt man keine Wendeltreppe hoch.","Der Strohhut wurde nicht im Strandkorb gesehen."],"hint":"Auf dem Leuchtturm saß die Sonnenbrille. Zwei der drei kommen dort gar nicht hoch.","outro":"Sören lag mit falschem Schnurrbart im Strandkorb und verdaute zwölf Kugeln Stracciatella. Karl-Heinz stand zwar direkt an der Eisdiele, wollte aber nur ein Wasser. Mechthild hat vom Leuchtturm aus alles gesehen und nichts gesagt. Sie hofft noch auf die Waffeln.","sol":{"who":2,"vals":[1,1]}},{"id":"f3","level":2,"title":"Der Liebesbrief im Kelpwald","intro":"Seeotterdame Ottilie ist verliebt, und zwar in Hartmut, einen Weißen Hai mit 300 Zähnen und einem weichen Herzen. Ihr Liebesbrief lag fertig im Kelpwald, auf Seetang geschrieben und mit einem Kussmund versiegelt. Jetzt ist er weg. Drei Meeresbewohner haben ausgesagt. Zwei sagen die Wahrheit, eine Person lügt. Wer lügt, hat den Brief.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🦑","n":"Torben","d":"Tintenfisch und Briefträger. Stellt mit acht Armen zu und verwechselt trotzdem alle Hausnummern."},{"e":"🐡","n":"Gisela","d":"Kugelfisch und pensionierte Deutschlehrerin. Bläst sich bei jedem Kommafehler auf."},{"e":"🦞","n":"Hubert","d":"Hummer. Kneift erst und fragt dann."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🐚","n":"Muschelhandy","d":"Das neueste Modell. Rauscht beim Telefonieren wie das Meer."},{"e":"🤿","n":"Taucherbrille","d":"Beschlägt ständig, was unter Wasser eigentlich niemand erklären kann."},{"e":"🛟","n":"Schwimmring","d":"Mit Entenmuster. Wird von Erwachsenen angeblich nur „für die Kinder“ gekauft."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🌿","n":"Kelpwald","d":"Hohe Algen, grünes Dämmerlicht. Ein beliebter Treffpunkt für Verliebte."},{"e":"🪸","n":"Korallenriff","d":"Bunt, laut und immer voll. Die Innenstadt des Meeres."},{"e":"⚓","n":"Schiffswrack","d":"Ein gesunkener Fischkutter namens „Erika“. Dient inzwischen als Postamt."}]}],"clues":["Der Brief lag im Kelpwald. Wer ihn genommen hat, war also dort.","Wer das Muschelhandy hatte, war am Korallenriff. Nur dort gibt es Empfang.","Der Schwimmring trieb am Schiffswrack."],"statements":[{"who":0,"text":"Ich war am Schiffswrack und habe Post sortiert."},{"who":1,"text":"Hubert hatte die Taucherbrille. Ich habe es genau gesehen."},{"who":2,"text":"Torben war nicht im Kelpwald. Der verheddert sich da immer."}],"hint":"Nimm an, Torben lügt. Dann müsste er im Kelpwald gewesen sein. Was sagt Hubert dazu?","outro":"Gisela hat gelogen. Sie hatte die Taucherbrille selbst auf der Nase und den Brief in der Flosse. Stehlen wollte sie ihn gar nicht. Sie hat mit Rotstift elf Rechtschreibfehler angestrichen („Hei“ schreibt man mit ai) und ihn dann zurückgelegt. Hartmut hat den Brief trotzdem bekommen und vor Rührung drei Zähne verloren. Fortsetzung folgt in Fall 6.","sol":{"who":1,"vals":[1,0]}},{"id":"f4","level":2,"title":"Die verschwundene Mathearbeit","intro":"Die Klasse 7b der Tierschule Eichengrund hat eine Mathearbeit geschrieben. Alle 24 Hefte lagen im Lehrerzimmer, bereit zur Korrektur. Nach der großen Pause sind sie weg. Die Klasse wirkt erstaunlich gefasst. Wer im Lehrerzimmer war, weiß mehr.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🦝","n":"Ronny","d":"Waschbär und Hausmeister. Wäscht alles, auch Dinge, die man nicht waschen sollte."},{"e":"🦉","n":"Edeltraud","d":"Eule und Bibliothekarin. Sagt zu allem „Schuhu“, meint aber „Psst“."},{"e":"🐹","n":"Hagen","d":"Hamster aus der 7b. Hat für die Arbeit nicht gelernt und die Backen voller Spickzettel."},{"e":"🐐","n":"Zora","d":"Ziege und Referendarin. Hat immer Hunger, auch auf Dinge ohne Nährwert."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🧳","n":"Rollkoffer","d":"Ein Rad eiert. Man hört ihn schon drei Flure vorher."},{"e":"✂️","n":"Schere","d":"Bastelschere mit runder Spitze. Schneidet Papier und sonst gar nichts."},{"e":"☕","n":"Kaffeetasse","d":"Aufschrift „Beste Lehrkraft der Welt“. Selbst gekauft."},{"e":"🍂","n":"Laubbläser","d":"Lautstärke wie ein startendes Flugzeug. Liebling des Hausmeisters."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🚪","n":"Lehrerzimmer","d":"Zutritt nur für Lehrkräfte. Riecht nach Kaffee und Korrekturstress."},{"e":"🤸","n":"Turnhalle","d":"Riecht nach Gummimatten. Irgendwo quietscht immer ein Turnschuh."},{"e":"🖨️","n":"Kopierraum","d":"Der Kopierer meldet seit 2019 „Papierstau in Fach 2“."},{"e":"🚲","n":"Fahrradkeller","d":"Dunkel, kühl und voller Fahrräder, die niemandem gehören wollen."}]}],"clues":["Die Hefte verschwanden aus dem Lehrerzimmer.","Ronny hatte den Laubbläser dabei, wie an jedem Tag seit 2011.","Der Laubbläser dröhnte den ganzen Vormittag im Fahrradkeller.","Edeltraud war im Kopierraum und hat 300 Arbeitsblätter kopiert, alle schief.","Wer den Rollkoffer zog, war in der Turnhalle.","Zora hatte weder den Rollkoffer noch die Schere."],"hint":"Ronny und sein Laubbläser sind schnell verortet. Wer kann dann noch den Rollkoffer in die Turnhalle gezogen haben?","outro":"Zora war mit ihrer Kaffeetasse im Lehrerzimmer und hat alle 24 Hefte aufgegessen. „Ich wollte nur am ersten knabbern“, gab sie zu, „aber Bruchrechnung schmeckt überraschend nussig.“ Hagen war mit dem Rollkoffer in der Turnhalle und ist unschuldig. Die Arbeit wird nachgeschrieben. Die 7b ist jetzt deutlich weniger gefasst.","sol":{"who":3,"vals":[2,0]}},{"id":"f5","level":3,"title":"Die Karaoke-Katastrophe","intro":"Waldfest, 20 Uhr, die Stimmung ist prächtig. Dann spielt die Karaoke-Maschine nur noch ein einziges Lied, nämlich „Alle meine Entchen“, in Dauerschleife und doppelter Lautstärke. Die Enten sind begeistert, alle anderen verzweifelt. Im Kassettenfach klebt ein Kaugummi. Wer hatte ihn?","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🦡","n":"Detlef","d":"Dachs. Singt seit Jahren denselben Schlager und trifft dabei keinen Ton."},{"e":"🐗","n":"Wilma","d":"Wildschwein. Grunzt beim Lachen und lacht viel."},{"e":"🦊","n":"Ferdinand","d":"Fuchs und Tontechniker. Schlau, aber nur bis 22 Uhr."},{"e":"🦔","n":"Ingeborg","d":"Igel. Darf seit dem Vorfall mit dem Planschbecken nichts Aufblasbares mehr betreten."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🪛","n":"Schraubenzieher","d":"Kreuzschlitz, mittelgroß. Passt grundsätzlich nie zur Schraube."},{"e":"🍬","n":"Kaugummi","d":"Erdbeergeschmack. Die Sorte, die nach vier Minuten nach nichts mehr schmeckt."},{"e":"🪣","n":"Wassereimer","d":"Zehn Liter, blau. Gehört der Feuerwehr und wird dringend zurückerwartet."},{"e":"🪗","n":"Akkordeon","d":"Hat 120 Bässe. Gespielt werden davon höchstens drei."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🎤","n":"Bühne","d":"Sechs Bretter auf Bierkisten. Wackelt im Takt mit."},{"e":"🌭","n":"Bratwurststand","d":"Die Schlange reicht bis zum Waldrand. Senf kostet nichts."},{"e":"🏰","n":"Hüpfburg","d":"Form eines Schlosses, Farbe eines Bonbons. Schuhe bitte ausziehen."},{"e":"🎛️","n":"Mischpult","d":"Vierzig Regler. Im Wald weiß nur einer, wofür sie gut sind."}]}],"clues":["Im Kassettenfach der Karaoke-Maschine klebte ein Kaugummi.","Detlef stand entweder auf der Bühne oder am Mischpult.","Das Akkordeon war auf der Bühne zu hören, leider.","Wer am Bratwurststand war, hatte den Wassereimer. Der Grill brannte nämlich.","Ferdinand saß den ganzen Abend am Mischpult.","Wer auf der Hüpfburg war, hatte keinen Schraubenzieher. Spitze Gegenstände sind dort verboten.","Ingeborg war entweder auf der Hüpfburg oder am Mischpult."],"hint":"Ferdinand besetzt das Mischpult. Damit lösen sich beide Entweder-oder-Hinweise sofort auf.","outro":"Ingeborg hatte den Kaugummi. Sie wollte ihn nur kurz „zwischenparken“, und das Kassettenfach stand gerade offen. Danach ging sie auf die Hüpfburg, obwohl sie dort Hausverbot hat. Stacheln zählen nämlich auch als spitze Gegenstände. Die Hüpfburg ist jetzt ein Hüpfteppich.","sol":{"who":3,"vals":[1,2]}},{"id":"f6","level":3,"title":"Hochzeit am Riff","intro":"Ottilie und Hartmut heiraten. (Wer Fall 3 gelöst hat, kennt die Vorgeschichte.) Seeotter und Hai, das ganze Riff ist gerührt. Dann der Schock. Aus der dreistöckigen Algen-Sahne-Torte fehlt ein riesiges Stück, und zwar bevor das Brautpaar sie anschneiden konnte. Hartmut schwört, dass er es nicht war. Vier Gäste haben ausgesagt, genau eine Person lügt. Wer lügt, hat genascht.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐙","n":"Konstanze","d":"Krake und Trauzeugin. Hält acht Taschentücher gleichzeitig."},{"e":"🐠","n":"Kevin","d":"Clownfisch und DJ. Seine Witze sind schlechter als seine Musik."},{"e":"🐢","n":"Thusnelda","d":"Schildkröte und Standesbeamtin, 140 Jahre alt. Ihre Trauungen dauern im Schnitt vier Stunden."},{"e":"🐬","n":"Dustin","d":"Delfin und Hochzeitsfotograf. Grinst auf jedem Foto, auch auf denen, die er selbst macht."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🍰","n":"Tortenheber","d":"Silbern und frisch poliert. Liegt gut in Hand, Flosse und Tentakel."},{"e":"🎉","n":"Konfettikanone","d":"Schießt Konfetti aus getrocknetem Seetang. Biologisch abbaubar."},{"e":"🤿","n":"Schnorchel","d":"Unter Wasser völlig nutzlos. Gilt am Riff trotzdem als schick."},{"e":"🤳","n":"Selfiestick","d":"Ausziehbar bis 1,20 Meter. Trifft dabei meistens einen Nachbarn."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🍽️","n":"Buffet","d":"Algensalat, Planktonhäppchen und in der Mitte die Torte."},{"e":"🪩","n":"Tanzfläche","d":"Eine Diskokugel aus Perlmutt dreht sich. Die Strömung gibt den Takt vor."},{"e":"📸","n":"Fotobox","d":"Mit Verkleidungskiste. Der Piratenhut ist am beliebtesten."},{"e":"🧥","n":"Garderobe","d":"Hier hängen 200 Jacken, obwohl unter Wasser niemand eine trägt."}]}],"clues":["Die Torte stand am Buffet. Wer genascht hat, war dort.","An einem Tortenheber klebte Sahne. Wer genascht hat, hatte ihn in der Hand.","Der Selfiestick war in der Fotobox.","Auf der Tanzfläche wurde die Konfettikanone abgefeuert, insgesamt elfmal."],"statements":[{"who":0,"text":"Kevin war in der Garderobe und hat dort für seinen Auftritt geübt."},{"who":1,"text":"Konstanze war auf der Tanzfläche. Acht Arme, null Taktgefühl."},{"who":2,"text":"Dustin hatte die Konfettikanone. Ich habe es ganz langsam und deutlich gesehen."},{"who":3,"text":"Ich war in der Fotobox, wo denn sonst?"}],"hint":"Wer genascht hat, war am Buffet. Prüfe jede Person einzeln. Wenn sie lügt, sagen alle anderen die Wahrheit. Passt das zusammen?","outro":"Thusnelda hat gelogen. Sie stand mit dem Tortenheber am Buffet und hat sich ein Stück genehmigt. Aufgefallen ist es nur, weil sie dafür drei Stunden gebraucht hat und immer noch kaute, als die Riffpolizei kam. Ottilie und Hartmut haben ihr verziehen. Die Trauung dauerte danach weitere vier Stunden.","sol":{"who":2,"vals":[0,0]}},{"id":"f7","level":4,"title":"Das blaue Lama","intro":"Lothar, das Schulmaskottchen der Tierschule Eichengrund, ist ein Lama. Bis gestern war er beige. Heute Morgen steht er himmelblau im Flur und ist beleidigt. Neben ihm liegen Brezelkrümel. Wer die Brezel gegessen hat, hat auch Lothar gefärbt. Diesmal gibt es drei Dinge zu klären, nämlich Gegenstand, Ort und Pausensnack.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🦜","n":"Pedro","d":"Papagei. Wiederholt alles, was man sagt, besonders Geheimnisse."},{"e":"🦫","n":"Birte","d":"Biberin. Hat die Schulbank aus der 6a aufgegessen und nennt das Werken."},{"e":"🦎","n":"Chantal","d":"Chamäleon. Passt sich farblich jeder Ausrede an."},{"e":"🦇","n":"Friedhelm","d":"Fledermaus. Sieht tagsüber fast nichts und gibt das nie zu."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🖌️","n":"Pinsel","d":"Breit und borstig. Haart mehr als das Lama."},{"e":"🔫","n":"Wasserpistole","d":"Modell „Supernass 3000“. Reichweite acht Meter."},{"e":"🧴","n":"Sprühdose","d":"Himmelblau, seidenmatt. Vor Gebrauch bitte gut schütteln."},{"e":"🪣","n":"Farbeimer","d":"Fünf Liter, ziemlich schwer. Der Henkel schneidet in die Pfote."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🎨","n":"Kunstraum","d":"Überall Farbkleckse. Den Boden hält man dort für ein Kunstwerk."},{"e":"🛝","n":"Schulhof","d":"Zwei Tischtennisplatten, ein Klettergerüst und ein Dauerstreit um den Ball."},{"e":"🧪","n":"Chemieraum","d":"Riecht nach Schwefel. Die Schutzbrillen sind alle zerkratzt."},{"e":"🍝","n":"Mensa","d":"Heute gibt es Nudeln. Es gibt immer Nudeln."}]},{"name":"Snack","q":"Welcher Snack?","items":[{"e":"🥨","n":"Brezel","d":"Mit grobem Salz. Krümelt bei jedem Bissen."},{"e":"🍎","n":"Apfel","d":"Rotbackig und sehr knackig. Man hört ihn im ganzen Flur."},{"e":"🥕","n":"Möhre","d":"Frisch aus dem Schulgarten und noch ein bisschen erdig."},{"e":"🧀","n":"Käsebrötchen","d":"Doppelt belegt. Riecht bis in den dritten Stock."}]}],"clues":["Neben dem blauen Lama lagen Brezelkrümel.","Chantal war in der Mensa.","Wer den Farbeimer schleppte, war im Kunstraum und aß dabei eine Möhre.","Pedro aß einen Apfel.","Die Wasserpistole wurde auf dem Schulhof benutzt.","In der Mensa gab es Käsebrötchen. Wer dort war, aß eins.","Pedro hatte weder Pinsel noch Sprühdose.","Birte war nicht im Chemieraum. Sie hat dort Hausverbot, seit sie den Labortisch probiert hat.","Im Chemieraum wurde kein Pinsel benutzt."],"hint":"Pedro bleibt nur ein einziger Gegenstand. Danach hilft die Frage, wer den Farbeimer gehabt haben kann.","outro":"Friedhelm war es. Er wollte mit der Sprühdose eigentlich die Tür vom Chemieraum blau lackieren, als Überraschung für den Hausmeister. Tagsüber sieht er aber fast nichts. Lothar stand eben ungünstig vor der Tür und hielt still, weil er dachte, es gäbe eine Massage. Die Farbe ist abwaschbar. Lothars Stolz leider weniger.","sol":{"who":3,"vals":[2,2,0]}},{"id":"f8","level":4,"title":"Die Gurke auf dem Siegerpodest","intro":"Sportfest der Tierschule Eichengrund. Der goldene Pokal steht auf dem Siegerpodest und wartet auf die Siegerehrung. Als Direktorin Dr. Uhu das Tuch wegzieht, liegt dort eine Salatgurke. Der Pokal ist weg. Vier Sportskanonen haben ausgesagt, genau eine Person lügt. Wer lügt, hat den Pokal vertauscht.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐆","n":"Günther","d":"Gepard. Hat heute zum ersten Mal ein Rennen verloren und spricht nicht darüber."},{"e":"🐌","n":"Sabine","d":"Schnecke. Hat heute zum ersten Mal ein Rennen gewonnen und spricht über nichts anderes."},{"e":"🦘","n":"Kalle","d":"Känguru. Hat einen Beutel und findet, das gehe niemanden etwas an."},{"e":"🦩","n":"Fabienne","d":"Flamingo. Steht seit 2017 auf einem Bein, weil sie das andere schont."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"⏱️","n":"Stoppuhr","d":"Misst auf die Hundertstelsekunde genau. Piept bei jedem Knopfdruck."},{"e":"🪢","n":"Springseil","d":"Drei Meter lang. Verknotet sich sogar im Schrank."},{"e":"🎒","n":"Turnbeutel","d":"Riecht nach Turnhalle. Niemand weiß so genau, was drin ist."},{"e":"📣","n":"Megafon","d":"Macht jede Stimme zehnmal lauter. Leider auch die falschen Töne."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🏆","n":"Siegerpodest","d":"Drei Stufen. Die oberste ist am rutschigsten."},{"e":"🚿","n":"Umkleide","d":"Riecht nach Deo und nassen Handtüchern. Ein Spind klemmt immer."},{"e":"🏝️","n":"Sandgrube","d":"Weitsprung-Anlage. Der Sand findet seinen Weg in jeden Schuh."},{"e":"🧃","n":"Getränkestand","d":"Apfelschorle für 50 Cent. Der Becher hat Pfand."}]},{"name":"Trikot","q":"Welches Trikot?","items":[{"e":"🔴","n":"Rot","d":"Leuchtet wie eine Tomate. Man sieht es schon vom Parkplatz."},{"e":"🟡","n":"Gelb","d":"Kanariengelb. Zieht im Sommer sämtliche Insekten an."},{"e":"🟢","n":"Grün","d":"Grasgrün. Auf dem Rasen ist man damit fast unsichtbar."},{"e":"🟣","n":"Lila","d":"Kräftiges Lila. Eine Sonderanfertigung auf eigenen Wunsch."}]}],"clues":["Eine Zeugin sah am Siegerpodest jemanden im grünen Trikot.","Wer die Stoppuhr hatte, trug Rot.","Das Megafon war an der Sandgrube im Einsatz.","Fabienne trug Lila, passend zu den Federn. Fast passend."],"statements":[{"who":0,"text":"Ich stand am Getränkestand und trug Rot. Ich habe nur getrunken, vier Liter."},{"who":1,"text":"Fabienne war in der Umkleide. Sie hat zwei Stunden für ein Bein gebraucht."},{"who":2,"text":"Ich hatte das Springseil. Mehr hatte ich nicht dabei, ehrlich."},{"who":3,"text":"Sabine hatte das Megafon. Man hat sie bis in die Nachbarstadt gehört."}],"hint":"Nimm nacheinander an, dass Günther, Sabine oder Fabienne lügt. Jedes Mal landet jemand im falschen Trikot am Siegerpodest oder mit dem Megafon am falschen Ort.","outro":"Kalle hat gelogen. Ein Springseil hatte er nie, er hatte den Turnbeutel, und im Turnbeutel steckte der Pokal. „Ich wollte ihn nur mal halten“, sagte er. „Ich werde immer Vierter.“ Die Gurke stammt aus seinem Pausenbrot. Dr. Uhu hat entschieden, dass es ab sofort auch einen Pokal für Platz vier gibt. Er hat die Form einer Gurke.","sol":{"who":2,"vals":[2,0,2]}},{"id":"f9","level":5,"title":"Der Knochen aus Saal 3","intro":"Naturkundemuseum, kurz nach Feierabend. Um 22 Uhr schrillt der Alarm. Dem Brachiosaurus fehlt ein Oberschenkelknochen, zwei Meter lang und rund 150 Millionen Jahre alt. Vier Tiere waren an diesem Abend im Haus, jedes zu einer anderen vollen Stunde und an genau einem Ort. Wer um 22 Uhr da war, hat den Knochen.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐕","n":"Dagobert","d":"Dackel und Nachtwächter. Sehr pflichtbewusst, solange es nichts zu apportieren gibt."},{"e":"🐦","n":"Elsbeth","d":"Elster. Sammelt alles, was glänzt, und nennt es Leihgabe."},{"e":"🐈","n":"Karlo","d":"Kater. Schläft 18 Stunden am Tag und ist in den übrigen sechs müde."},{"e":"🐀","n":"Roswitha","d":"Ratte und Museumsführerin. Kennt jeden Gang, auch die in den Wänden."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🔦","n":"Taschenlampe","d":"Der Lichtkegel flackert. Die Batterien sind fast leer."},{"e":"🪶","n":"Staubwedel","d":"Aus echten Straußenfedern. Kitzelt beim Staubwischen in der Nase."},{"e":"🪜","n":"Leiter","d":"Aus Aluminium. Hat acht Sprossen, eine davon wackelt."},{"e":"🔍","n":"Lupe","d":"Vergrößert zehnfach. Riesig wirkt damit vor allem das eigene Auge."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🦕","n":"Dinosauriersaal","d":"Saal 3. Das Skelett des Brachiosaurus reicht bis unter die Decke."},{"e":"🏺","n":"Ägyptensaal","d":"Sarkophage, Hieroglyphen und eine Mumie, die angeblich manchmal niest."},{"e":"🛍️","n":"Museumsshop","d":"Radiergummis in Dinoform, Postkarten und Plüschtiere mit Preisschild."},{"e":"🕸️","n":"Dachboden","d":"Spinnweben, alte Kisten und ein ausgestopfter Dodo mit strengem Blick."}]},{"name":"Uhrzeit","q":"Wann?","items":[{"e":"🕗","n":"20 Uhr","d":"Das Museum hat gerade geschlossen. Die letzte Schulklasse ist weg."},{"e":"🕘","n":"21 Uhr","d":"Der Putzdienst ist durch. In den Sälen brennt nur noch Notlicht."},{"e":"🕙","n":"22 Uhr","d":"Es ist stockdunkel. Genau jetzt schrillt der Alarm."},{"e":"🕚","n":"23 Uhr","d":"Die Polizei ist unterwegs. Im Gebälk knackt es."}]}],"clues":["Der Alarm ging um 22 Uhr los.","Elsbeth war als Erste im Haus, nämlich schon um 20 Uhr.","Die Leiter wurde genau eine Stunde nach Elsbeths Besuch benutzt.","Wer die Taschenlampe hatte, kam später als die Person mit dem Staubwedel.","Um 23 Uhr knarrte es auf dem Dachboden.","Roswitha war im Ägyptensaal und kam früher als Dagobert.","Im Museumsshop hat jemand mit der Lupe die Preisschilder studiert.","Karlo hatte weder Leiter noch Staubwedel. Beides riecht nach Arbeit.","Dagobert war nicht im Museumsshop. Er hat dort Hausverbot, seit er den Plüsch-T-Rex im Blumenbeet vergraben hat.","Elsbeth hatte keinen Staubwedel. Fremde Federn findet sie unheimlich."],"hint":"Elsbeth um 20 Uhr, die Leiter um 21 Uhr. Karlo trägt keine Leiter, und Roswitha kam vor Dagobert. Wer war also um 21 Uhr da?","outro":"Dagobert, der Nachtwächter persönlich. Um 22 Uhr wollte er im Dinosauriersaal nur Staub wedeln. Dann stand er vor dem größten Knochen seines Lebens. „Ich bin auch nur ein Hund“, sagte er bei der Vernehmung. Der Knochen wurde im Museumsgarten gefunden, ordentlich vergraben und mit einem Schildchen versehen. Darauf stand „Für später“.","sol":{"who":0,"vals":[1,0,2]}},{"id":"f10","level":5,"title":"Die Goldene Gurke","intro":"Gala der Meisterdetektive. Der Ehrenpreis des Abends ist die Goldene Gurke, gestiftet von Direktorin Dr. Uhu (siehe Fall 8). Als der Tresor geöffnet wird, ist er leer. Auf der Gästeliste stehen ausgerechnet fünf alte Bekannte, die alle schon einmal etwas angestellt haben. Jede Person kam zu einer anderen vollen Stunde und blieb an einem Ort. Fünf Aussagen, genau eine ist gelogen. Wer lügt, hat die Gurke.","cats":[{"name":"Verdächtige","q":"Wer war es?","items":[{"e":"🐧","n":"Pauli","d":"Pinguin, bekannt aus Fall 1. Beteuert, er sei „resozialisiert“, und kann das Wort sogar buchstabieren."},{"e":"🐡","n":"Gisela","d":"Kugelfisch, bekannt aus Fall 3. Hat die Einladungskarte korrigiert zurückgeschickt."},{"e":"🐐","n":"Zora","d":"Ziege, bekannt aus Fall 4. Wurde gebeten, die Tischdeko nicht zu essen."},{"e":"🐕","n":"Dagobert","d":"Dackel, bekannt aus Fall 9. Arbeitet inzwischen im Museumsgarten, unter Aufsicht."},{"e":"🦘","n":"Kalle","d":"Känguru, bekannt aus Fall 8. Besitzt seit Kurzem einen Pokal in Gurkenform."}]},{"name":"Gegenstand","q":"Womit?","items":[{"e":"🎩","n":"Zylinder","d":"Schwarz, hoch und innen hohl. Bei Zauberern sehr beliebt."},{"e":"🎀","n":"Glitzerfliege","d":"Besteht aus 400 Pailletten. Blendet bei direktem Licht."},{"e":"🥂","n":"Kindersekt","d":"Prickelt wie echter Sekt und schmeckt nach Traube."},{"e":"🎈","n":"Luftballon","d":"Goldfarben, mit Helium gefüllt. Hält eine Schnur und sonst nichts aus."},{"e":"🎻","n":"Geigenkasten","d":"Lang, schwarz und abschließbar. Bietet Platz für eine Geige oder für etwas Ähnliches."}]},{"name":"Ort","q":"Wo?","items":[{"e":"🟥","n":"Roter Teppich","d":"Zwanzig Meter Samt. Links und rechts warten die Fotografen."},{"e":"💃","n":"Ballsaal","d":"Kronleuchter, Parkett und ein Streichquartett, das nur Walzer kann."},{"e":"🍳","n":"Küche","d":"Hier werden 300 Häppchen angerichtet. Zutritt nur mit Kochmütze."},{"e":"🌙","n":"Balkon","d":"Mit Blick auf den Stadtpark. Abends wird es dort kühl."},{"e":"🔐","n":"Tresorraum","d":"Stahltür, Zahlenschloss und drinnen ein Samtkissen in Gurkenform."}]},{"name":"Uhrzeit","q":"Wann?","items":[{"e":"🕕","n":"18 Uhr","d":"Einlass. Die Garderobe ist noch leer."},{"e":"🕖","n":"19 Uhr","d":"Sektempfang. Die ersten Häppchen sind schon weg."},{"e":"🕗","n":"20 Uhr","d":"Die Eröffnungsrede beginnt. Sie dauert länger als geplant."},{"e":"🕘","n":"21 Uhr","d":"Das Streichquartett spielt den dritten Walzer."},{"e":"🕙","n":"22 Uhr","d":"Gleich soll die Preisverleihung beginnen."}]}],"clues":["Zora kam als Erste, schon um 18 Uhr, und wich den ganzen Abend nicht von der Tanzfläche im Ballsaal.","Wer den Zylinder trug, kam genau eine Stunde nach Zora.","Die Person im Tresorraum kam später als die Person in der Küche, aber früher als die Person auf dem Balkon.","Der Luftballon schwebte über dem Balkon.","Wer als Letztes kam, blieb gleich auf dem roten Teppich stehen und posierte.","Im Ballsaal wurde Kindersekt getrunken.","Dagobert hatte keinen Geigenkasten. Mit so kurzen Beinen schleift der nur über den Boden.","Gisela hatte weder Geigenkasten noch Glitzerfliege."],"statements":[{"who":0,"text":"Ich war in der Küche. Nur gucken, nichts anfassen. Ehrenwort!"},{"who":1,"text":"Dagobert kam als Letzter. Unpünktlichkeit schreibt man übrigens mit ü."},{"who":2,"text":"Pauli trug den Zylinder. Der sah lecker aus."},{"who":3,"text":"Gisela kam später als Kalle. Ich habe beide am Geruch erkannt."},{"who":4,"text":"Ich war nie im Tresorraum. Ich weiß nicht mal, wo der ist."}],"hint":"Ordne zuerst die Uhrzeiten. Zora 18 Uhr, der Zylinder 19 Uhr, die letzte Person auf dem roten Teppich. Prüfe dann, wessen Aussage zum Tresorraum nicht passen kann.","outro":"Kalle hat gelogen. Er war im Tresorraum, und im Geigenkasten lag keine Geige. Dort lag die Goldene Gurke, direkt neben seinem Pokal in Gurkenform. „Ich wollte, dass er nicht mehr so allein ist“, schluchzte Kalle. Die Jury war gerührt und stellte beide Gurken nebeneinander aus. Pauli war tatsächlich unschuldig. In der Küche fehlen seitdem allerdings 37 Fischstäbchen. Die Ermittlungen laufen.","sol":{"who":4,"vals":[4,4,2]}}];
+const KEY = 'aktePinguin.v2';
+let st = { solved: {}, grid: {}, struck: {}, notes: {} };
+try { Object.assign(st, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+const app = document.getElementById('app'), nb = document.getElementById('nb'), fab = document.getElementById('fab');
+const SYM = ['', '✗', '✓', '✗'];
+let cur = -1, hintOpen = false;
+const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+function showNb(on) {
+  nb.hidden = !on; fab.hidden = on || cur < 0;
+  document.body.classList.toggle('nbo', on);
+}
+
+function menu() {
+  cur = -1; showNb(false);
+  const done = CASES.filter(c => st.solved[c.id]).length;
+  app.innerHTML = `
+    <p class="mono">Ermittlungsbüro für tierische Vergehen</p>
+    <h1>Akte Pinguin</h1>
+    <p class="sub">Zehn Logikkrimis zum Kombinieren. ${done} von ${CASES.length} Fällen gelöst.</p>
+    <details${done ? '' : ' open'}><summary>So wird ermittelt</summary><ul>
+      <li>Jede verdächtige Person hatte genau einen Gegenstand und war an genau einem Ort. Nichts kommt doppelt vor.</li>
+      <li>Die Karten zu Verdächtigen, Gegenständen und Orten lassen sich antippen und umdrehen.</li>
+      <li>Im Notizbuch trägst du ein, was du weißt. Es bleibt beim Scrollen sichtbar.</li>
+      <li>Im Gitter setzt einmal Tippen ein rotes ✗ (passt nicht), zweimal ein ✓ (passt), dreimal leert das Feld.</li>
+      <li>Ein ✓ füllt Zeile und Spalte seines Blocks mit grauen ✗. Nimmst du das ✓ zurück, verschwinden sie wieder. Rote ✗ bleiben stehen.</li>
+      <li>Erledigte Hinweise kannst du antippen und durchstreichen.</li>
+      <li>In Fällen mit Aussagen lügt genau eine Person. Alle anderen sagen die Wahrheit.</li>
+    </ul></details>
+    <ul class="cases">${CASES.map((c, i) => `
+      <li><button data-open="${i}"><span class="nr">${i + 1}</span>
+        <span><span class="t">${c.title}</span><br><span class="stars" aria-label="Schwierigkeit ${c.level} von 5">${stars(c.level)}</span></span>
+        ${st.solved[c.id] ? '<span class="stamp">Gelöst</span>' : '<span></span>'}</button></li>`).join('')}
+    </ul>
+    <footer>Alle Fälle, Figuren und Vergehen sind frei erfunden. Kein Tier kam zu Schaden, nur ein paar Fischstäbchen.
+      <br><button class="link" data-act="wipe">Alle Spielstände löschen</button></footer>`;
+  scrollTo(0, 0);
+}
+
+function grid(c) {
+  const n = c.cats.length, cols = [], rows = [0];
+  for (let k = 1; k < n; k++) cols.push(k);
+  for (let k = n - 1; k > 1; k--) rows.push(k);
+  const m = c.cats[0].items.length, total = cols.length * m;
+  let h = `<table class="lg" style="--cs:clamp(22px,calc((var(--pw) - 128px)/${total}),36px)"><thead><tr><th class="none"></th>${
+    cols.map(k => `<th class="ct k${k}" colspan="${m}">${c.cats[k].name}</th>`).join('')}</tr><tr><th class="none"></th>${
+    cols.map(k => c.cats[k].items.map(x => `<th class="v k${k}"><span class="vn">${x.n}</span><span class="ve">${x.e}</span></th>`).join('')).join('')}</tr></thead><tbody>`;
+  rows.forEach((a, ri) => {
+    const valid = cols.length - ri;
+    c.cats[a].items.forEach((x, i) => {
+      h += `<tr><th class="r k${a}" title="${esc(x.n)}">${x.e} ${x.n}</th>`;
+      for (let ci = 0; ci < valid; ci++) {
+        const b = cols[ci];
+        c.cats[b].items.forEach((y, j) => {
+          const cl = [j === 0 && 'bl', i === 0 && 'bt', ci === valid - 1 && j === m - 1 && 'br', i === m - 1 && 'bb'].filter(Boolean).join(' ');
+          h += `<td class="${cl}"><button class="c" data-k="${a}.${i}-${b}.${j}" aria-label="${esc(x.n)} und ${esc(y.n)}"></button></td>`;
+        });
+      }
+      h += '</tr>';
+    });
+  });
+  return h + '</tbody></table>';
+}
+
+function paint() {
+  const g = st.grid[CASES[cur].id] || {};
+  const ch = Object.keys(g).filter(k => g[k] === 2).map(k => k.split(/[.-]/));
+  nb.querySelectorAll('.c').forEach(b => {
+    const k = b.dataset.k; let v = g[k] || 0;
+    if (!v) { const [a, i, bb, j] = k.split(/[.-]/); if (ch.some(x => x[0] === a && x[2] === bb && (x[1] === i || x[3] === j))) v = 3; }
+    b.dataset.v = v; b.textContent = SYM[v];
+  });
+}
+
+function notebook(c) {
+  const m = c.cats[0].items.length;
+  const notes = st.notes[c.id] || (st.notes[c.id] = c.cats[0].items.map(p => c.cats.map((_, k) => k ? '' : p.n)));
+  nb.innerHTML = `<div class="nbh"><b>📓 Notizbuch</b><button class="small" data-act="reset">Gitter leeren</button><button class="small" data-act="nb" aria-label="Notizbuch schließen">✕</button></div>
+    <div class="nbb"><p class="nbt">Ermittlungsgitter</p>${grid(c)}
+    <p class="leg"><i style="color:var(--red)">✗</i> selbst gesetzt · <i style="color:var(--grey)">✗</i> automatisch · <i style="color:var(--ok)">✓</i> passt</p><br>
+    <p class="nbt">Eigene Notizen</p>
+    <table class="ft"><thead><tr>${c.cats.map((k, ci) => `<th class="k${ci}">${ci ? k.name : 'Person'}</th>`).join('')}</tr></thead><tbody>${
+      notes.map((r, ri) => `<tr>${c.cats.map((k, ci) => `<td><input data-n="${ri}.${ci}" value="${esc(r[ci] || '')}" aria-label="${ci ? k.name : 'Person'}, Zeile ${ri + 1}"></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  paint();
+}
+
+const card = (x, k) => `<button class="fc k${k}" data-flip aria-pressed="false"><span class="in">
+  <span class="f"><span class="em">${x.e}</span><b>${x.n}</b><span class="turn">umdrehen ↻</span></span>
+  <span class="bk"><b>${x.e} ${x.n}</b><span>${x.d || ''}</span></span></span></button>`;
+
+function openCase(i) {
+  cur = i; hintOpen = false;
+  const c = CASES[i], struck = st.struck[c.id] || [];
+  const cl = c.clues.map((x, k) => `<li data-s="c${k}" class="${struck.includes('c' + k) ? 'done' : ''}">${x}</li>`).join('');
+  const sayings = c.statements ? `<h3>Aussagen</h3><p class="note">Genau eine dieser Aussagen ist gelogen. Wer lügt, war es.</p>` +
+    c.statements.map((s, k) => { const p = c.cats[0].items[s.who];
+      return `<div class="say ${struck.includes('s' + k) ? 'done' : ''}" data-s="s${k}"><b>${p.e} ${p.n}:</b> „${s.text}“</div>`; }).join('') : '';
+  app.innerHTML = `
+    <div class="row"><button data-act="back">← Alle Fälle</button>${st.solved[c.id] ? '<span class="stamp">Gelöst</span>' : ''}</div>
+    <p class="mono" style="margin:14px 0 0">Fall ${i + 1} · <span class="stars">${stars(c.level)}</span></p>
+    <h2>${c.title}</h2>
+    <div class="intro">${c.intro}</div>
+    ${c.cats.map((k, ci) => `<h3 class="kh k${ci}">${k.name}</h3><div class="cards">${k.items.map(x => card(x, ci)).join('')}</div>`).join('')}
+    <h3>Hinweise</h3><ol class="clues">${cl}</ol>
+    ${sayings}
+    <p class="row" style="margin-top:16px"><button data-act="hint">Tipp anzeigen</button></p>
+    <div id="hint"></div>
+    <h3>Anklage</h3>
+    <div class="answer">${c.cats.map((k, ci) => `<select data-a="${ci}" aria-label="${k.q}"><option value="">${k.q}</option>${
+      k.items.map((x, j) => `<option value="${j}">${x.e} ${x.n}</option>`).join('')}</select>`).join('')}</div>
+    <button class="primary" data-act="check">Anklage erheben</button>
+    <div class="msg" id="msg" role="status"></div>
+    <div id="outro">${st.solved[c.id] ? outro(c, i) : ''}</div>`;
+  notebook(c);
+  showNb(innerWidth >= 1000);
+  scrollTo(0, 0);
+}
+
+function outro(c, i) {
+  const who = c.cats[0].items[c.sol.who];
+  const rest = c.sol.vals.map((v, k) => { const x = c.cats[k + 1].items[v]; return `${x.e} ${x.n}`; }).join(', ');
+  return `<div class="outro"><p class="mono" style="margin:0 0 6px">Auflösung</p><b>${who.e} ${who.n}</b> (${rest})<p style="margin:.6em 0 0">${c.outro}</p></div>
+    <p class="row">${i + 1 < CASES.length ? `<button class="primary" data-open="${i + 1}">Nächster Fall →</button>` : '<span class="stamp">Alle Akten geschlossen</span>'}
+    <button data-act="back">Zur Übersicht</button></p>`;
+}
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  const op = t.closest('[data-open]');
+  if (op) return openCase(+op.dataset.open);
+  const fl = t.closest('[data-flip]');
+  if (fl) { fl.setAttribute('aria-pressed', fl.classList.toggle('on')); return; }
+  const act = t.closest('[data-act]');
+  const c = CASES[cur];
+  if (act) {
+    const a = act.dataset.act;
+    if (a === 'back') return menu();
+    if (a === 'nb') return showNb(nb.hidden);
+    if (a === 'wipe') { if (confirm('Wirklich alle Spielstände löschen?')) { st = { solved: {}, grid: {}, struck: {}, notes: {} }; save(); menu(); } return; }
+    if (a === 'reset') { st.grid[c.id] = {}; save(); paint(); return; }
+    if (a === 'hint') { hintOpen = !hintOpen; document.getElementById('hint').innerHTML = hintOpen ? `<div class="hint">${c.hint}</div>` : ''; act.textContent = hintOpen ? 'Tipp verbergen' : 'Tipp anzeigen'; return; }
+    if (a === 'check') {
+      const msg = document.getElementById('msg');
+      const v = [...app.querySelectorAll('select[data-a]')].map(s => s.value);
+      if (v.includes('')) { msg.className = 'msg bad'; msg.textContent = 'Die Anklage ist noch unvollständig.'; return; }
+      const ok = +v[0] === c.sol.who && c.sol.vals.every((x, k) => +v[k + 1] === x);
+      if (!ok) { msg.className = 'msg bad'; msg.textContent = 'Das hält vor Gericht nicht stand. Die Ermittlungen gehen weiter.'; return; }
+      msg.className = 'msg'; msg.textContent = 'Volltreffer. Fall gelöst!';
+      st.solved[c.id] = true; save();
+      const o = document.getElementById('outro'); o.innerHTML = outro(c, cur); o.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return;
+  }
+  const cell = t.closest('.c');
+  if (cell) {
+    const g = st.grid[c.id] || (st.grid[c.id] = {}), k = cell.dataset.k;
+    const v = ((g[k] || 0) + 1) % 3;
+    if (v) g[k] = v; else delete g[k];
+    save(); paint(); return;
+  }
+  const s = t.closest('[data-s]');
+  if (s) {
+    const arr = st.struck[c.id] || (st.struck[c.id] = []);
+    const k = s.dataset.s, at = arr.indexOf(k);
+    if (at < 0) arr.push(k); else arr.splice(at, 1);
+    s.classList.toggle('done', at < 0); save();
+  }
+});
+nb.addEventListener('input', e => {
+  const n = e.target.dataset.n; if (!n) return;
+  const [r, k] = n.split('.'); st.notes[CASES[cur].id][r][k] = e.target.value; save();
+});
+
+menu();
+</script>
+</body>
+</html>
