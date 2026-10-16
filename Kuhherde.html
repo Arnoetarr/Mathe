@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Herdentiere Punktetafel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF; --card:#FFFFFF; --ink:#000000; --muted:#5A5A5A;
+  --spot:#000000; --spot-bg:rgba(0,0,0,.07);
+  --pink:#F6A5C0; --pink-deep:#C2185B; --snout:#F7BBCB;
+  --grass:#3B7F2F; --grass-light:#DDEFD3; --horn:#E9DCB5; --bell:#D9A91E;
+  --cow-body:#FFFFFF; --cow-spot:#000000;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161616; --card:#232323; --ink:#FFFFFF; --muted:#BDBDBD;
+    --spot-bg:rgba(255,255,255,.06); --grass-light:#23361E; --grass:#7CC56A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161616; --card:#232323; --ink:#FFFFFF; --muted:#BDBDBD;
+  --spot-bg:rgba(255,255,255,.06); --grass-light:#23361E; --grass:#7CC56A;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:1.05rem;line-height:1.45;
+}
+/* Kuhflecken im Hintergrund */
+.spots{position:fixed;inset:0;z-index:0;pointer-events:none;color:var(--spot-bg)}
+.spots svg{width:100%;height:100%}
+main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:1.25rem 1rem 6rem}
+
+h1{
+  font-family:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  font-weight:400;font-size:clamp(2.4rem,7vw,4.5rem);line-height:1;margin:.2rem 0 .4rem;
+  letter-spacing:.01em;
+}
+.brand{display:flex;align-items:center;gap:.8rem}
+.brand svg{width:clamp(56px,10vw,88px);height:auto;flex:none}
+.sub{color:var(--muted);margin:0 0 1.5rem;max-width:60ch}
+
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pink-deep);outline-offset:2px}
+
+/* Setup */
+.setup{max-width:640px}
+.add{display:flex;gap:.5rem;flex-wrap:wrap}
+.add input{
+  flex:1 1 240px;font:inherit;padding:.75rem 1rem;border:3px solid var(--ink);border-radius:14px;
+  background:var(--card);color:var(--ink);
+}
+.btn{
+  border:3px solid var(--ink);border-radius:14px;padding:.7rem 1.1rem;background:var(--card);
+  font-weight:700;
+}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.grass{background:var(--grass);border-color:var(--grass);color:#fff}
+.hint{color:var(--muted);font-size:.92rem;margin:.5rem 0 1.2rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.5rem;padding:0;list-style:none}
+.chips li{
+  display:flex;align-items:center;gap:.4rem;padding:.35rem .4rem .35rem .9rem;
+  border:2px solid var(--ink);border-radius:999px;background:var(--card);font-weight:700;
+}
+.chips button{border:0;background:transparent;font-size:1.2rem;line-height:1;padding:.1rem .45rem;border-radius:999px}
+.chips button:hover{background:var(--spot-bg)}
+.empty{color:var(--muted);font-style:italic}
+.row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+select{font:inherit;padding:.5rem .7rem;border:3px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink)}
+
+/* Frage */
+.question{
+  background:var(--ink);color:var(--bg);border-radius:26px;padding:1.4rem 1.4rem 1.1rem;margin:0 0 1rem;
+}
+.question .count{font-weight:700;opacity:.7;margin:0 0 .3rem}
+.question .text{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:clamp(1.8rem,5vw,3.2rem);line-height:1.1;margin:0 0 1rem;overflow-wrap:anywhere}
+.question .qbtns{display:flex;gap:.5rem;flex-wrap:wrap}
+.question button{border:3px solid var(--bg);border-radius:14px;padding:.5rem 1rem;background:transparent;color:var(--bg);font-weight:700}
+.question button.next{background:var(--pink);border-color:var(--pink);color:#000}
+.setup textarea{
+  width:100%;min-height:120px;font:inherit;padding:.75rem 1rem;border:3px solid var(--ink);border-radius:14px;
+  background:var(--card);color:var(--ink);resize:vertical;margin:.3rem 0 .5rem;
+}
+.check{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem}
+.check input{width:1.3rem;height:1.3rem;accent-color:var(--pink-deep)}
+.sh{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-weight:400;font-size:1.5rem;margin:1.6rem 0 .6rem}
+.row.tight{gap:.5rem;margin:.6rem 0}
+.btn.small{padding:.45rem .8rem;font-size:.95rem}
+.btn.danger{border-color:var(--pink-deep);color:var(--pink-deep)}
+.add textarea{
+  flex:1 1 100%;font:inherit;padding:.75rem 1rem;border:3px solid var(--ink);border-radius:14px;
+  background:var(--card);color:var(--ink);resize:vertical;
+}
+.checklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.4rem;margin:.6rem 0}
+.ci{display:flex;align-items:center;gap:.5rem;border:2px solid var(--ink);border-radius:12px;padding:.35rem .4rem .35rem .6rem;background:var(--card)}
+.ci.on{background:var(--grass-light);border-color:var(--grass)}
+.ci input{width:1.3rem;height:1.3rem;flex:none;accent-color:var(--grass)}
+.ci label{flex:1;font-weight:700;cursor:pointer;overflow-wrap:anywhere}
+.ci .x{border:0;background:transparent;font-size:1.1rem;line-height:1;padding:.15rem .4rem;border-radius:999px;color:var(--muted)}
+.ci .x:hover{background:var(--spot-bg)}
+#listsel{min-width:240px;max-width:100%}
+#addlist{width:100%;font:inherit;padding:.6rem .9rem;border:2px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink);resize:vertical;margin:.3rem 0 .4rem}
+/* Spiel */
+.status{
+  display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin:0 0 1.2rem;
+  padding:.7rem 1rem;border-radius:16px;background:var(--grass-light);
+}
+.status svg{width:40px;height:40px;flex:none}
+.status strong{font-size:1.1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}
+.player{
+  position:relative;background:var(--card);border:3px solid var(--ink);border-radius:22px;
+  padding:1rem 1rem .9rem;display:flex;flex-direction:column;gap:.6rem;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.player.pink{border-color:var(--pink-deep);box-shadow:0 0 0 5px var(--pink)}
+.player.leader:not(.pink){box-shadow:6px 6px 0 var(--ink)}
+.player .name{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:1.6rem;line-height:1.1;margin:0;overflow-wrap:anywhere;padding-right:2.6rem}
+.badge{position:absolute;top:.6rem;right:.6rem;width:44px;height:44px}
+.score{display:flex;align-items:baseline;gap:.35rem}
+.score .num{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:2.8rem;line-height:1}
+.score .of{color:var(--muted);font-weight:700}
+.herd{display:flex;flex-wrap:wrap;gap:2px;min-height:30px}
+.herd svg{width:30px;height:30px}
+.herd .ghost{opacity:.16}
+.blocked{font-size:.9rem;font-weight:700;color:var(--pink-deep);margin:0}
+.actions{display:grid;grid-template-columns:auto 1fr;gap:.45rem;margin-top:auto}
+.actions .plus{font-size:1.25rem;background:var(--ink);color:var(--bg);border:3px solid var(--ink);border-radius:14px;padding:.55rem}
+.actions .minus{border:3px solid var(--ink);border-radius:14px;background:var(--card);font-size:1.25rem;padding:.55rem .9rem}
+.actions .givepink{grid-column:1/-1;border:3px dashed var(--pink-deep);border-radius:14px;background:transparent;padding:.5rem;font-weight:700;color:var(--pink-deep)}
+.player.pink .givepink{background:var(--pink);border-style:solid;color:#000}
+
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--bg);
+  border-top:3px solid var(--ink);
+  padding:.6rem 1rem calc(.6rem + env(safe-area-inset-bottom,0px));
+  display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;
+}
+.bar .btn{padding:.55rem .9rem}
+.bar .btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Kopfzeile im Spiel */
+.gamehead{display:flex;align-items:center;gap:.8rem 1rem;flex-wrap:wrap;margin:0 0 .9rem}
+.gamehead .brand svg{width:48px;height:48px}
+.gamehead h1{font-size:clamp(1.6rem,3.5vw,2.4rem);margin:0}
+.gamehead .status{margin:0;padding:.45rem .9rem;flex:1 1 260px}
+.gamehead .status svg{width:32px;height:32px}
+.gamehead .status .hint{font-size:.85rem}
+.rulesbtn{margin-left:auto}
+/* Timer */
+.question{display:grid;grid-template-columns:1fr auto;gap:.4rem 1.4rem;align-items:center}
+.question > *{grid-column:1}
+.question .timer{grid-column:2;grid-row:1 / span 3;text-align:center;min-width:7.5rem}
+.question .tnum{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:clamp(3rem,8vw,5.5rem);line-height:1;font-variant-numeric:tabular-nums}
+.question .track{height:12px;border-radius:999px;background:rgba(127,127,127,.35);overflow:hidden;margin-top:.5rem}
+.question .tbar{height:100%;background:var(--grass);border-radius:999px;transition:width 1s linear}
+.question .tbar.low{background:var(--pink)}
+.question .timer.over .tnum{color:var(--pink)}
+.question .hiddenq{opacity:.75}
+.question .timeup{font-weight:700;color:var(--pink);margin:0 0 .6rem;font-size:1.2rem}
+.question button.big{font-size:1.25rem;padding:.75rem 1.4rem}
+.question.small{padding:1rem 1.1rem .9rem;border-radius:20px}
+.question.small .text{font-size:clamp(1.5rem,3.6vw,2.6rem);margin-bottom:.7rem}
+@media (max-width:560px){
+  .question{grid-template-columns:1fr}
+  .question .timer{grid-column:1;grid-row:auto;text-align:left}
+}
+@media (prefers-reduced-motion: reduce){ .question .tbar{transition:none} }
+/* Auswahl */
+.pick{border:0;background:transparent;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:8px}
+.player{cursor:pointer}
+.bar .btn.go{background:var(--grass);border-color:var(--grass);color:#fff}
+/* Kompakte Karten */
+.grid.compact{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.45rem}
+.player.compact{border-width:2px;border-radius:14px;padding:.35rem .45rem .4rem .55rem;gap:.25rem}
+.player.compact .pick{font-weight:700;font-size:1.05rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;width:100%}
+.player.compact .crow{display:flex;align-items:center;gap:.35rem}
+.player.compact .crow .pick{flex:1;min-width:0}
+.player.compact .num{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:1.6rem;line-height:1;min-width:1.4ch;text-align:right}
+.player.compact .mini{display:flex;flex-wrap:wrap;gap:0}
+.player.compact .mini svg{width:14px;height:14px}
+.player.compact .mini .ghost{opacity:.16}
+.player.compact .cact{display:grid;grid-template-columns:auto 1fr auto;gap:.3rem}
+.player.compact .cact button{border:2px solid var(--ink);border-radius:10px;background:var(--card);padding:.3rem .55rem;font-weight:700;line-height:1.1}
+.player.compact .cact .plus{background:var(--ink);color:var(--bg)}
+.player.compact .cact .pinkbtn{border-style:dashed;border-color:var(--pink-deep);padding:.15rem .3rem;display:flex;align-items:center}
+.player.compact .cact .pinkbtn svg{width:24px;height:24px}
+.player.compact.pink{box-shadow:0 0 0 3px var(--pink)}
+.player.compact.pink .pinkbtn{background:var(--pink);border-style:solid}
+.player.compact.leader:not(.pink){box-shadow:4px 4px 0 var(--ink)}
+.player.compact .blocked{font-size:.75rem}
+/* Regeln */
+.win.rules{text-align:left;max-width:720px;max-height:92vh;overflow:auto;padding:1.5rem 1.6rem}
+.win.rules svg{animation:none}
+.rules li{font-size:1.15rem}
+.rules h2{text-align:center;margin-top:0}
+.rules ol{padding-left:1.4rem;margin:.6rem 0 1rem}
+.rules li{margin:.45rem 0;line-height:1.4}
+.rules .note{background:var(--grass-light);border-radius:14px;padding:.7rem .9rem;margin:0 0 1.2rem;color:var(--ink)}
+/* Rangliste */
+main.wide{max-width:1500px}
+.layout.withrank{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:1rem;align-items:start}
+.rank{position:sticky;top:.6rem;max-height:calc(100vh - 11rem);overflow:auto;background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:.7rem .7rem .8rem}
+.rank h2{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-weight:400;font-size:1.4rem;margin:.1rem .2rem .5rem}
+.rank ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.rank li{position:relative;display:flex;align-items:center;gap:.45rem;padding:.2rem .45rem;border-radius:9px;overflow:hidden;font-size:.98rem;line-height:1.25}
+.rank li .fill{position:absolute;inset:0 auto 0 0;background:var(--grass-light);z-index:0}
+.rank li > *:not(.fill){position:relative;z-index:1}
+.rank .pl{min-width:1.8em;font-weight:700;color:var(--muted);text-align:right}
+.rank .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank .pt{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-size:1.15rem;min-width:1.4ch;text-align:right}
+.rank li svg{width:20px;height:20px;flex:none}
+.rank li.top{font-weight:700}
+.rank li.top .pl{color:var(--ink)}
+.rank li.first{font-size:1.1rem}
+.rank li.first .pt{font-size:1.35rem}
+.rank li.haspink{outline:2px solid var(--pink-deep);outline-offset:-2px}
+.rank .nm.multi{white-space:normal;overflow:visible}
+.rank li:has(.multi){align-items:flex-start;padding:.3rem .45rem}
+.rank .pinkname{background:var(--pink);color:#000;border-radius:5px;padding:0 .2em}
+.rank .gap{height:1px;background:var(--spot-bg);margin:4px .3rem}
+@media (max-width:900px){
+  .layout.withrank{grid-template-columns:1fr}
+  .rank{position:static;max-height:none}
+}
+/* Runde: schon bepunktet / Auswahl */
+.player.sel{background:#FFF3C4;border-color:var(--bell);outline:4px solid var(--bell);outline-offset:-1px}
+.player.sel .pick::before{content:"● ";color:var(--bell)}
+.player.done{background:var(--grass-light);border-color:var(--grass)}
+.player.done .plus{background:var(--grass)!important;border-color:var(--grass)!important;color:#fff!important;cursor:not-allowed;opacity:1}
+.player.done{cursor:default}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .player.sel{background:#3A3212} }
+:root[data-theme="dark"] .player.sel{background:#3A3212}
+/* Siegerbild */
+.overlay{
+  position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.55);padding:1rem;
+}
+.overlay.show{display:flex}
+.win{
+  background:var(--card);border:4px solid var(--ink);border-radius:28px;padding:2rem 1.5rem;
+  max-width:520px;width:100%;text-align:center;
+  animation:pop .45s cubic-bezier(.2,1.4,.4,1);
+}
+.win svg{width:140px;height:140px;animation:wobble 1.2s ease-in-out infinite alternate}
+.win h2{font-family:"Bagel Fat One","Trebuchet MS",sans-serif;font-weight:400;font-size:clamp(2rem,6vw,3rem);margin:.3rem 0;overflow-wrap:anywhere}
+.win p{margin:.2rem 0 1.4rem;color:var(--muted)}
+.win .row{justify-content:center;margin:0}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes wobble{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@media (prefers-reduced-motion: reduce){
+  .win,.win svg{animation:none}
+  .player{transition:none}
+}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="headclip"><rect x="15" y="14" width="34" height="38" rx="15"/></clipPath>
+    <symbol id="cow" viewBox="0 0 64 64">
+      <path d="M20 16 C15 12 13 7 15 4 C18 8 21 10 24 13 Z" fill="var(--horn)" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M44 16 C49 12 51 7 49 4 C46 8 43 10 40 13 Z" fill="var(--horn)" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="10" cy="24" rx="8" ry="4.5" transform="rotate(-18 10 24)" fill="var(--cow-body)" stroke="#000" stroke-width="2.5"/>
+      <ellipse cx="54" cy="24" rx="8" ry="4.5" transform="rotate(18 54 24)" fill="var(--cow-body)" stroke="#000" stroke-width="2.5"/>
+      <rect x="15" y="14" width="34" height="38" rx="15" fill="var(--cow-body)"/>
+      <g clip-path="url(#headclip)" fill="var(--cow-spot)">
+        <path d="M14 14 C22 12 27 18 24 25 C21 31 13 30 12 24 Z"/>
+        <path d="M38 12 C46 10 52 16 50 22 C46 24 42 22 40 19 C38 17 36 14 38 12 Z"/>
+      </g>
+      <rect x="15" y="14" width="34" height="38" rx="15" fill="none" stroke="#000" stroke-width="3"/>
+      <circle cx="25" cy="29" r="3" fill="#000"/>
+      <circle cx="39" cy="29" r="3" fill="#000"/>
+      <circle cx="26" cy="28" r="1" fill="#fff"/>
+      <circle cx="40" cy="28" r="1" fill="#fff"/>
+      <ellipse cx="32" cy="46" rx="15" ry="10" fill="var(--snout)" stroke="#000" stroke-width="3"/>
+      <ellipse cx="27" cy="45" rx="2.2" ry="3" fill="#000"/>
+      <ellipse cx="37" cy="45" rx="2.2" ry="3" fill="#000"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="spots" aria-hidden="true">
+  <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" fill="currentColor">
+    <path d="M60 80 C140 30 240 70 220 150 C200 230 90 240 50 180 C20 140 20 110 60 80 Z"/>
+    <path d="M820 60 C900 40 980 110 950 180 C920 240 830 220 800 170 C770 120 770 80 820 60 Z"/>
+    <path d="M430 380 C520 340 610 400 590 470 C560 540 460 530 420 480 C390 440 390 400 430 380 Z"/>
+    <path d="M90 700 C170 650 280 700 260 790 C240 870 120 880 80 820 C50 770 50 730 90 700 Z"/>
+    <path d="M760 720 C860 680 960 760 930 850 C900 930 780 920 740 860 C710 810 710 750 760 720 Z"/>
+    <path d="M330 900 C380 880 430 920 410 960 C390 990 330 985 315 955 C305 935 310 910 330 900 Z"/>
+  </svg>
+</div>
+
+<main id="app"></main>
+
+<div class="overlay" id="rules" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+  <div class="win rules" id="rulesBody"></div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+  <div class="win">
+    <svg aria-hidden="true"><use href="#cow"/></svg>
+    <h2 id="winTitle"></h2>
+    <p id="winText"></p>
+    <div class="row">
+      <button class="btn" id="winContinue">Weiterspielen</button>
+      <button class="btn primary" id="winNew">Neues Spiel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const KEY = "herdentiere-punkte-v1";
+  const PINK_STYLE = "--cow-body:#F6A5C0;--cow-spot:#C2185B;--snout:#FFD6E2";
+  const QUESTIONS = [
+    "Nenne ein Schulfach.",
+    "Was ist der beste Pausensnack?",
+    "Nenne eine Farbe für ein Klassen-T-Shirt.",
+    "Welches Tier könnte man im Klassenzimmer halten?",
+    "Was ist die schlimmste Hausaufgabe?",
+    "Wohin sollte die nächste Klassenfahrt gehen?",
+    "Nenne eine Zahl zwischen 1 und 10.",
+    "Was ist das beste Emoji?",
+    "Nenne einen Wochentag.",
+    "Was liegt in jeder Schultasche?",
+    "Nenne eine Pizza-Sorte.",
+    "Nenne einen Beruf, für den man Mathe braucht.",
+    "Was ist die beste Jahreszeit?",
+    "Welches Spiel passt zum Wandertag?",
+    "Was sagen Lehrkräfte ständig?",
+    "Welche Farbe sollte die Klassenzimmerwand haben?",
+    "Was ist das wichtigste Gerät im Haushalt?",
+    "Nenne eine Süßigkeit.",
+    "Nenne einen Ort in Halle.",
+    "Was muss man als Klassensprecher unbedingt können?",
+    "Nenne ein Haustier.",
+    "Nenne eine Obstsorte.",
+    "Was ist das beste Schulessen?",
+    "Nenne eine Sportart.",
+    "Nenne ein Getränk.",
+    "Welche App ist auf fast jedem Handy?",
+    "Nenne ein Tier auf dem Bauernhof.",
+    "Was kauft man im Kino?",
+    "Nenne ein Land, in dem man Urlaub macht.",
+    "Was macht man am liebsten in den Ferien?",
+    "Nenne eine Eissorte.",
+    "Nenne ein Musikinstrument.",
+    "Was fehlt in unserer Schule am meisten?",
+    "Nenne ein Wort, das mit „Schul“ anfängt.",
+    "Was ist das beste Frühstück?",
+    "Nenne einen Feiertag.",
+    "Wie viele Stunden Schlaf braucht man?",
+    "Nenne ein Gemüse.",
+    "Was nervt im Schulbus?",
+    "Was gehört auf ein Pausenbrot?",
+    "Nenne ein Tier, das im Wald lebt.",
+    "Nenne ein Tier im Zoo.",
+    "Nenne einen Vogel.",
+    "Nenne einen Fisch.",
+    "Nenne ein Insekt.",
+    "Welches Tier ist am süßesten?",
+    "Welches Tier ist am gefährlichsten?",
+    "Nenne ein Tier mit Streifen.",
+    "Nenne ein Tier, das fliegen kann.",
+    "Nenne ein Tier, das im Meer lebt.",
+    "Nenne ein Frühstücksgetränk.",
+    "Was isst man zu Weihnachten?",
+    "Nenne eine Brotsorte.",
+    "Nenne eine Nudelsorte.",
+    "Was gibt es auf einem Geburtstag immer?",
+    "Nenne etwas, das man grillen kann.",
+    "Nenne eine Chips-Sorte.",
+    "Was isst man im Kino außer Popcorn?",
+    "Nenne ein Gericht mit Kartoffeln.",
+    "Was bestellt man beim Döner?",
+    "Nenne einen Gegenstand auf dem Lehrertisch.",
+    "Was hängt im Klassenzimmer an der Wand?",
+    "Nenne etwas aus dem Federmäppchen.",
+    "Was vergisst man am häufigsten zu Hause?",
+    "Nenne ein Wort, das mit „Pause“ anfängt.",
+    "Welches Fach hättest du gern öfter?",
+    "Was macht man in der großen Pause?",
+    "Nenne eine Aufgabe im Klassendienst.",
+    "Was gehört in eine gute Klassenregel?",
+    "Was wünscht sich die Klasse für den Wandertag?",
+    "Nenne einen Grund, zu spät zu kommen.",
+    "Was ist das beste an Klassenfahrten?",
+    "Nenne etwas, das man in Mathe braucht.",
+    "Nenne eine geometrische Form.",
+    "Nenne eine gerade Zahl unter 20.",
+    "Nenne eine Farbe im Regenbogen.",
+    "Nenne eine Farbe, die niemand mag.",
+    "Welche Farbe hat ein Glücksbringer?",
+    "Nenne etwas, das rot ist.",
+    "Nenne etwas, das gelb ist.",
+    "Nenne etwas, das blau ist.",
+    "Nenne etwas, das rund ist.",
+    "Nenne etwas, das klebt.",
+    "Nenne etwas, das man teilt.",
+    "Nenne etwas, das piept.",
+    "Nenne eine Sportart mit Ball.",
+    "Nenne eine Wintersportart.",
+    "Nenne einen Fußballverein.",
+    "Was braucht man zum Schwimmen?",
+    "Welche Sportart ist am anstrengendsten?",
+    "Nenne ein Spiel für draußen.",
+    "Nenne ein Brettspiel.",
+    "Nenne ein Kartenspiel.",
+    "Nenne ein Videospiel.",
+    "Was macht man bei Regen drinnen?",
+    "Nenne ein Fahrzeug.",
+    "Womit kommt man zur Schule?",
+    "Nenne eine Stadt in Deutschland.",
+    "Nenne ein Bundesland.",
+    "Nenne einen Fluss.",
+    "Nenne ein Land in Europa.",
+    "Nenne eine Hauptstadt.",
+    "Wo macht man Urlaub am Meer?",
+    "Nenne ein Gebäude in jeder Stadt.",
+    "Was sieht man auf dem Marktplatz?",
+    "Nenne ein Wetter.",
+    "Was braucht man bei Regen?",
+    "Nenne etwas, das man im Sommer macht.",
+    "Nenne etwas, das man im Winter macht.",
+    "Was gehört zu Halloween?",
+    "Nenne einen Monat.",
+    "Welcher Monat ist der beste?",
+    "Nenne ein Sternzeichen.",
+    "Nenne einen Planeten.",
+    "Was sieht man nachts am Himmel?",
+    "Nenne ein Zimmer in einer Wohnung.",
+    "Nenne ein Möbelstück.",
+    "Was steht in jeder Küche?",
+    "Nenne ein Werkzeug.",
+    "Was findet man im Badezimmer?",
+    "Nenne ein Kleidungsstück.",
+    "Was trägt man im Winter?",
+    "Nenne eine Schuhmarke.",
+    "Nenne eine Handymarke.",
+    "Was macht man als Erstes nach der Schule?",
+    "Nenne eine Superkraft.",
+    "Welche Superkraft hätte jeder gern?",
+    "Nenne ein Märchen.",
+    "Nenne eine Figur aus einem Märchen.",
+    "Nenne ein Fabelwesen.",
+    "Nenne einen Beruf, den viele Kinder werden wollen.",
+    "Nenne einen Beruf im Krankenhaus.",
+    "Nenne einen Beruf mit Uniform.",
+    "Was macht man mit 18 als Erstes?",
+    "Nenne einen Traumberuf.",
+    "Nenne etwas, das man im Supermarkt kauft.",
+    "Nenne etwas, das man verschenken kann.",
+    "Was kostet ungefähr einen Euro?",
+    "Nenne etwas, das man sammeln kann.",
+    "Nenne ein Hobby.",
+    "Nenne ein Geräusch, das nervt.",
+    "Nenne ein Wort, das gute Laune macht.",
+    "Nenne etwas, das man nicht vergessen darf.",
+    "Was macht eine gute Freundschaft aus?",
+    "Was braucht eine gute Klassengemeinschaft?",
+    "Nenne ein Geräusch auf dem Bauernhof.",
+    "Welches Tier macht „Muh“?",
+    "Nenne etwas, das aus Milch gemacht wird.",
+    "Nenne eine Käsesorte.",
+    "Was frisst eine Kuh?",
+    "Was ist der schlimmste Wochentag?",
+    "Was ist der beste Wochentag?",
+    "Nenne ein Tier mit langem Hals.",
+    "Nenne ein Tier, das Winterschlaf hält.",
+    "Nenne ein Tier mit Stacheln.",
+    "Nenne ein Tier, das hüpft.",
+    "Nenne ein Tier, das nachts aktiv ist.",
+    "Nenne ein Tier aus Afrika.",
+    "Nenne ein Tier, das man reiten kann.",
+    "Welches Tier wäre das beste Klassenmaskottchen?",
+    "Nenne ein Tier, vor dem viele Angst haben.",
+    "Nenne eine Hunderasse.",
+    "Was frisst eine Katze am liebsten?",
+    "Nenne ein Tier mit Flossen.",
+    "Nenne ein Tier, das grün ist.",
+    "Nenne ein Tier, das schnell ist.",
+    "Nenne ein Tier, das langsam ist.",
+    "Nenne etwas, das man zum Frühstück isst.",
+    "Nenne einen Brotaufstrich.",
+    "Nenne eine Suppe.",
+    "Nenne ein Gericht aus Italien.",
+    "Nenne ein Fast-Food-Restaurant.",
+    "Was isst man auf dem Weihnachtsmarkt?",
+    "Nenne einen Kuchen.",
+    "Nenne eine Frucht, die gelb ist.",
+    "Nenne eine Frucht, die rot ist.",
+    "Was trinkt man, wenn man krank ist?",
+    "Nenne ein Gewürz.",
+    "Was gehört in einen Obstsalat?",
+    "Nenne eine Beilage zum Mittagessen.",
+    "Was ist das beste Essen in der Schulmensa?",
+    "Was gehört ins Müsli?",
+    "Nenne ein Getränk mit Kohlensäure.",
+    "Was isst man mit Stäbchen?",
+    "Nenne einen Grund, warum man im Unterricht lacht.",
+    "Nenne etwas, das in jeder Turnhalle steht.",
+    "Was macht man am letzten Schultag vor den Ferien?",
+    "Nenne ein Wort, das mit „Klassen“ anfängt.",
+    "Nenne etwas, das man an der Tafel findet.",
+    "Was braucht man für den Kunstunterricht?",
+    "Nenne ein Experiment aus dem Unterricht.",
+    "Nenne ein Buch, das man in der Schule liest.",
+    "Was ist die beste Note?",
+    "Nenne eine Aufgabe von Klassensprechern.",
+    "Was sollte es in jeder Schule geben?",
+    "Nenne ein Schulfest.",
+    "Was nimmt man mit auf Klassenfahrt?",
+    "Was passiert auf jeder Klassenfahrt?",
+    "Nenne eine Pausenaktivität auf dem Schulhof.",
+    "Was macht man in der Vertretungsstunde?",
+    "Nenne ein Fach mit vielen Hausaufgaben.",
+    "Nenne eine Rechenart.",
+    "Nenne einen Körper aus der Geometrie.",
+    "Nenne eine Zahl, die Glück bringt.",
+    "Nenne eine Zahl, die Pech bringt.",
+    "Nenne eine Zahl zwischen 1 und 100.",
+    "Wie viele Tage hat ein Monat?",
+    "Nenne eine Uhrzeit, zu der man aufsteht.",
+    "Wann beginnt die erste Stunde?",
+    "Nenne eine Farbe für ein Auto.",
+    "Nenne etwas, das grün ist.",
+    "Nenne etwas, das weiß ist.",
+    "Nenne etwas, das schwarz ist.",
+    "Nenne etwas, das orange ist.",
+    "Nenne etwas, das weich ist.",
+    "Nenne etwas, das hart ist.",
+    "Nenne etwas, das kalt ist.",
+    "Nenne etwas, das heiß ist.",
+    "Nenne etwas, das stinkt.",
+    "Nenne etwas, das gut riecht.",
+    "Nenne etwas, das laut ist.",
+    "Nenne etwas, das leise ist.",
+    "Nenne etwas, das klein ist.",
+    "Nenne etwas, das riesig ist.",
+    "Nenne etwas, das man mit Wasser macht.",
+    "Nenne etwas mit Rädern.",
+    "Nenne etwas, das man aufladen muss.",
+    "Nenne etwas mit Knöpfen.",
+    "Nenne etwas, das man öffnen kann.",
+    "Nenne etwas, das man jeden Tag benutzt.",
+    "Nenne eine Sportart im Wasser.",
+    "Nenne eine Sportart mit Schläger.",
+    "Nenne eine Disziplin bei den Bundesjugendspielen.",
+    "Was macht man im Sportunterricht am liebsten?",
+    "Nenne ein Spiel für den Kindergeburtstag.",
+    "Nenne ein Spiel auf dem Handy.",
+    "Nenne ein Spielzeug.",
+    "Nenne etwas, das man auf dem Spielplatz findet.",
+    "Nenne ein Fahrgeschäft auf dem Rummel.",
+    "Was gewinnt man an der Losbude?",
+    "Nenne ein Verkehrsmittel in der Stadt.",
+    "Nenne ein Verkehrsschild.",
+    "Was sieht man am Bahnhof?",
+    "Nenne eine Automarke.",
+    "Nenne ein Land außerhalb Europas.",
+    "Nenne ein Wahrzeichen.",
+    "Nenne einen Berg.",
+    "Nenne ein Meer.",
+    "Nenne eine Insel.",
+    "Nenne eine große Stadt auf der Welt.",
+    "Nenne etwas, das man im Urlaub mitbringt.",
+    "Was packt man zuerst in den Koffer?",
+    "Nenne etwas, das man am Strand macht.",
+    "Nenne etwas, das man im Schwimmbad macht.",
+    "Nenne etwas, das zum Herbst gehört.",
+    "Nenne etwas, das zum Frühling gehört.",
+    "Was gehört zu Ostern?",
+    "Was gehört zu Weihnachten?",
+    "Was gehört zu Silvester?",
+    "Was gehört zu einem Geburtstag?",
+    "Was wünscht man sich zum Geburtstag?",
+    "Nenne eine Blume.",
+    "Nenne einen Baum.",
+    "Was wächst im Garten?",
+    "Nenne ein Naturereignis.",
+    "Nenne etwas, das man im Wald findet.",
+    "Nenne ein Werkzeug im Garten.",
+    "Nenne ein Elektrogerät in der Küche.",
+    "Nenne etwas, das im Kühlschrank steht.",
+    "Nenne etwas, das im Kinderzimmer liegt.",
+    "Nenne etwas, das man unter dem Bett findet.",
+    "Nenne eine Hausarbeit.",
+    "Welche Hausarbeit mag niemand?",
+    "Nenne ein Kleidungsstück für den Sommer.",
+    "Nenne ein Accessoire.",
+    "Nenne eine Frisur.",
+    "Was trägt man bei einer Hochzeit?",
+    "Nenne etwas, das man an Karneval trägt.",
+    "Nenne ein Kostüm.",
+    "Nenne einen Superhelden.",
+    "Nenne einen Bösewicht aus einem Film.",
+    "Nenne eine Zeichentrickfigur.",
+    "Nenne einen Film, den alle kennen.",
+    "Nenne ein Musikgenre.",
+    "Nenne ein Lied, das jeder mitsingen kann.",
+    "Nenne eine Social-Media-App.",
+    "Was macht man als Erstes am Handy?",
+    "Nenne etwas, das man googelt.",
+    "Nenne einen Beruf in der Schule.",
+    "Nenne einen Beruf mit Tieren.",
+    "Nenne einen Beruf, bei dem man draußen arbeitet.",
+    "Nenne einen Beruf, bei dem man viel verdient.",
+    "Nenne einen Beruf, der früh aufstehen muss.",
+    "Nenne etwas, das eine gute Lehrkraft ausmacht.",
+    "Nenne eine Eigenschaft einer guten Freundin oder eines guten Freundes.",
+    "Was macht man, wenn einem langweilig ist?",
+    "Was macht man am Wochenende?",
+    "Was macht man an einem Regentag?",
+    "Was macht gute Laune?",
+    "Nenne etwas, das man nicht leihen möchte.",
+    "Nenne etwas, das man sparen kann.",
+    "Wofür würdest du 100 Euro ausgeben?",
+    "Was nimmt man auf eine einsame Insel mit?",
+    "Nenne eine Erfindung, die das Leben leichter macht.",
+    "Was kauft man als Erstes nach einem Lottogewinn?",
+    "Nenne einen Grund, früh ins Bett zu gehen.",
+    "Nenne ein Wort, das man oft falsch schreibt.",
+    "Nenne ein englisches Wort, das jeder kennt.",
+    "Nenne eine Sprache.",
+    "Nenne ein Wort, das sich reimt auf „Kuh“.",
+    "Nenne ein Wort mit „Milch“.",
+    "Wie viele Beine hat eine Kuh?",
+    "Welche Farbe hat eine Kuh?",
+    "Wie heißt ein Kuhbaby?",
+    "Wo lebt eine Kuh?"
+  ];
+  let state = { phase:"setup", players:[], pink:null, pinks:[], pinkCount:"auto", scored:[], target:8, custom:"", onlyCustom:false, deck:[], qpos:0, lists:[], activeList:null, timer:30, sound:true, view:"auto", showRank:true };
+  let history = [];
+  let dismissedWinners = "";
+
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && Array.isArray(s.players)) state = Object.assign(state, s); }
+  }catch(e){}
+
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+  function el(tag, attrs, ...kids){
+    const n = document.createElement(tag);
+    if(attrs) for(const k in attrs){
+      if(k === "class") n.className = attrs[k];
+      else if(k === "text") n.textContent = attrs[k];
+      else if(k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    kids.forEach(c => c && n.appendChild(c));
+    return n;
+  }
+  function cow(opts){
+    const ns = "http://www.w3.org/2000/svg";
+    const s = document.createElementNS(ns,"svg");
+    s.setAttribute("aria-hidden","true");
+    if(opts && opts.pink) s.setAttribute("style", PINK_STYLE);
+    if(opts && opts.cls) s.setAttribute("class", opts.cls);
+    const u = document.createElementNS(ns,"use");
+    u.setAttribute("href","#cow");
+    s.appendChild(u);
+    return s;
+  }
+  function pool(){
+    const own = (state.custom||"").split("\n").map(x=>x.trim()).filter(Boolean);
+    if(state.onlyCustom && own.length) return own;
+    return QUESTIONS.concat(own);
+  }
+  function shuffleDeck(){
+    const arr = pool().slice();
+    for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    state.deck = arr; state.qpos = 0;
+  }
+  function snapshot(){
+    history.push(JSON.stringify({players:state.players, pinks:pinkList(), scored:state.scored||[]}));
+    if(history.length > 60) history.shift();
+  }
+  function pinkList(){
+    if(!Array.isArray(state.pinks)) state.pinks = [];
+    if(state.pink){ if(!state.pinks.includes(state.pink)) state.pinks.push(state.pink); state.pink = null; }
+    return state.pinks;
+  }
+  function maxPinks(){
+    return 1;
+  }
+  function hasPink(id){ return pinkList().includes(id); }
+  function togglePink(id){
+    const l = pinkList();
+    if(l.includes(id)){ state.pinks = l.filter(x=>x!==id); return; }
+    l.push(id);
+    while(l.length > maxPinks()) l.shift();
+  }
+  function isScored(id){ return Array.isArray(state.scored) && state.scored.includes(id); }
+  function givePoint(p){ if(isScored(p.id)) return; p.points++; state.scored = (state.scored||[]).concat(p.id); }
+  function takePoint(p){ if(p.points<=0) return; p.points--; state.scored = (state.scored||[]).filter(x=>x!==p.id); }
+
+  /* ---------- Setup ---------- */
+  function splitNames(txt){ return txt.split(/[,;\n\t]/).map(x=>x.trim()).filter(Boolean); }
+  function hasPlayer(name){ return state.players.some(p=>p.name.toLowerCase()===name.toLowerCase()); }
+  function addPlayer(name){ if(!hasPlayer(name)) state.players.push({id:uid(), name:name, points:0}); }
+  function removePlayer(name){
+    const p = state.players.find(x=>x.name.toLowerCase()===name.toLowerCase());
+    if(!p) return;
+    state.players = state.players.filter(x=>x!==p);
+    state.pinks = pinkList().filter(x=>x!==p.id);
+  }
+  let refocus = null;
+
+  let dl = null;
+  try{ if(window.claude && window.claude.use) window.claude.use("downloads").then(x=>{ dl = x; }).catch(()=>{}); }catch(e){}
+
+  async function exportData(){
+    const data = JSON.stringify({app:"herdentiere", version:1, lists:state.lists||[], custom:state.custom||""}, null, 2);
+    const d = new Date(); const stamp = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const filename = "herdentiere-listen-"+stamp+".json";
+    if(dl){
+      try{ await dl.save({filename, data}); }
+      catch(e){ if(e && e.code!=="declined") alert("Speichern hat nicht geklappt ("+(e.code||"Fehler")+")."); }
+      return;
+    }
+    try{
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([data],{type:"application/json"}));
+      a.download = filename; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }catch(e){ alert("Speichern ist hier nicht möglich."); }
+  }
+
+  function importData(file){
+    const r = new FileReader();
+    r.onload = () => {
+      let obj;
+      try{ obj = JSON.parse(r.result); }catch(e){ alert("Die Datei ist keine gültige Herdentiere-Datei."); return; }
+      if(!obj || obj.app!=="herdentiere" || !Array.isArray(obj.lists)){ alert("Die Datei ist keine gültige Herdentiere-Datei."); return; }
+      if(!Array.isArray(state.lists)) state.lists = [];
+      let neu = 0, ergaenzt = 0;
+      obj.lists.forEach(l=>{
+        if(!l || typeof l.name!=="string" || !Array.isArray(l.people)) return;
+        const people = l.people.filter(x=>typeof x==="string" && x.trim()).map(x=>x.trim());
+        const ex = state.lists.find(x=>x.name.toLowerCase()===l.name.toLowerCase());
+        if(ex){ people.forEach(n=>{ if(!ex.people.some(y=>y.toLowerCase()===n.toLowerCase())) ex.people.push(n); }); ergaenzt++; }
+        else { state.lists.push({id:uid(), name:l.name, people}); neu++; }
+      });
+      let fragen = 0;
+      if(typeof obj.custom==="string" && obj.custom.trim()){
+        const have = new Set((state.custom||"").split("\n").map(x=>x.trim().toLowerCase()).filter(Boolean));
+        const add = obj.custom.split("\n").map(x=>x.trim()).filter(x=>x && !have.has(x.toLowerCase()));
+        if(add.length){ state.custom = ((state.custom||"").trim() ? state.custom.trim()+"\n" : "") + add.join("\n"); fragen = add.length; }
+      }
+      save(); render();
+      alert("Geladen: "+neu+" neue Liste(n), "+ergaenzt+" ergänzt, "+fragen+" eigene Frage(n).");
+    };
+    r.readAsText(file);
+  }
+
+  function renderSetup(app){
+    if(!Array.isArray(state.lists)) state.lists = [];
+    const active = state.lists.find(l=>l.id===state.activeList) || null;
+
+    /* Listen */
+    const listSel = el("select",{id:"listsel","aria-label":"Gespeicherte Liste", onchange(e){ state.activeList = e.target.value || null; save(); render(); }});
+    listSel.appendChild(el("option",{value:"", text: state.lists.length ? "Liste wählen" : "Noch keine Liste"}));
+    state.lists.forEach(l=>{ const o=el("option",{value:l.id, text:l.name+" ("+l.people.length+")"}); if(active && l.id===active.id) o.selected=true; listSel.appendChild(o); });
+
+    const listBox = el("div",null);
+    if(active){
+      const grid = el("div",{class:"checklist"});
+      active.people.slice().sort((a,b)=>a.localeCompare(b,"de")).forEach((name,i)=>{
+        const id = "cb-"+i;
+        const cb = el("input",{type:"checkbox", id:id});
+        cb.checked = hasPlayer(name);
+        cb.addEventListener("change",()=>{ cb.checked ? addPlayer(name) : removePlayer(name); refocus=id; save(); render(); });
+        grid.appendChild(el("div",{class:"ci"+(cb.checked?" on":"")},
+          cb, el("label",{for:id, text:name}),
+          el("button",{class:"x", "aria-label":name+" aus der Liste löschen", title:"Aus der Liste löschen", text:"×", onclick(){
+            if(!confirm(name+" aus der Liste „"+active.name+"“ löschen?")) return;
+            active.people = active.people.filter(n=>n!==name); save(); render();
+          }})
+        ));
+      });
+      const addToList = el("textarea",{id:"addlist", rows:"2", placeholder:"Weitere Namen für diese Liste, eine pro Zeile oder mit Komma"});
+      listBox.append(
+        el("div",{class:"row tight"},
+          el("button",{class:"btn small", text:"Alle ankreuzen", onclick(){ active.people.forEach(addPlayer); save(); render(); }}),
+          el("button",{class:"btn small", text:"Keine", onclick(){ active.people.forEach(removePlayer); save(); render(); }}),
+          el("button",{class:"btn small danger", text:"Liste löschen", onclick(){
+            if(!confirm("Liste „"+active.name+"“ löschen?")) return;
+            state.lists = state.lists.filter(l=>l!==active); state.activeList=null; save(); render();
+          }})
+        ),
+        active.people.length ? grid : el("p",{class:"empty", text:"Die Liste ist leer."}),
+        addToList,
+        el("button",{class:"btn small", text:"Zur Liste hinzufügen", onclick(){
+          const names = splitNames(addToList.value);
+          names.forEach(n=>{ if(!active.people.some(x=>x.toLowerCase()===n.toLowerCase())) active.people.push(n); addPlayer(n); });
+          save(); render();
+        }})
+      );
+    } else if(!state.lists.length){
+      listBox.appendChild(el("p",{class:"hint", text:"Trag unten Namen ein und speichere sie als Liste. Beim nächsten Mal kreuzt du nur noch an, wer dabei ist."}));
+    }
+
+    /* Heute dabei */
+    const input = el("textarea",{id:"names", rows:"3", placeholder:"Namen eintragen, eine pro Zeile oder mit Komma getrennt", "aria-label":"Namen"});
+    function addNames(){
+      splitNames(input.value).forEach(addPlayer);
+      refocus="names"; save(); render();
+    }
+    input.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); addNames(); } });
+
+    const chips = el("ul",{class:"chips"});
+    if(!state.players.length) chips.appendChild(el("li",{class:"empty", style:"border:0;background:none;padding-left:0", text:"Noch niemand in der Herde."}));
+    state.players.forEach(p => {
+      chips.appendChild(el("li",null,
+        document.createTextNode(p.name),
+        el("button",{"aria-label":p.name+" entfernen", text:"×", onclick(){ removePlayer(p.name); save(); render(); }})
+      ));
+    });
+
+    const saveAsList = el("button",{class:"btn small", text:"Als neue Liste speichern", onclick(){
+      if(!state.players.length){ alert("Trag zuerst Namen ein."); return; }
+      const name = (prompt("Name der Liste, z. B. Klassensprecher oder Klasse 7b") || "").trim();
+      if(!name) return;
+      const l = {id:uid(), name:name, people:state.players.map(p=>p.name)};
+      state.lists.push(l); state.activeList = l.id; save(); render();
+    }});
+
+    const sel = el("select",{"aria-label":"Punkte zum Sieg", onchange(e){ state.target = +e.target.value; save(); }});
+    [3,4,5,6,7,8,9,10,12].forEach(v => {
+      const o = el("option",{value:v, text:v+" Kühe"}); if(v===state.target) o.selected = true; sel.appendChild(o);
+    });
+
+    const start = el("button",{class:"btn grass", text:"Spiel starten", onclick(){
+      if(state.players.length < 2){ alert("Für das Spiel braucht es mindestens zwei Mitspielende."); return; }
+      state.phase = "game"; history = []; dismissedWinners = ""; state.scored = []; shuffleDeck(); save(); render();
+    }});
+
+    app.append(
+      el("div",{class:"gamehead"}, el("div",{class:"brand"}, cow(), el("h1",{text:"Herdentiere"})), el("button",{class:"btn small rulesbtn", text:"Regeln", onclick:openRules})),
+      el("section",{class:"setup"},
+        el("h2",{class:"sh", text:"Gespeicherte Listen"}),
+        listSel, listBox,
+        (function(){
+          const f = el("input",{type:"file", accept:".json,application/json", id:"importfile", class:"sr"});
+          f.addEventListener("change",()=>{ if(f.files && f.files[0]) importData(f.files[0]); f.value=""; });
+          return el("div",{class:"row tight"},
+            (function(){ const b = el("button",{class:"btn small", text:"Listen sichern", onclick:exportData}); b.disabled = !((state.lists||[]).length || (state.custom||"").trim()); return b; })(),
+            el("button",{class:"btn small", text:"Listen laden", onclick(){ f.click(); }}),
+            f
+          );
+        })(),
+        el("p",{class:"hint", text:"„Listen sichern“ speichert alle Listen und deine eigenen Fragen als Datei. Mit „Listen laden“ holst du sie auf ein anderes Gerät."}),
+        el("h2",{class:"sh", text:"Heute dabei ("+state.players.length+")"}),
+        chips,
+        el("div",{class:"add"}, input),
+        el("div",{class:"row tight"},
+          el("button",{class:"btn primary", text:"Hinzufügen", onclick:addNames}),
+          saveAsList,
+          state.players.length ? el("button",{class:"btn small", text:"Alle entfernen", onclick(){ state.players=[]; state.pinks=[]; state.scored=[]; save(); render(); }}) : null
+        ),
+        el("p",{class:"hint", text:"Tipp: Du kannst eine Namensspalte direkt aus Excel oder einer Liste einfügen. Enter fügt hinzu, Umschalt + Enter macht eine neue Zeile."}),
+        el("h2",{class:"sh", text:"Einstellungen"}),
+        el("div",{class:"row"}, el("label",{text:"Sieg bei"}), sel),
+        (function(){
+          const t = el("select",{"aria-label":"Zeit pro Frage", onchange(e){ state.timer = +e.target.value; save(); }});
+          [[0,"ohne Timer"],[15,"15 Sekunden"],[20,"20 Sekunden"],[30,"30 Sekunden"],[45,"45 Sekunden"],[60,"1 Minute"],[90,"90 Sekunden"],[120,"2 Minuten"]].forEach(([v,l])=>{
+            const o = el("option",{value:v, text:l}); if(v===state.timer) o.selected = true; t.appendChild(o);
+          });
+          return el("div",{class:"row"}, el("label",{text:"Zeit pro Frage"}), t);
+        })(),
+        (function(){ const c = el("input",{type:"checkbox", id:"snd"}); c.checked = state.sound!==false; c.addEventListener("change",e=>{state.sound=e.target.checked; save();}); return el("div",{class:"check"}, c, el("label",{for:"snd", text:"Muh-Ton, wenn die Zeit um ist"})); })(),
+        el("label",{for:"own", style:"font-weight:700", text:"Eigene Fragen (eine pro Zeile, optional)"}),
+        (function(){ const t = el("textarea",{id:"own", placeholder:"Nenne etwas, das in unserem Klassenraum fehlt."}); t.value = state.custom||""; t.addEventListener("input",e=>{state.custom=e.target.value; save();}); return t; })(),
+        (function(){ const c = el("input",{type:"checkbox", id:"only"}); c.checked = !!state.onlyCustom; c.addEventListener("change",e=>{state.onlyCustom=e.target.checked; save();}); return el("div",{class:"check"}, c, el("label",{for:"only", text:"Nur eigene Fragen verwenden ("+QUESTIONS.length+" Fragen sind schon hinterlegt)"})); })(),
+        start
+      )
+    );
+    if(refocus){ const f=document.getElementById(refocus); if(f) f.focus(); refocus=null; }
+  }
+
+  /* ---------- Spiel ---------- */
+  let qstate = "hidden", timeLeft = 0, timeTotal = 0, timerId = null;
+  let selected = new Set();
+  let audioCtx = null;
+
+  function unlockAudio(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+    }catch(e){}
+  }
+  function moo(){
+    if(state.sound === false || !audioCtx) return;
+    try{
+      const ctx = audioCtx, t = ctx.currentTime + .02;
+      const o = ctx.createOscillator(), o2 = ctx.createOscillator();
+      const f = ctx.createBiquadFilter(), g = ctx.createGain(), g2 = ctx.createGain();
+      o.type = "sawtooth"; o2.type = "square";
+      o.frequency.setValueAtTime(150,t); o.frequency.linearRampToValueAtTime(178,t+.3); o.frequency.exponentialRampToValueAtTime(92,t+1.5);
+      o2.frequency.setValueAtTime(75,t); o2.frequency.linearRampToValueAtTime(89,t+.3); o2.frequency.exponentialRampToValueAtTime(46,t+1.5);
+      f.type = "lowpass"; f.Q.value = 7;
+      f.frequency.setValueAtTime(350,t); f.frequency.linearRampToValueAtTime(1150,t+.4); f.frequency.linearRampToValueAtTime(450,t+1.5);
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.4,t+.15); g.gain.setValueAtTime(.4,t+1.05); g.gain.exponentialRampToValueAtTime(.0001,t+1.6);
+      g2.gain.value = .45;
+      o.connect(f); o2.connect(g2); g2.connect(f); f.connect(g); g.connect(ctx.destination);
+      o.start(t); o2.start(t); o.stop(t+1.7); o2.stop(t+1.7);
+    }catch(e){}
+  }
+  function fmt(sec){ return sec >= 60 ? Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0") : String(sec); }
+  function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+  function runTimer(){
+    stopTimer();
+    timerId = setInterval(()=>{
+      timeLeft--;
+      if(timeLeft <= 0){ timeLeft = 0; stopTimer(); qstate = "over"; moo(); render(); return; }
+      paintTimer();
+    }, 1000);
+  }
+  function paintTimer(){
+    const n = document.getElementById("tnum"), b = document.getElementById("tbar");
+    if(n) n.textContent = fmt(timeLeft);
+    if(b){ b.style.width = (timeTotal ? 100*timeLeft/timeTotal : 0)+"%"; b.classList.toggle("low", timeLeft <= 5); }
+  }
+  function reveal(){
+    unlockAudio();
+    if(state.timer > 0){ timeLeft = timeTotal = state.timer; qstate = "running"; runTimer(); }
+    else qstate = "open";
+    render();
+  }
+  function endTime(){ stopTimer(); timeLeft = 0; qstate = "over"; render(); }
+  function nextQuestion(){
+    stopTimer(); qstate = "hidden"; selected.clear(); state.scored = [];
+    state.qpos++; if(state.qpos >= state.deck.length) shuffleDeck();
+    save(); render();
+  }
+  function prevQuestion(){
+    if(state.qpos <= 0) return;
+    stopTimer(); qstate = "hidden"; state.qpos--; save(); render();
+  }
+  function primaryAction(){
+    if(qstate === "hidden") reveal();
+    else if(qstate === "running" || qstate === "paused") endTime();
+    else nextQuestion();
+  }
+  function isCompact(){
+    return state.view === "kompakt" || (state.view !== "gross" && state.players.length > 10);
+  }
+
+  function renderQuestion(compact){
+    if(!state.deck || !state.deck.length) shuffleDeck();
+    const shown = qstate !== "hidden";
+    const sec = el("section",{class:"question"+(compact?" small":""), "aria-label":"Aktuelle Frage"});
+    sec.appendChild(el("p",{class:"count", text:"Frage "+(state.qpos+1)+" von "+state.deck.length}));
+    if(!shown){
+      sec.appendChild(el("p",{class:"text hiddenq", text:"Die nächste Frage liegt bereit."}));
+    } else {
+      sec.appendChild(el("p",{class:"text", "aria-live":"polite", text:state.deck[state.qpos]}));
+      if(qstate === "over") sec.appendChild(el("p",{class:"timeup", role:"status", text: state.timer>0 ? "Zeit um! Alle zeigen jetzt ihre Antwort." : "Alle zeigen jetzt ihre Antwort."}));
+    }
+    if(shown && state.timer > 0){
+      const bar = el("div",{class:"tbar"+(timeLeft<=5?" low":""), id:"tbar"});
+      bar.style.width = (timeTotal ? 100*timeLeft/timeTotal : 0)+"%";
+      sec.appendChild(el("div",{class:"timer"+(qstate==="over"?" over":""), "aria-label":"Restzeit"},
+        el("div",{class:"tnum", id:"tnum", text: qstate==="over" ? "0" : fmt(timeLeft)}),
+        el("div",{class:"track"}, bar)
+      ));
+    }
+    const btns = el("div",{class:"qbtns"});
+    if(qstate === "hidden"){
+      btns.append(
+        el("button",{class:"next big", text:"Frage aufdecken", onclick:reveal}),
+      );
+      if(state.qpos > 0) btns.append(el("button",{text:"Vorige Frage", onclick:prevQuestion}));
+    } else if(qstate === "running" || qstate === "paused"){
+      btns.append(
+        el("button",{text: qstate==="running" ? "Pause" : "Weiter", onclick(){
+          if(qstate === "running"){ stopTimer(); qstate = "paused"; } else { qstate = "running"; runTimer(); }
+          render();
+        }}),
+        el("button",{text:"+10 Sekunden", onclick(){ timeLeft += 10; timeTotal = Math.max(timeTotal, timeLeft); paintTimer(); }}),
+        el("button",{class:"next", text:"Zeit beenden", onclick:endTime})
+      );
+    } else {
+      btns.append(
+        el("button",{class:"next big", text:"Nächste Frage", onclick:nextQuestion})
+      );
+    }
+    sec.appendChild(btns);
+    return sec;
+  }
+
+  function renderGame(app){
+    const holders = state.players.filter(p=>hasPink(p.id));
+    const nP = maxPinks();
+    const nScored = (state.scored||[]).length;
+    let pinkText;
+    if(!holders.length) pinkText = nP > 1 ? "Die "+nP+" rosa Kühe sind frei" : "Die rosa Kuh ist frei";
+    else {
+      const names = holders.map(h=>h.name);
+      pinkText = (names.length > 1 ? names.slice(0,-1).join(", ")+" und "+names[names.length-1]+" haben" : names[0]+" hat") + " eine rosa Kuh";
+      if(nP > holders.length) pinkText += " (noch "+(nP-holders.length)+" frei)";
+    }
+    const max = Math.max(0, ...state.players.map(p=>p.points));
+    const compact = isCompact();
+
+    const status = el("div",{class:"status"},
+      cow({pink:true}),
+      el("div",null,
+        el("strong",{text: pinkText}),
+        el("div",{class:"hint", style:"margin:0", text: nScored
+          ? "Diese Frage: "+nScored+(nScored===1?" Kuh":" Kühe")+" vergeben. Wer schon eine hat, ist bis zur nächsten Frage gesperrt."
+          : "Tipp: Namen antippen, um mehrere auszuwählen und allen gleichzeitig eine Kuh zu geben."})
+      )
+    );
+
+    function toggleSel(p){ if(isScored(p.id)) return; selected.has(p.id) ? selected.delete(p.id) : selected.add(p.id); render(); }
+
+    const grid = el("div",{class:"grid"+(compact?" compact":"")});
+    const list = compact ? state.players.slice().sort((a,b)=>a.name.localeCompare(b.name,"de")) : state.players;
+    list.forEach(p => {
+      const isPink = hasPink(p.id);
+      const done = isScored(p.id);
+      const isSel = selected.has(p.id) && !done;
+      const cls = "player" + (compact?" compact":"") + (isPink?" pink":"") + (isSel?" sel":"") + (done?" done":"") + (p.points>0 && p.points===max?" leader":"");
+      const pick = el("button",{class:"pick", "aria-pressed": isSel ? "true" : "false", title:"Antippen zum Auswählen", text:p.name, onclick(){ toggleSel(p); }});
+      const minus = el("button",{class:"minus", "aria-label":"Einen Punkt abziehen bei "+p.name, title: done ? "Kuh dieser Frage zurücknehmen" : "Einen Punkt abziehen", text:"−", onclick(){
+        if(p.points<=0) return; snapshot(); takePoint(p); update();
+      }});
+      const plus = el("button",{class:"plus", "aria-label": done ? p.name+" hat für diese Frage schon eine Kuh" : "Einen Punkt für "+p.name, text: done ? "✓" : (compact ? "+1" : "+1 Kuh"), onclick(){
+        if(done) return; snapshot(); givePoint(p); update();
+      }});
+      if(done){ plus.disabled = true; plus.title = "Schon eine Kuh für diese Frage. Mit − zurücknehmen."; }
+      let card;
+      if(compact){
+        const pinkBtn = el("button",{class:"pinkbtn", title: isPink ? "Rosa Kuh abnehmen" : "Rosa Kuh geben", "aria-label": (isPink ? "Rosa Kuh abnehmen bei " : "Rosa Kuh geben an ")+p.name, onclick(){
+          snapshot(); togglePink(p.id); update();
+        }}, cow({pink:true}));
+        card = el("article",{class:cls, "aria-label":p.name},
+          el("div",{class:"crow"}, pick, el("span",{class:"num", title:"Kühe", text:String(p.points)})),
+          (isPink && p.points >= state.target) ? el("p",{class:"blocked", text:"Blockiert durch rosa Kuh"}) : null,
+          el("div",{class:"cact"}, minus, plus, pinkBtn)
+        );
+      } else {
+        const herd = el("div",{class:"herd", "aria-hidden":"true"});
+        const shownCows = Math.max(state.target, p.points);
+        for(let i=0;i<shownCows;i++) herd.appendChild(cow({cls: i < p.points ? "" : "ghost"}));
+        card = el("article",{class:cls, "aria-label":p.name},
+          el("h2",{class:"name"}, pick),
+          el("div",{class:"score"},
+            el("span",{class:"num", text:String(p.points)}),
+            el("span",{class:"of", text:"/ "+state.target+" Kühe"})
+          ),
+          herd,
+          (isPink && p.points >= state.target) ? el("p",{class:"blocked", text:"Ziel erreicht, aber die rosa Kuh blockiert."}) : null,
+          el("div",{class:"actions"}, minus, plus,
+            el("button",{class:"givepink", text: isPink ? "Rosa Kuh abnehmen" : "Rosa Kuh geben", onclick(){
+              snapshot(); togglePink(p.id); update();
+            }})
+          )
+        );
+        if(isPink) card.appendChild(el("div",{class:"badge"}, cow({pink:true})));
+      }
+      card.addEventListener("click", e => { if(e.target.closest("button")) return; toggleSel(p); });
+      grid.appendChild(card);
+    });
+
+    const bar = el("nav",{class:"bar", "aria-label":"Spielsteuerung"});
+    for(const id of [...selected]) if(isScored(id)) selected.delete(id);
+    if(selected.size){
+      bar.append(
+        el("button",{class:"btn go", text:"+1 Kuh für "+selected.size+" Ausgewählte", onclick(){
+          snapshot(); state.players.forEach(p=>{ if(selected.has(p.id)) givePoint(p); }); selected.clear(); update();
+        }}),
+        el("button",{class:"btn", text:"Auswahl aufheben", onclick(){ selected.clear(); render(); }})
+      );
+    }
+    const undo = el("button",{class:"btn", text:"Rückgängig", onclick(){
+      const last = history.pop(); if(!last) return;
+      const s = JSON.parse(last); state.players = s.players; state.pinks = s.pinks || (s.pink ? [s.pink] : []); state.scored = s.scored || []; save(); render();
+    }});
+    undo.disabled = !history.length;
+    bar.append(
+      undo,
+      el("button",{class:"btn", text: compact ? "Große Karten" : "Kompakte Karten", onclick(){ state.view = compact ? "gross" : "kompakt"; save(); render(); }}),
+      el("button",{class:"btn", text: state.showRank===false ? "Rangliste zeigen" : "Rangliste ausblenden", onclick(){ state.showRank = state.showRank===false; save(); render(); }}),
+      el("button",{class:"btn", text:"Punkte auf null", onclick(){
+        if(!confirm("Alle Punkte und die rosa Kuh zurücksetzen?")) return;
+        snapshot(); state.players.forEach(p=>p.points=0); state.pinks=[]; state.scored=[]; dismissedWinners=""; selected.clear(); update();
+      }}),
+      el("button",{class:"btn", text:"Einstellungen", onclick(){
+        stopTimer(); qstate = "hidden"; selected.clear(); state.phase="setup"; save(); render();
+      }})
+    );
+
+    app.append(
+      el("div",{class:"gamehead"},
+        el("div",{class:"brand"}, cow(), el("h1",{text:"Herdentiere"})),
+        status,
+        el("button",{class:"btn small rulesbtn", text:"Regeln", onclick:openRules})
+      ),
+      el("div",{class:"layout"+(state.showRank===false?"":" withrank")},
+        el("div",{class:"maincol"}, renderQuestion(compact), grid),
+        state.showRank===false ? null : renderRank()
+      ),
+      bar
+    );
+  }
+
+  function renderRank(){
+    const sorted = state.players.slice().sort((a,b)=> b.points-a.points || a.name.localeCompare(b.name,"de"));
+    const grouped = sorted.length > 14;
+    const rows = [];
+    sorted.forEach((p,i)=>{
+      const place = sorted.findIndex(x=>x.points===p.points) + 1;
+      if(grouped && rows.length && rows[rows.length-1].points === p.points) rows[rows.length-1].people.push(p);
+      else rows.push({place, points:p.points, people:[p]});
+    });
+    const ol = el("ol");
+    let divided = false;
+    rows.forEach((r,i)=>{
+      if(!divided && i>0 && r.place>3){ ol.appendChild(el("div",{class:"gap", "aria-hidden":"true"})); divided = true; }
+      const rowPink = r.people.some(p=>hasPink(p.id));
+      const fill = el("span",{class:"fill"});
+      fill.style.width = Math.min(100, 100*r.points/state.target)+"%";
+      const nm = el("span",{class:"nm"+(grouped?" multi":"")});
+      r.people.forEach((p,j)=>{
+        if(j) nm.appendChild(document.createTextNode(", "));
+        nm.appendChild(el("span",{class: hasPink(p.id) ? "pinkname" : "", text:p.name}));
+      });
+      ol.appendChild(el("li",{class:(r.place<=3 && r.points>0?"top":"")+(r.place===1 && r.points>0?" first":"")+(rowPink?" haspink":"")},
+        fill,
+        el("span",{class:"pl", text: r.place+"."}),
+        nm,
+        rowPink ? cow({pink:true}) : null,
+        el("span",{class:"pt", text:String(r.points)})
+      ));
+    });
+    return el("aside",{class:"rank", "aria-label":"Rangliste"}, el("h2",{text:"Rangliste"}), ol);
+  }
+
+  /* ---------- Regeln ---------- */
+  function openRules(){
+    const b = document.getElementById("rulesBody");
+    const items = [
+      "Eine Frage wird gezeigt, zum Beispiel „Nenne ein Haustier.“",
+      "Jede und jeder schreibt still eine Antwort auf. Nicht reden, nicht abgucken!",
+      "Das Ziel: Schreib das auf, was die meisten schreiben. Denk wie die Herde!",
+      "Wenn die Zeit um ist, zeigen alle gleichzeitig ihre Antwort.",
+      "Die größte Gruppe bekommt eine Kuh pro Person. Sind zwei Gruppen gleich groß, bekommt niemand eine Kuh.",
+      ...(maxPinks() > 1 ? [
+        "Es gibt "+maxPinks()+" rosa Kühe. Wer mit der Antwort ganz allein dasteht, bekommt eine. Stehen mehr als "+maxPinks()+" Personen allein da, bekommt niemand eine.",
+        "Sind alle rosa Kühe vergeben, gibt die Person ihre ab, die sie am längsten hat."
+      ] : [
+        "Steht genau eine Person mit ihrer Antwort ganz allein da, bekommt sie die rosa Kuh. Sie behält sie, bis jemand anderes allein dasteht."
+      ]),
+      "Wer eine rosa Kuh hat, kann nicht gewinnen.",
+      "Pro Frage gibt es höchstens eine Kuh für jede Person.",
+      "Wer zuerst "+state.target+" Kühe hat und keine rosa Kuh, gewinnt."
+    ];
+    const ol = el("ol");
+    items.forEach(t => ol.appendChild(el("li",{text:t})));
+    b.replaceChildren(
+      cow(),
+      el("h2",{id:"rulesTitle", text:"So geht Herdentiere"}),
+      ol,
+      el("p",{class:"note", text:"Was als gleiche Antwort zählt, entscheidet die Spielleitung. „Hund“ und „Hunde“ sind zum Beispiel gleich."}),
+      el("div",{class:"row"}, el("button",{class:"btn primary", id:"rulesClose", text:"Alles klar, los geht's", onclick:closeRules}))
+    );
+    b.querySelector("svg").setAttribute("style","width:90px;height:90px;display:block;margin:0 auto");
+    document.getElementById("rules").classList.add("show");
+    document.getElementById("rulesClose").focus();
+  }
+  function closeRules(){ document.getElementById("rules").classList.remove("show"); }
+  document.getElementById("rules").addEventListener("click", e => { if(e.target.id === "rules") closeRules(); });
+
+  /* Presenter-Fernbedienung und Tastatur */
+  document.addEventListener("keydown", e => {
+    if(state.phase !== "game") return;
+    if(document.querySelector(".overlay.show")) return;
+    const tag = (e.target && e.target.tagName) || "";
+    if(/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+    if(e.key === "PageDown" || e.key === "ArrowRight" || (e.key === " " && tag !== "BUTTON")){
+      e.preventDefault(); primaryAction();
+    }
+  });
+
+  function update(){ save(); render(); checkWin(); }
+
+  function checkWin(){
+    const winners = state.players.filter(p => p.points >= state.target && !hasPink(p.id));
+    const key = winners.map(w=>w.id+":"+w.points).join("|");
+    if(!winners.length || key === dismissedWinners) return;
+    dismissedWinners = key;
+    document.getElementById("winTitle").textContent = winners.map(w=>w.name).join(" & ");
+    document.getElementById("winText").textContent = winners.length > 1
+      ? "haben gemeinsam die Herde gewonnen. Muuuh!"
+      : "hat die Herde gewonnen. Muuuh!";
+    const ov = document.getElementById("overlay");
+    ov.classList.add("show");
+    document.getElementById("winNew").focus();
+  }
+
+  document.getElementById("winContinue").addEventListener("click", ()=>{
+    document.getElementById("overlay").classList.remove("show");
+  });
+  document.getElementById("winNew").addEventListener("click", ()=>{
+    state.players.forEach(p=>p.points=0); state.pinks=[]; state.scored=[]; history=[]; dismissedWinners=""; selected.clear();
+    document.getElementById("overlay").classList.remove("show");
+    save(); render();
+  });
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Escape"){ document.getElementById("overlay").classList.remove("show"); closeRules(); }
+  });
+
+  function render(){
+    const app = document.getElementById("app");
+    app.replaceChildren();
+    if(state.phase === "game" && state.players.length >= 2){ app.classList.add("wide"); renderGame(app); }
+    else { app.classList.remove("wide"); state.phase = "setup"; renderSetup(app); }
+  }
+  render();
+})();
+</script>
+</body>
+</html>
