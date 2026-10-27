@@ -353,7 +353,7 @@ function zeigeThemen(){
     const k = el("div",{class:"kacheln"});
     for(const kap of g.kapitel){
       const da = !!KAPITEL[kap.id], fertig = !!(S.kapitel[kap.id] && S.kapitel[kap.id].fertig);
-      const zusatz = kap.analog ? (kap.analogText || "auf Papier bei deiner Lehrkraft") : (fertig ? "fertig" : (S.kapitel[kap.id] ? "angefangen" : (kap.zusatz||"")));
+      const zusatz = kap.analog ? (kap.analogText || "auf Papier in der Material-Box") : (fertig ? "fertig" : (S.kapitel[kap.id] ? "angefangen" : (kap.zusatz||"")));
       const kachel = el("button",{class:"kachel" + (da?"":" zu") + (fertig?" fertig":"") + (kap.analog?" analog":""), "data-kap":kap.id,
           onclick: da ? ()=>oeffneKapitel(kap.id) : null},
         el("span",{class:"nr"}, kap.nr), el("span",{class:"txt"}, kap.titel, el("span",{class:"klein"}, zusatz)),
@@ -1007,7 +1007,7 @@ function kaertchen(werte, markiert=[]){
 /* ===== Kurs Statistik 7/8 ===== */
 LP.kurs = "statistik78";
 LP.name = "Statistik 7/8";
-LP.untertitel = "Lernpfad für Klasse 7/8 · Daten lesen, darstellen und auswerten";
+LP.untertitel = "Lernpfad für Stufe 7/8 · Daten lesen, darstellen und auswerten";
 LP.dateiPraefix = "Statistik78";
 LP.themenText = "Wähle ein Kapitel. Die Nummern sind dieselben wie auf den Karten in der Box. Beginne mit den Eingangschecks: Sie zeigen dir, ob du die Karten 1 bis 4 brauchst.";
 LP.gruppen = [
@@ -1097,7 +1097,7 @@ LP.gruppen = [
     aufgabe({karte:"E2", nr:3, idnr:"E2.3", teile:[
       {typ:"zahl", wert:150, einheit:"Lernende", frage:"30 % einer Klassenstufe sind 45 Lernende. Wie viele Lernende hat die Klassenstufe?", loesung:"10 % sind 15 Lernende, 100 % sind 150 Lernende."}]}),
     aufgabe({karte:"E2", nr:4, idnr:"E2.4", teile:[
-      {typ:"zahl", wert:10, einheit:"Lernende", frage:"In einer Klasse mit 25 Lernenden fahren 40 % mit dem Rad zur Schule. Wie viele sind das?", loesung:"25 · 0,4 = 10 Lernende"}]}),
+      {typ:"zahl", wert:10, einheit:"Lernende", frage:"In einer Lerngruppe mit 25 Lernenden fahren 40 % mit dem Rad zur Schule. Wie viele sind das?", loesung:"25 · 0,4 = 10 Lernende"}]}),
     aufgabe({karte:"E2", nr:5, idnr:"E2.5", teile:[
       {typ:"zahl", wert:32, einheit:"€", frage:"Eine Hose kostet 40 €. Es gibt 20 % Rabatt. Wie viel kostet sie jetzt?", loesung:"Rabatt: 20 % von 40 € = 8 €. Neuer Preis: 40 € − 8 € = 32 €",
        fehler:a=>zahl(a)===8 ? "8 € ist der Rabatt. Wie viel kostet die Hose danach?" : null}]}),
@@ -1161,7 +1161,7 @@ LP.gruppen = [
       {k:"b", typ:"felder", frage:tortenstueck(8,3), felder:[{art:"bruch", z:3, n:8, gekuerzt:true},{wert:37.5, einheit:"%"}], loesung:B(3,8)+" = 37,5 %", tipp:"3 : 8 = 0,375", kurz:"Anteil Kreis 3/8"},
       {k:"c", typ:"felder", frage:tortenstueck(5,2), felder:[{art:"bruch", z:2, n:5, gekuerzt:true},{wert:40, einheit:"%"}], loesung:B(2,5)+" = 40 %", kurz:"Anteil Kreis 2/5"},
       {k:"d", typ:"felder", frage:svgBruchbild({n:10, k:7, g:30}), felder:[{art:"bruch", z:7, n:10, gekuerzt:true},{wert:70, einheit:"%"}], loesung:B(7,10)+" = 70 %", kurz:"Anteil Streifen 7/10"}]}),
-    aufgabe({karte:1, nr:2, stufe:"Basis", intro:()=>el("div",{}, el("p",{}, "So kommt die Klasse 7c zur Schule."),
+    aufgabe({karte:1, nr:2, stufe:"Basis", intro:()=>el("div",{}, el("p",{}, "So kommt die Lerngruppe 7c zur Schule."),
         el("div",{class:"grafik", html:svgKreis({teile:[{wert:4,name:"Bus",farbe:"var(--d1)"},{wert:2,name:"Rad",farbe:"var(--d2)"},{wert:1,name:"zu Fuß",farbe:"var(--d3)"},{wert:1,name:"Auto",farbe:"var(--d6)"}], r:80, linien:8})})),
       teile:[
       {k:"a", typ:"felder", frage:"Welcher Anteil kommt mit dem <b>Bus</b>? Gib den gekürzten Bruch und Prozent an.", felder:[{art:"bruch", z:1, n:2},{wert:50, einheit:"%"}], tipp:"Der Kreis ist in 8 gleiche Teile geteilt. Zähle die Teile für den Bus.", loesung:B(4,8)+" = "+B(1,2)+" = 50 %", kurz:"Bus"},
@@ -1217,7 +1217,7 @@ LP.gruppen = [
     fertigText:"<p>Du kannst Prozentwert, Prozentsatz und Grundwert berechnen.</p>",
     schritte:[
     entdecken({karte:3, titel:"Der Prozentstreifen",
-      text:"<p>In der Klasse sind <b>40 Lernende</b>. Der ganze Streifen steht für alle 40 Lernenden, das sind 100 %. Bewege den Regler. Oben siehst du die Anzahl der Lernenden, unten die Prozente. Löse die drei Aufträge.</p>",
+      text:"<p>In der Lerngruppe sind <b>40 Lernende</b>. Der ganze Streifen steht für alle 40 Lernenden, das sind 100 %. Bewege den Regler. Oben siehst du die Anzahl der Lernenden, unten die Prozente. Löse die drei Aufträge.</p>",
       baue(box, geschafft, u){
         const G = 40, ziele = [{w:12, p:30},{w:20, p:50},{w:30, p:75}];
         let stufe = u.geloest ? 3 : 0, p = u.geloest ? 75 : 0;
@@ -1307,7 +1307,7 @@ LP.gruppen = [
       grafik:kiDiagramm, quelle:"nach: mpfs, Pressemitteilung zur JIM-Studie 2025",
       darum:"Zahlen in einem Text muss man suchen. Ein Diagramm zeigt sie auf einen Blick. Hier wiederholst du, Säulen- und Balkendiagramme zu lesen und zu zeichnen."}),
     entdecken({karte:5, titel:"Ein Diagramm bauen",
-      text:`<p>Die Klasse 7b hat ihr Lieblingsfach angegeben: ${tab([["Fach","Sport","Kunst","Mathe","Deutsch","Musik"],["Anzahl","9","6","5","3","2"]])}</p>
+      text:`<p>Die Lerngruppe 7b hat ihr Lieblingsfach angegeben: ${tab([["Fach","Sport","Kunst","Mathe","Deutsch","Musik"],["Anzahl","9","6","5","3","2"]])}</p>
         <p>Baue das Säulendiagramm. Ziehe jede Säule am orangen Griff ${SYM_GRIFF} auf die richtige Höhe oder nutze ${SYM_HOCH} und ${SYM_RUNTER}. Wenn alle Säulen stimmen, siehst du, was ein gutes Diagramm noch braucht.</p>`,
       baue(box, geschafft, u){
         const ziel = [9,6,5,3,2], rueck = el("div",{class:"rueck hidden"});
@@ -1408,7 +1408,7 @@ LP.gruppen = [
        tipp:"Ziehe grob und stelle dann mit ▲ und ▼ in Zehntel-Schritten genau ein.", loesung:"Punkte bei 10,5; 10,3; 10,4; 9,1; 10,5; 10,6; 10,9; 10,1", kurz:"Liniendiagramm Temperatur"},
       {k:"b", typ:"wahl", chips:true, frage:"Welches Jahr war am wärmsten?", optionen:["2018","2022","2023","2024","2025"], richtig:3, loesung:"2024 mit 10,9 °C"},
       {k:"c", typ:"felder", frage:"Von 1961 bis 1990 lag das Jahresmittel bei 8,2 °C. Wie viel wärmer war es 2024 und 2025?", felder:[{wert:2.7, vor:"2024:", einheit:"°C"},{wert:1.9, vor:"2025:", einheit:"°C"}], loesung:"2024: 10,9 − 8,2 = 2,7 °C; 2025: 10,1 − 8,2 = 1,9 °C"}]}),
-    aufgabe({karte:8, nr:4, stufe:"Standard", intro:()=>el("div",{}, el("p",{}, "Eine Klasse hat an einem heißen Tag in der Innenstadt und im Stadtpark gemessen:"), el("div",{class:"grafik", html:parkDiagramm()})), teile:[
+    aufgabe({karte:8, nr:4, stufe:"Standard", intro:()=>el("div",{}, el("p",{}, "Eine Lerngruppe hat an einem heißen Tag in der Innenstadt und im Stadtpark gemessen:"), el("div",{class:"grafik", html:parkDiagramm()})), teile:[
       {k:"a", typ:"felder", frage:"Wie warm war es um 14 Uhr an beiden Orten?", felder:[{wert:32, vor:"Innenstadt:", einheit:"°C"},{wert:27, vor:"Park:", einheit:"°C"}], loesung:"Innenstadt 32 °C, Park 27 °C"},
       {k:"b", typ:"wahl", chips:true, frage:"Wann war der Unterschied am größten?", optionen:["8 Uhr","12 Uhr","14 Uhr","16 Uhr","20 Uhr"], richtig:4, tipp:"Rechne für jede Uhrzeit Innenstadt minus Park.", loesung:"um 20 Uhr: 28 − 22 = 6 °C"},
       {k:"c", typ:"mehr", frage:"Warum ist es im Park kühler? Wähle alle passenden Gründe.", optionen:["Bäume spenden Schatten.","Beton und Asphalt speichern in der Stadt die Wärme.","Im Park scheint die Sonne nicht.","Pflanzen verdunsten Wasser und kühlen die Luft."], richtig:[0,1,3], loesung:"Bäume spenden Schatten, Pflanzen verdunsten Wasser. In der Stadt speichern Beton und Asphalt Wärme."}]}),
@@ -1431,7 +1431,7 @@ LP.gruppen = [
       grafik:strom, quelle:"nach: Statistisches Bundesamt, Stromerzeugung 2025 (vorläufig), Anteile gerundet; Sonstige z. B. Biogas",
       darum:"Ein Streifendiagramm zeigt, wie sich ein Ganzes aus Teilen zusammensetzt. Hier lernst du, Streifendiagramme zu lesen, zu zeichnen und mit den Anteilen zu rechnen."}),
     entdecken({karte:9, titel:"Ein Streifen aus 10 cm",
-      text:`<p>So kommen die Lernenden der Klasse 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %.</p>
+      text:`<p>So kommen die Lernenden der Lerngruppe 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %.</p>
         <p>Der ganze Streifen ist 10 cm lang. Stelle mit ${SYM_HOCH} und ${SYM_RUNTER} ein, wie lang jeder Abschnitt sein muss. Ein Schritt sind 5 mm.</p>`,
       baue(box, geschafft, u){
         const namen = ["zu Fuß","Rad","Bus/Bahn","Auto"], ziel = [35,25,30,10], farben = ["var(--d1)","var(--d2)","var(--d3)","var(--d6)"];
@@ -1472,7 +1472,7 @@ LP.gruppen = [
       {k:"b", typ:"zahl", wert:50, einheit:"%", frage:"Wie viel Prozent kamen aus Wind, Photovoltaik und Wasserkraft zusammen?", loesung:"30 + 16 + 4 = 50 %"},
       {k:"c", typ:"zahl", wert:38, einheit:"%", frage:"Wie viel Prozent kamen aus Kohle und Erdgas zusammen?", loesung:"22 + 16 = 38 %"},
       {k:"d", typ:"wahl", frage:"Laut Meldung waren 58,6 % erneuerbar. Warum ist das mehr als dein Ergebnis in b)?", optionen:["Die Meldung hat sich verrechnet.","Unter „Sonstige“ steckt auch erneuerbarer Strom, z. B. aus Biogas.","Weil die Werte gerundet sind, fehlen 8,6 %."], richtig:1, loesung:"Unter „Sonstige“ steckt auch erneuerbarer Strom, z. B. aus Biogas."}]}),
-    aufgabe({karte:9, nr:2, stufe:"Basis", intro:"<p>So kommen die Lernenden der Klasse 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %</p>", teile:[
+    aufgabe({karte:9, nr:2, stufe:"Basis", intro:"<p>So kommen die Lernenden der Lerngruppe 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %</p>", teile:[
       {k:"a", typ:"tabelle", frage:"Wie lang ist jeder Abschnitt bei einem Streifen von 10 cm?", kopf:["","zu Fuß","Rad","Bus/Bahn","Auto"], zeilen:[["Länge in cm",{w:3.5},{w:2.5},{w:3},{w:1}]], loesung:"3,5 cm; 2,5 cm; 3 cm; 1 cm"},
       {k:"b", typ:"heft", frage:"Zeichne das Streifendiagramm mit Legende in deinen Hefter.", muster:()=>svgStreifen({teile:[{wert:35,name:"zu Fuß",farbe:"var(--d1)"},{wert:25,name:"Rad",farbe:"var(--d2)"},{wert:30,name:"Bus/Bahn",farbe:"var(--d3)"},{wert:10,name:"Auto",farbe:"var(--d6)"}], breite:400})},
       {k:"c", typ:"zahl", wert:90, einheit:"%", frage:"Wie viel Prozent kommen ohne Auto zur Schule?", loesung:"100 − 10 = 90 %"}]}),
@@ -1544,7 +1544,7 @@ LP.gruppen = [
     aufgabe({karte:11, nr:2, stufe:"Basis", teile:[
       {typ:"tabelle", frage:"Fülle die Tabelle aus.", zeilen:[["Prozent","50 %","25 %","10 %"],["Winkel",{w:180},{w:90},{w:36}],["Prozent",{w:12.5},"30 %",{w:20}],["Winkel","45°",{w:108},"72°"]],
        tipp:"Winkel = p · 3,6° und p = Winkel : 3,6", loesung:"50 % = 180°; 25 % = 90°; 10 % = 36°; 12,5 % = 45°; 30 % = 108°; 20 % = 72°"}]}),
-    aufgabe({karte:11, nr:3, stufe:"Standard", intro:"<p>So kommen die Lernenden der Klasse 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %</p>", teile:[
+    aufgabe({karte:11, nr:3, stufe:"Standard", intro:"<p>So kommen die Lernenden der Lerngruppe 7b zur Schule: zu Fuß 35 %, Rad 25 %, Bus/Bahn 30 %, Auto 10 %</p>", teile:[
       {k:"a", typ:"tabelle", frage:"Berechne die Winkel.", kopf:["","zu Fuß","Rad","Bus/Bahn","Auto"], zeilen:[["Winkel in °",{w:126},{w:90},{w:108},{w:36}]], loesung:"Fuß 126°, Rad 90°, Bus/Bahn 108°, Auto 36°; Summe 360°"},
       {k:"b", typ:"heft", frage:"Zeichne das Kreisdiagramm mit r = 4 cm in deinen Hefter.", muster:()=>svgKreis({teile:[{wert:35,name:"zu Fuß",farbe:"var(--d1)"},{wert:25,name:"Rad",farbe:"var(--d2)"},{wert:30,name:"Bus/Bahn",farbe:"var(--d3)"},{wert:10,name:"Auto",farbe:"var(--d6)"}], r:70, prozente:true})}]}),
     aufgabe({karte:12, nr:4, stufe:"Standard", intro:"<p>24 Lernende nennen ihr Lieblingsfach:</p>" + tab([["Fach","Sport","Kunst","Mathe","Deutsch","Bio"],["Anzahl","8","6","4","3","3"]]), teile:[
@@ -1614,7 +1614,7 @@ LP.gruppen = [
       {k:"b", typ:"wahl", chips:true, frage:"Woher der Strom 2025 kam (Anteile in Prozent, zusammen 100 %)", optionen:ARTEN, richtig:1, loesung:"Kreis- oder Streifendiagramm: Anteile am Ganzen"},
       {k:"c", typ:"wahl", chips:true, frage:"Strom aus Wind, Kohle, Erdgas usw. in Mrd. kWh, nach Größe sortiert", optionen:ARTEN, richtig:2, loesung:"Balkendiagramm: Rangfolge"},
       {k:"d", typ:"wahl", chips:true, frage:"Die Punktzahlen von vier Teams bei einem Quiz", optionen:ARTEN, richtig:2, loesung:"Säulen- oder Balkendiagramm: Werte vergleichen"},
-      {k:"e", typ:"wahl", chips:true, frage:"Anteil der Lernenden einer Klasse, die mit Bus, Rad, zu Fuß oder mit dem Auto kommen", optionen:ARTEN, richtig:1, loesung:"Kreis- oder Streifendiagramm: Anteile der Klasse, zusammen 100 %"}]}),
+      {k:"e", typ:"wahl", chips:true, frage:"Anteil der Lernenden einer Lerngruppe, die mit Bus, Rad, zu Fuß oder mit dem Auto kommen", optionen:ARTEN, richtig:1, loesung:"Kreis- oder Streifendiagramm: Anteile der Lerngruppe, zusammen 100 %"}]}),
     aufgabe({karte:14, nr:2, stufe:"Standard", intro:"<p>Anteil der Elektroautos an allen neuen Pkw:</p>" + tab([["Jahr","2023","2024","2025"],["Anteil","18,4 %","13,5 %","19,1 %"]]), quelle:"Kraftfahrt-Bundesamt, berichtet von electrive.net 2026", teile:[
       {k:"a", typ:"saeulen", frage:"Zeichne ein Säulendiagramm. Ziehe die Säulen grob und stelle mit ▲ und ▼ genau ein.", namen:["2023","2024","2025"], werte:[18.4,13.5,19.1], start:[15,15,15], max:25, schritt:0.1, achse:5, einheit:"Anteil in %", farbe:"var(--d3)", loesung:"Säulen bei 18,4 %, 13,5 % und 19,1 %", kurz:"Säulendiagramm Elektroautos"},
       {k:"b", typ:"wahl", frage:"Warum passt ein Säulendiagramm?", optionen:["Man vergleicht Werte aus verschiedenen Jahren.","Die Werte ergeben zusammen 100 %.","Säulen sind am schnellsten gezeichnet."], richtig:0, loesung:"Man vergleicht Werte aus verschiedenen Jahren. Auch ein Liniendiagramm passt."},
@@ -1709,7 +1709,7 @@ LP.gruppen = [
       grafik:pkwTab, quelle:"nach: Kraftfahrt-Bundesamt, Jahresbilanzen 2024 und 2025",
       darum:"Zahlen kann man als Anzahl oder als Anteil angeben. Hier lernst du den Unterschied zwischen absoluter und relativer Häufigkeit und rechnest beide aus."}),
     entdecken({karte:17, titel:"Eine Strichliste führen",
-      text:"<p>20 Lernende der Klasse 7d sagen, wie sie zur Schule kommen. Unten erscheint immer eine Antwort. Tippe auf den passenden Knopf. So entsteht die Strichliste.</p>",
+      text:"<p>20 Lernende der Lerngruppe 7d sagen, wie sie zur Schule kommen. Unten erscheint immer eine Antwort. Tippe auf den passenden Knopf. So entsteht die Strichliste.</p>",
       baue(box, geschafft, u, kapId){
         const kat = ["Bus","Rad","zu Fuß","Auto"], folge = [0,1,0,2,0,1,3,0,1,2,0,0,1,2,1,0,3,2,0,1];
         let pos = u.geloest ? 20 : 0;
@@ -1739,7 +1739,7 @@ LP.gruppen = [
       ["Die <b>relative Häufigkeit</b> gibt den <b>Anteil an allen</b> an. Du teilst die absolute Häufigkeit durch die Gesamtzahl. Das Ergebnis schreibst du als Bruch, Dezimalzahl oder in Prozent.", br(10,25)+" = 10 : 25 = 0,4 = <b>40 %</b>"],
       ["Alle relativen Häufigkeiten zusammen ergeben <b>100 %</b>. Damit kannst du deine Rechnung kontrollieren.", "mit Haustier 40 %, ohne 60 %<br>40 % + 60 % = 100 % ✓"],
       ["Kennst du den Anteil und die Gesamtzahl, rechnest du zurück auf die <b>Anzahl</b>.", "30 % von 1200 Befragten<br>1200 · 0,3 = <b>360</b>"]]}),
-    aufgabe({karte:17, nr:1, stufe:"Basis", intro:"<p>Wie viele Geschwister hast du? (Klasse 7a)</p>" + tab([["Geschwister","Strichliste"],["0",striche(4)],["1",striche(10)],["2",striche(7)],["3",striche(3)],["4 oder mehr",striche(1)]],{links:true}), teile:[
+    aufgabe({karte:17, nr:1, stufe:"Basis", intro:"<p>Wie viele Geschwister hast du? (Lerngruppe 7a)</p>" + tab([["Geschwister","Strichliste"],["0",striche(4)],["1",striche(10)],["2",striche(7)],["3",striche(3)],["4 oder mehr",striche(1)]],{links:true}), teile:[
       {k:"a", typ:"tabelle", frage:"Notiere die absoluten Häufigkeiten.", kopf:["Geschwister","0","1","2","3","4+"], zeilen:[["Anzahl",{w:4},{w:10},{w:7},{w:3},{w:1}]], loesung:"4; 10; 7; 3; 1"},
       {k:"b", typ:"zahl", wert:25, einheit:"Lernende", frage:"Wie viele Lernende wurden befragt?", loesung:"4 + 10 + 7 + 3 + 1 = 25"},
       {k:"c", typ:"tabelle", frage:"Berechne die relativen Häufigkeiten in Prozent.", kopf:["Geschwister","0","1","2","3","4+"], zeilen:[["Prozent",{w:16},{w:40},{w:28},{w:12},{w:4}]], tipp:"4 : 25 = 0,16 = 16 %", loesung:"16 %; 40 %; 28 %; 12 %; 4 %"},
@@ -1756,7 +1756,7 @@ LP.gruppen = [
     aufgabe({karte:18, nr:4, stufe:"Knobeln", teile:[
       {k:"a", typ:"zahl", wert:125, einheit:"Personen", frage:"Bei einer Umfrage antworten 15 Personen mit „Ja“. Das sind 12 %. Wie viele Personen wurden befragt?", loesung:"15 : 0,12 = 125 Personen"},
       {k:"b", typ:"wahl", frage:"Kann eine relative Häufigkeit größer als 100 % sein?", optionen:["Ja, wenn sehr viele mitmachen.","Nein. Ein Teil kann nie größer sein als das Ganze. Höchstens alle (100 %) antworten gleich."], richtig:1, loesung:"Nein. Ein Teil kann nie größer sein als das Ganze."}]}),
-    aufgabe({karte:18, nr:5, stufe:"Standard", intro:"<p>Die Klasse 7c untersucht den Inhalt ihres Restmülleimers. Sie zählt 40 Teile: Papier 14, Plastikverpackungen 10, Bioabfall 8, echter Restmüll 8.</p>", teile:[
+    aufgabe({karte:18, nr:5, stufe:"Standard", intro:"<p>Die Lerngruppe 7c untersucht den Inhalt ihres Restmülleimers. Sie zählt 40 Teile: Papier 14, Plastikverpackungen 10, Bioabfall 8, echter Restmüll 8.</p>", teile:[
       {k:"a", typ:"tabelle", frage:"Berechne die relativen Häufigkeiten in Prozent.", kopf:["","Papier","Plastik","Bioabfall","Restmüll"], zeilen:[["Prozent",{w:35},{w:25},{w:20},{w:20}]], loesung:"Papier 14 : 40 = 35 %; Plastik 25 %; Bioabfall 20 %; Restmüll 20 %"},
       {k:"b", typ:"zahl", wert:80, einheit:"%", frage:"Wie viel Prozent der Teile gehörten gar nicht in den Restmüll?", loesung:"35 % + 25 % + 20 % = 80 %"},
       {k:"c", typ:"heft", frage:"Zeichne ein Streifendiagramm mit 10 cm Länge in deinen Hefter.", muster:()=>svgStreifen({teile:[{wert:35,name:"Papier",farbe:"var(--d1)"},{wert:25,name:"Plastik",farbe:"var(--d4)"},{wert:20,name:"Bio",farbe:"var(--d3)"},{wert:20,name:"Rest",farbe:"var(--d6)"}], breite:400})}]}),
@@ -1779,22 +1779,22 @@ LP.gruppen = [
       grafik:co2, quelle:"nach: EU-Kommission, EDGAR-Bericht 2025, über Statista",
       darum:"Wer vergleicht, muss sich entscheiden: Anzahlen oder Anteile? Hier lernst du, wann ein absoluter und wann ein relativer Vergleich fair ist."}),
     entdecken({karte:19, titel:"Wer fährt sicherer?",
-      text:"<p>In Klasse A tragen 12 von 20 Lernenden einen Fahrradhelm, in Klasse B 15 von 30. Schalte zwischen <b>Anzahl</b> und <b>Anteil</b> um und beantworte die Fragen.</p>",
+      text:"<p>In Lerngruppe A tragen 12 von 20 Lernenden einen Fahrradhelm, in Lerngruppe B 15 von 30. Schalte zwischen <b>Anzahl</b> und <b>Anteil</b> um und beantworte die Fragen.</p>",
       baue(box, geschafft, u, kapId){
         const bild = el("div",{class:"grafik"});
-        const zeige = a => { bild.innerHTML = a==="n" ? svgSaeulen({namen:["Klasse A","Klasse B"], werte:[12,15], max:20, schritt:5, einheit:"Lernende mit Helm", breite:320})
-                                                 : svgSaeulen({namen:["Klasse A","Klasse B"], werte:[60,50], max:100, schritt:20, einheit:"Anteil mit Helm in %", farbe:"var(--d2)", breite:320}); };
+        const zeige = a => { bild.innerHTML = a==="n" ? svgSaeulen({namen:["Lerngruppe A","Lerngruppe B"], werte:[12,15], max:20, schritt:5, einheit:"Lernende mit Helm", breite:320})
+                                                 : svgSaeulen({namen:["Lerngruppe A","Lerngruppe B"], werte:[60,50], max:100, schritt:20, einheit:"Anteil mit Helm in %", farbe:"var(--d2)", breite:320}); };
         const kn = el("div",{class:"chips", style:"justify-content:center"}, ...[["n","Anzahl"],["a","Anteil"]].map(([a,t])=>el("button",{onclick:e=>{ kn.querySelectorAll("button").forEach(b=>b.classList.remove("gewaehlt")); e.currentTarget.classList.add("gewaehlt"); zeige(a); }}, t)));
         box.append(kn, bild); kn.firstChild.classList.add("gewaehlt"); zeige("n");
         const ids = [kapId+":entdecken-1", kapId+":entdecken-2", kapId+":entdecken-3"];
         const pruefe = () => { if(ids.every(erledigt)) geschafft(); };
         box.append(
-          baueTeil({id:ids[0], karte:19, titel:"Entdecken: mehr Helme", typ:"wahl", chips:true, frage:"In welcher Klasse tragen <b>mehr</b> Lernende einen Helm?", optionen:["Klasse A","Klasse B"], richtig:1, lob:"Richtig, 15 sind mehr als 12. Das ist ein <b>absoluter Vergleich</b>.", beiAuswertung:()=>setTimeout(pruefe,0)}),
-          baueTeil({id:ids[1], karte:19, titel:"Entdecken: größerer Anteil", typ:"wahl", chips:true, frage:"In welcher Klasse trägt ein <b>größerer Anteil</b> einen Helm? Schalte auf „Anteil“.", optionen:["Klasse A","Klasse B"], richtig:0, lob:"Richtig! A: 12 von 20 = 60 %, B: 15 von 30 = 50 %. Das ist ein <b>relativer Vergleich</b>.", beiAuswertung:()=>setTimeout(pruefe,0)}),
-          baueTeil({id:ids[2], karte:19, titel:"Entdecken: fairer Vergleich", typ:"wahl", frage:"Welcher Vergleich ist hier fair?", optionen:["der absolute, weil Anzahlen genauer sind","der relative, weil die Klassen unterschiedlich groß sind"], richtig:1, lob:"Genau! Sind die Gruppen unterschiedlich groß, ist nur der relative Vergleich fair.", beiAuswertung:()=>setTimeout(pruefe,0)}));
+          baueTeil({id:ids[0], karte:19, titel:"Entdecken: mehr Helme", typ:"wahl", chips:true, frage:"In welcher Lerngruppe tragen <b>mehr</b> Lernende einen Helm?", optionen:["Lerngruppe A","Lerngruppe B"], richtig:1, lob:"Richtig, 15 sind mehr als 12. Das ist ein <b>absoluter Vergleich</b>.", beiAuswertung:()=>setTimeout(pruefe,0)}),
+          baueTeil({id:ids[1], karte:19, titel:"Entdecken: größerer Anteil", typ:"wahl", chips:true, frage:"In welcher Lerngruppe trägt ein <b>größerer Anteil</b> einen Helm? Schalte auf „Anteil“.", optionen:["Lerngruppe A","Lerngruppe B"], richtig:0, lob:"Richtig! A: 12 von 20 = 60 %, B: 15 von 30 = 50 %. Das ist ein <b>relativer Vergleich</b>.", beiAuswertung:()=>setTimeout(pruefe,0)}),
+          baueTeil({id:ids[2], karte:19, titel:"Entdecken: fairer Vergleich", typ:"wahl", frage:"Welcher Vergleich ist hier fair?", optionen:["der absolute, weil Anzahlen genauer sind","der relative, weil die Lerngruppen unterschiedlich groß sind"], richtig:1, lob:"Genau! Sind die Gruppen unterschiedlich groß, ist nur der relative Vergleich fair.", beiAuswertung:()=>setTimeout(pruefe,0)}));
       }}),
     merkeKasten({karte:19, titel:"Absolut oder relativ vergleichen", zeilen:[
-      ["Beim <b>absoluten Vergleich</b> vergleichst du die <b>Anzahlen</b>.", "Klasse A: 12 Helme,<br>Klasse B: 15 Helme → B hat mehr."],
+      ["Beim <b>absoluten Vergleich</b> vergleichst du die <b>Anzahlen</b>.", "Lerngruppe A: 12 Helme,<br>Lerngruppe B: 15 Helme → B hat mehr."],
       ["Beim <b>relativen Vergleich</b> vergleichst du die <b>Anteile</b>. Dazu berechnest du für jede Gruppe die relative Häufigkeit.", "A: 12 von 20 = 60 %<br>B: 15 von 30 = 50 %<br>→ A hat anteilig mehr."],
       ["Sind die Gruppen <b>unterschiedlich groß</b>, ist nur der relative Vergleich fair. Auch Angaben wie „pro Kopf“ oder „pro 1000 Einwohner*innen“ sind relative Vergleiche.",
         ()=>html(svgStreifen({teile:[{wert:60,name:"A",farbe:"var(--d1)"},{wert:40,name:"",farbe:"#d9e2e6"}], breite:240, legende:false, prozente:t=>t.name?"A: 60 %":""}) + "<br>" + svgStreifen({teile:[{wert:50,name:"B",farbe:"var(--d2)"},{wert:50,name:"",farbe:"#d9e2e6"}], breite:240, legende:false, prozente:t=>t.name?"B: 50 %":""}))]]}),
@@ -1804,9 +1804,9 @@ LP.gruppen = [
       {k:"c", typ:"wahl", frage:"Warum sind die Rangfolgen so verschieden?", optionen:["China und Indien haben sehr viele Einwohner*innen. Der Ausstoß verteilt sich auf viel mehr Menschen.","Die Diagramme haben verschiedene Farben.","Die USA haben die Werte falsch gemeldet."], richtig:0, loesung:"China und Indien haben sehr viele Einwohner*innen. Der Ausstoß verteilt sich auf viel mehr Menschen."},
       {k:"d", typ:"zahl", wert:6.18, tol:0.051, frage:"Wie viel Mal so viel CO₂ stößt eine Person in den USA aus wie eine Person in Indien? Runde auf eine Stelle nach dem Komma.", loesung:"13,6 : 2,2 ≈ 6,2-mal so viel"}]}),
     aufgabe({karte:19, nr:2, stufe:"Basis", intro:"<p>Bei den Bundesjugendspielen bekommen 24 von 30 Lernenden der 7a und 21 von 28 Lernenden der 7b eine Urkunde.</p>", teile:[
-      {k:"a", typ:"wahl", chips:true, frage:"Welche Klasse hat mehr Urkunden?", optionen:["7a","7b"], richtig:0, loesung:"die 7a (24 > 21)"},
+      {k:"a", typ:"wahl", chips:true, frage:"Welche Lerngruppe hat mehr Urkunden?", optionen:["7a","7b"], richtig:0, loesung:"die 7a (24 > 21)"},
       {k:"b", typ:"felder", frage:"Berechne die Anteile in Prozent.", felder:[{wert:80, vor:"7a:", einheit:"%"},{wert:75, vor:"7b:", einheit:"%"}], loesung:"7a: 24 : 30 = 80 %; 7b: 21 : 28 = 75 %"},
-      {k:"c", typ:"wahl", chips:true, frage:"Welche Klasse war erfolgreicher?", optionen:["7a","7b","beide gleich"], richtig:0, loesung:"die 7a, weil ihr Anteil größer ist"}]}),
+      {k:"c", typ:"wahl", chips:true, frage:"Welche Lerngruppe war erfolgreicher?", optionen:["7a","7b","beide gleich"], richtig:0, loesung:"die 7a, weil ihr Anteil größer ist"}]}),
     aufgabe({karte:20, nr:3, stufe:"Basis", intro:"<p>Wer trägt beim Radfahren einen Helm?</p>" + tab([["Klassenstufe","mit Helm","ohne Helm"],["6","12","8"],["7","14","13"]]), teile:[
       {k:"a", typ:"wahl", chips:true, frage:"In welcher Stufe tragen mehr Lernende einen Helm?", optionen:["Stufe 6","Stufe 7"], richtig:1, loesung:"in Stufe 7 (14 > 12)"},
       {k:"b", typ:"felder", frage:"Berechne den Anteil der Helmträger*innen. Runde auf eine Stelle nach dem Komma.", felder:[{wert:60, vor:"Stufe 6:", einheit:"%"},{wert:51.85, tol:0.06, vor:"Stufe 7:", einheit:"%"}], tipp:"In Stufe 6 sind es 12 + 8 = 20 Lernende.", loesung:"Stufe 6: 12 : 20 = 60 %; Stufe 7: 14 : 27 ≈ 51,9 %"},
@@ -1947,7 +1947,7 @@ LP.gruppen = [
        fehler:a=>{ const z=zahl(a); return z===3.5 ? "So rechnet Tim in Teil c). Beachte, wie oft jede Note vorkommt." : (z===75 ? "75 ist die Summe aller Noten. Teile noch durch die Anzahl der Lernenden." : null); }},
       {k:"c", typ:"heft", frage:"Tim rechnet (1 + 2 + 3 + 4 + 5 + 6) : 6 = 3,5. Erkläre seinen Fehler in ganzen Sätzen.",
        muster:"Tim beachtet nicht, wie oft jede Note vorkommt. Es gab acht Dreien, aber nur eine Sechs. Er muss jede Note mit ihrer Anzahl malnehmen und durch 25 teilen."}]}),
-    aufgabe({karte:24, nr:4, stufe:"Standard", intro:"<p>Geschwister in der Klasse 7a. Diese Umfrage kennst du von Karte 17.</p>" + tab([["Geschwister","0","1","2","3","4"],["Anzahl","4","10","7","3","1"]]), teile:[
+    aufgabe({karte:24, nr:4, stufe:"Standard", intro:"<p>Geschwister in der Lerngruppe 7a. Diese Umfrage kennst du von Karte 17.</p>" + tab([["Geschwister","0","1","2","3","4"],["Anzahl","4","10","7","3","1"]]), teile:[
       {k:"a", typ:"zahl", wert:1.48, tol:0.006, einheit:"Geschwister", kurz:"Mittelwert Geschwister", frage:"Berechne den Mittelwert der Geschwisterzahl.",
        tipp:"0 · 4 + 1 · 10 + 2 · 7 + 3 · 3 + 4 · 1 = 37. Wie viele Kinder wurden befragt?", loesung:"0 + 10 + 14 + 9 + 4 = 37; 37 : 25 = 1,48 Geschwister",
        fehler:a=>{ const z=zahl(a); return z===2 ? "Du hast (0 + 1 + 2 + 3 + 4) : 5 gerechnet. Beachte die Anzahl in der Tabelle." : (z===37 ? "37 ist die Summe aller Geschwister. Teile noch durch die Anzahl der Kinder." : null); }},
@@ -2144,7 +2144,7 @@ LP.gruppen = [
       {k:"a", typ:"heft", ort:"computer", frage:"Erstelle ein Liniendiagramm mit Titel und Achsenbeschriftung. Ergänze danach die Zeile 2030 mit dem Ziel 80 %.", datei:{name:"Erneuerbare.csv", zeilen:[["Jahr","Anteil in %"],["2000","6,3"],["2005","10,3"],["2010","17,2"],["2015","31,6"],["2020","45,4"],["2025","55,1"]]},
        muster:"Titel z. B. „Erneuerbarer Strom in Deutschland“, Achsen „Jahr“ und „Anteil in %“."},
       {k:"b", typ:"wahl", frage:"Was verändert sich im Diagramm, wenn du 2030 mit 80 % ergänzt?", optionen:["Nichts.","Das letzte Stück ist viel steiler als die Strecken davor. Der Ausbau müsste deutlich schneller werden.","Die Linie fällt am Ende."], richtig:1, loesung:"Calc verlängert die Linie bis 2030. Das letzte Stück ist viel steiler. Der Ausbau müsste deutlich schneller werden."}]}),
-    aufgabe({karte:30, nr:6, stufe:"Standard", computer:true, intro:"<p>Restmüll der Klasse 7c (Karte 18): Papier 14, Plastikverpackungen 10, Bioabfall 8, echter Restmüll 8</p>", teile:[
+    aufgabe({karte:30, nr:6, stufe:"Standard", computer:true, intro:"<p>Restmüll der Lerngruppe 7c (Karte 18): Papier 14, Plastikverpackungen 10, Bioabfall 8, echter Restmüll 8</p>", teile:[
       {k:"a", typ:"heft", ort:"computer", frage:"Erstelle ein Kreisdiagramm mit Datenbeschriftungen in Prozent und ein Säulendiagramm.", datei:{name:"Restmuell.csv", zeilen:[["Art","Anzahl"],["Papier","14"],["Plastik","10"],["Bioabfall","8"],["Restmüll","8"]]},
        muster:()=>svgKreis({teile:[{wert:14,name:"Papier"},{wert:10,name:"Plastik"},{wert:8,name:"Bio"},{wert:8,name:"Restmüll"}], r:70, prozente:true})},
       {k:"b", typ:"wahl", chips:true, frage:"Welches Diagramm passt besser zu der Frage „Wie viel gehört nicht in den Restmüll?“", optionen:["Kreisdiagramm","Säulendiagramm"], richtig:0, loesung:"Das Kreisdiagramm: Es zeigt Anteile am Ganzen. Vier Fünftel des Kreises gehören nicht in den Restmüll."}]})
@@ -2257,15 +2257,15 @@ LP.gruppen = [
     fertigText:"<p>Stark! Du weißt jetzt: Gleiche Mitte heißt noch lange nicht gleiche Klasse.</p>",
     schritte:[
     einstieg({karte:"X3", kicker:"Rätsel · Notenspiegel", titel:"Gleicher Durchschnitt, ganz andere Klasse?", untereinander:true,
-      text:"<p>Eine Klasse mit <b>20 Lernenden</b> hat eine Arbeit geschrieben. Du kennst nur Hinweise auf den Notenspiegel. Erfinde passende Notenspiegel und prüfe sie mit Rechnungen. Du brauchst dafür Häufigkeitstabellen, arithmetisches Mittel, Median und Spannweite.</p><p><b>Tipp:</b> Bei 20 Lernenden und einem arithmetischen Mittel von 3,0 muss die Summe aller Noten 60 sein.</p>"}),
+      text:"<p>Eine Lerngruppe mit <b>20 Lernenden</b> hat eine Arbeit geschrieben. Du kennst nur Hinweise auf den Notenspiegel. Erfinde passende Notenspiegel und prüfe sie mit Rechnungen. Du brauchst dafür Häufigkeitstabellen, arithmetisches Mittel, Median und Spannweite.</p><p><b>Tipp:</b> Bei 20 Lernenden und einem arithmetischen Mittel von 3,0 muss die Summe aller Noten 60 sein.</p>"}),
     info({karte:"X3", name:"So prüfst du", kicker:"So prüfst du", titel:"Drei Prüfregeln", inhalt:"<div class='hinweisbox'><b>Anzahl:</b> Summe der Anzahlen = 20<br><b>Arithmetisches Mittel:</b> Summe (Note · Anzahl) : 20<br><b>Median:</b> Noten der Größe nach aufschreiben, Mitte zwischen dem 10. und 11. Wert</div><p>Trage in den Aufgaben ein, wie viele Lernende welche Note bekommen. Der Lernpfad prüft, ob alle Bedingungen erfüllt sind. Es gibt viele richtige Lösungen.</p>"}),
     aufgabe({karte:"X3", nr:1, titel:"Notenspiegel finden", stufe:"Expertenaufgabe", piktogramm:"🎯", teile:[
       Object.assign({k:"a", frage:"Finde einen Notenspiegel mit arithmetischem Mittel <b>3,0</b> und Median <b>3</b>.", loesung:"z. B. 2, 4, 8, 4, 2, 0 Lernende mit den Noten 1 bis 6"}, spiegel(r=>r.med===3, "Prüfe die drei Regeln: 20 Lernende? Summe der Noten 60? Median 3?", [2,4,8,4,2,0])),
       Object.assign({k:"b", frage:"Finde einen Notenspiegel mit arithmetischem Mittel <b>3,0</b> und Median <b>2</b>.", loesung:"z. B. 4, 7, 0, 5, 2, 2. Prüfung: 4 + 14 + 0 + 20 + 10 + 12 = 60. Plätze 1 bis 4 Einsen, 5 bis 11 Zweien, also sind der 10. und 11. Wert beide 2."}, spiegel(r=>r.med===2, "Prüfe: 20 Lernende? Summe der Noten 60? Median 2? Tipp: viele Zweien und ein paar sehr schlechte Noten.", [4,7,0,5,2,2]))]}),
-    aufgabe({karte:"X3", nr:2, titel:"Ganz verschieden", stufe:"Expertenaufgabe", piktogramm:"🎯", intro:"<p>Finde zwei Notenspiegel, die beide arithmetisches Mittel 3,0 und Median 3 haben, aber <b>völlig verschieden</b> aussehen: Bei Klasse A sollen die Noten eng beieinanderliegen (Spannweite höchstens 1), bei Klasse B weit auseinander (Spannweite mindestens 4).</p>", teile:[
-      Object.assign({k:"a", frage:"Klasse A", kurz:"eng", loesung:"z. B. 0, 0, 20, 0, 0, 0: alle haben eine 3"}, spiegel((r,w)=>{ const da = w.map((k,i)=>k?i+1:null).filter(Boolean); return r.med===3 && Math.max(...da)-Math.min(...da)<=1; }, "Prüfe: Mittel 3,0, Median 3 und Spannweite höchstens 1?", [0,0,20,0,0,0])),
-      Object.assign({k:"b", frage:"Klasse B", kurz:"weit", loesung:"z. B. 10, 0, 0, 0, 10, 0: Median (1 + 5) : 2 = 3"}, spiegel((r,w)=>{ const da = w.map((k,i)=>k?i+1:null).filter(Boolean); return r.med===3 && Math.max(...da)-Math.min(...da)>=4; }, "Prüfe: Mittel 3,0, Median 3 und Spannweite mindestens 4?", [10,0,0,0,10,0])),
-      {k:"c", typ:"heft", frage:"Zeichne zu beiden Notenspiegeln ein Säulendiagramm.", muster:()=>svgSaeulen({namen:["1","2","3","4","5","6"], reihen:[{werte:[0,0,20,0,0,0], farbe:"var(--d1)", name:"Klasse A"},{werte:[10,0,0,0,10,0], farbe:"var(--d2)", name:"Klasse B"}], max:20, schritt:5, einheit:"Anzahl", legende:true, breite:420})},
+    aufgabe({karte:"X3", nr:2, titel:"Ganz verschieden", stufe:"Expertenaufgabe", piktogramm:"🎯", intro:"<p>Finde zwei Notenspiegel, die beide arithmetisches Mittel 3,0 und Median 3 haben, aber <b>völlig verschieden</b> aussehen: Bei Lerngruppe A sollen die Noten eng beieinanderliegen (Spannweite höchstens 1), bei Lerngruppe B weit auseinander (Spannweite mindestens 4).</p>", teile:[
+      Object.assign({k:"a", frage:"Lerngruppe A", kurz:"eng", loesung:"z. B. 0, 0, 20, 0, 0, 0: alle haben eine 3"}, spiegel((r,w)=>{ const da = w.map((k,i)=>k?i+1:null).filter(Boolean); return r.med===3 && Math.max(...da)-Math.min(...da)<=1; }, "Prüfe: Mittel 3,0, Median 3 und Spannweite höchstens 1?", [0,0,20,0,0,0])),
+      Object.assign({k:"b", frage:"Lerngruppe B", kurz:"weit", loesung:"z. B. 10, 0, 0, 0, 10, 0: Median (1 + 5) : 2 = 3"}, spiegel((r,w)=>{ const da = w.map((k,i)=>k?i+1:null).filter(Boolean); return r.med===3 && Math.max(...da)-Math.min(...da)>=4; }, "Prüfe: Mittel 3,0, Median 3 und Spannweite mindestens 4?", [10,0,0,0,10,0])),
+      {k:"c", typ:"heft", frage:"Zeichne zu beiden Notenspiegeln ein Säulendiagramm.", muster:()=>svgSaeulen({namen:["1","2","3","4","5","6"], reihen:[{werte:[0,0,20,0,0,0], farbe:"var(--d1)", name:"Lerngruppe A"},{werte:[10,0,0,0,10,0], farbe:"var(--d2)", name:"Lerngruppe B"}], max:20, schritt:5, einheit:"Anzahl", legende:true, breite:420})},
       {k:"d", typ:"wahl", frage:"Was zeigen arithmetisches Mittel und Median hier nicht? Welcher Kennwert hilft?", optionen:["Sie zeigen nicht, wie weit die Noten streuen. Die Spannweite hilft: A hat 0, B hat 4.","Sie zeigen nicht die beste Note. Das Maximum hilft.","Sie zeigen alles, ein weiterer Kennwert ist nicht nötig."], richtig:0, loesung:"Mittel und Median zeigen die Mitte, aber nicht die Streuung. Die Spannweite hilft (Karte 21)."},
       {k:"e", typ:"heft", frage:"Stelle einen deiner Notenspiegel als Kreisdiagramm dar.", muster:"Für a): 360° : 20 = 18° pro Person, also 36°, 72°, 144°, 72°, 36°."}]}),
     aufgabe({karte:"X3", nr:3, titel:"Zu zweit", stufe:"Partnerarbeit · freiwillig", freiwillig:true, piktogramm:"👥", teile:[
