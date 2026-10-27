@@ -1,0 +1,1867 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gleichungen und Formeln umstellen</title>
+<style>
+:root{
+  color-scheme: light;
+  --papier:#EEF1F4;
+  --blatt:#FFFFFF;
+  --tinte:#1B2530;
+  --leise:#536070;
+  --marker:#A4EC96;      /* gesuchte Variable, der Fuß */
+  --socke:#1E5BC6;       /* klebt direkt an der Variable */
+  --schuh:#B3246C;       /* hängt außen dran */
+  --hinweis:#FFE08A;
+  --f1:#FFF4C9; --f2:#E3ECF7; --f3:#FBE7DA; --f4:#EFE6F6; --f5:#DDF0F2; --f6:#FBE3EA; --f7:#ECEBE2;
+  --text:"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Avenir Next","Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --mathe:"STIX Two Text",Cambria,"Iowan Old Style","Palatino Linotype","Noto Serif",Georgia,serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--papier);color:var(--tinte);
+  font-family:var(--text);font-size:18px;line-height:1.55;
+  -webkit-text-size-adjust:100%;transition:background-color .4s;
+}
+body[data-seite="fall1"]{--papier:var(--f1)}
+body[data-seite="fall2"]{--papier:var(--f2)}
+body[data-seite="fall3"]{--papier:var(--f3)}
+body[data-seite="fall4"]{--papier:var(--f4)}
+body[data-seite="fall5"]{--papier:var(--f5)}
+body[data-seite="fall6"]{--papier:var(--f6)}
+body[data-seite="fall7"]{--papier:var(--f7)}
+@media (min-width:900px){body{font-size:19px}}
+@media (prefers-reduced-motion:reduce){body{transition:none}}
+p{margin:0 0 .8em}
+h1,h2,h3{font-family:var(--mathe);font-weight:600;line-height:1.15;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--socke);outline-offset:2px}
+[hidden]{display:none !important}
+
+/* ---------- Mathe-Bausteine ---------- */
+.m{font-family:var(--mathe);font-size:1.12em;white-space:nowrap}
+.v{font-family:var(--mathe);font-style:italic;font-size:1.1em}
+.m .v,.rechnung .v,.bsp .v,.chip .v,.pf .v,.formel .v,.fehlersuche .v,.gross .v,.muster .v{font-size:1em}
+.ziel{background:var(--marker);border-radius:.3em;padding:0 .28em;font-weight:600}
+.so{color:var(--socke);font-weight:700}
+.sc{color:var(--schuh);font-weight:700}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.25;margin:0 .1em}
+.frac>span:first-child{border-bottom:2px solid currentColor;padding:0 .3em .05em}
+.frac>span:last-child{padding:.05em .3em 0}
+
+/* ---------- Kopfleiste ---------- */
+.leiste{position:sticky;top:0;z-index:5;background:var(--papier);border-bottom:2px solid var(--tinte);transition:background-color .4s}
+.leiste-innen{max-width:60rem;margin:0 auto;padding:.45rem 1rem;display:flex;align-items:center;gap:.3rem;overflow-x:auto}
+.leiste button{
+  flex:none;height:2.2rem;min-width:2.2rem;border-radius:2rem;border:1.5px solid var(--tinte);
+  background:#fff;font-size:.9rem;font-weight:700;padding:0 .2rem;
+}
+.leiste button.start{padding:0 .9rem;margin-right:.5rem}
+.leiste button[data-ziel="fall1"]{background:var(--f1)}
+.leiste button[data-ziel="fall2"]{background:var(--f2)}
+.leiste button[data-ziel="fall3"]{background:var(--f3)}
+.leiste button[data-ziel="fall4"]{background:var(--f4)}
+.leiste button[data-ziel="fall5"]{background:var(--f5)}
+.leiste button[data-ziel="fall6"]{background:var(--f6)}
+.leiste button[data-ziel="fall7"]{background:var(--f7)}
+.leiste button[aria-current]{background:var(--tinte);color:#fff}
+.leiste button:disabled{opacity:.35;cursor:default;border-style:dashed}
+
+/* ---------- Seitenaufbau ---------- */
+main{max-width:60rem;margin:0 auto;padding:0 1rem 5rem}
+.seite>section{margin-top:3rem}
+.seite>.kopf{margin-top:2.2rem;display:grid;grid-template-columns:auto 1fr;gap:.4rem 1.1rem;align-items:center}
+.nummer{
+  width:4.2rem;height:4.2rem;border-radius:50%;background:var(--tinte);color:#fff;
+  display:grid;place-items:center;font-family:var(--mathe);font-size:2.1rem;font-weight:600;
+}
+h1{font-size:clamp(1.9rem,5.2vw,3.1rem);letter-spacing:-.01em}
+.kopf .einstieg{grid-column:1 / -1;max-width:40rem;margin-top:1rem}
+.kopf .einstieg p:last-child{margin-bottom:0}
+.unterzeile{color:var(--leise);font-size:.95rem;margin:.3rem 0 0}
+h2{font-size:1.65rem;margin-bottom:.9rem}
+.vorspann{max-width:40rem}
+.blatt{background:var(--blatt);border-radius:14px;padding:1.1rem 1.2rem}
+
+/* ---------- Startseite ---------- */
+.idee{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;counter-reset:i}
+.idee.blatt{padding:1.1rem 1.2rem}
+.idee li{counter-increment:i;font-family:var(--mathe);font-size:1.25rem;line-height:1.3}
+.idee li::before{
+  content:counter(i);display:grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;
+  border:2px solid var(--tinte);font-family:var(--text);font-size:.95rem;font-weight:700;margin-bottom:.5rem;
+}
+@media (max-width:700px){.idee{grid-template-columns:1fr}}
+.faelle{display:grid;gap:.6rem}
+.fallzeile{
+  display:grid;grid-template-columns:2.6rem minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:.3rem 1rem;align-items:center;
+  width:100%;text-align:left;border:2px solid transparent;border-radius:14px;padding:.8rem 1rem;background:#fff;
+}
+button.fallzeile{border-color:var(--tinte)}
+.fallzeile .nr{
+  width:2.4rem;height:2.4rem;border-radius:50%;display:grid;place-items:center;
+  border:1.5px solid var(--tinte);font-weight:700;background:var(--papier);
+}
+.fallzeile[data-ziel="fall1"] .nr{background:var(--f1)}
+.fallzeile[data-ziel="fall2"] .nr{background:var(--f2)}
+.fallzeile[data-ziel="fall3"] .nr{background:var(--f3)}
+.fallzeile[data-ziel="fall4"] .nr{background:var(--f4)}
+.fallzeile[data-ziel="fall5"] .nr{background:var(--f5)}
+.fallzeile[data-ziel="fall6"] .nr{background:var(--f6)}
+.fallzeile[data-ziel="fall7"] .nr{background:var(--f7)}
+.fallzeile .name{font-family:var(--mathe);font-size:1.2rem;font-weight:600;line-height:1.2}
+.fallzeile .regel{display:block;font-family:var(--text);font-size:.85rem;font-weight:400;color:var(--leise);margin-top:.15rem}
+.fallzeile .muster{font-family:var(--mathe);font-size:1.15rem;white-space:nowrap}
+div.fallzeile{opacity:.6}
+div.fallzeile .name::after{content:" (folgt)";font-family:var(--text);font-size:.8rem;font-weight:400}
+@media (max-width:700px){
+  .fallzeile{grid-template-columns:2.6rem minmax(0,1fr) minmax(0,1fr)}
+  .fallzeile .name{grid-column:2 / -1}
+  .fallzeile .muster:nth-of-type(3){grid-column:2}
+}
+
+/* ---------- Socke und Schuh ---------- */
+.streifen{
+  display:grid;align-items:center;justify-items:center;gap:.4rem .3rem;
+  grid-template-columns:minmax(0,1fr) minmax(3.6em,.8fr) minmax(0,1fr) minmax(3.6em,.8fr) minmax(0,1fr);
+  padding:1.2rem 1rem 1.3rem;
+}
+.streifen.kurz{grid-template-columns:minmax(0,1fr) minmax(3.6em,.8fr) minmax(0,1fr);max-width:34rem}
+.streifen .wort{justify-self:start;font-weight:700;font-size:.95rem}
+.streifen svg{width:100%;max-width:150px;height:auto;display:block}
+.streifen .formel{font-family:var(--mathe);font-size:1.25em;white-space:nowrap;margin-bottom:.3rem}
+.zeichnung text{font-family:var(--mathe);font-weight:700;fill:var(--tinte)}
+.pf{display:flex;flex-direction:column;align-items:center;gap:.3em;width:100%;font-family:var(--mathe);font-weight:700;font-size:1.15em;white-space:nowrap;text-align:center;line-height:1.15}
+.pf.unten{flex-direction:column-reverse}
+.pf small{display:block;font-family:var(--text);font-size:.7em;font-weight:700}
+.pf .linie{display:block;width:100%;height:3px;background:currentColor;position:relative}
+.pf .linie::after{content:"";position:absolute;top:-5.5px;border:7px solid transparent}
+.pf.rechts .linie::after{right:-2px;border-left-color:currentColor;border-right-width:0}
+.pf.links .linie::after{left:-2px;border-right-color:currentColor;border-left-width:0}
+@media (max-width:560px){.streifen{padding:1rem .5rem;column-gap:.15rem}.streifen .formel{font-size:.95em}.streifen .wort{font-size:.8rem}.pf{font-size:1em}}
+.einbild{display:grid;grid-template-columns:minmax(6rem,9.5rem) 1fr;gap:1.4rem;align-items:center}
+.einbild svg{width:100%;height:auto;display:block}
+.einbild p:last-child{margin-bottom:0}
+@media (max-width:560px){.einbild{grid-template-columns:1fr}.einbild svg{max-width:9rem}}
+.deutung{max-width:40rem;margin-top:1.1rem}
+.deutung p:last-child{margin-bottom:0}
+
+/* ---------- Rechnung mit Befehlsstrich ---------- */
+.rechnung{
+  display:grid;grid-template-columns:auto auto auto auto;justify-content:start;align-items:center;
+  font-family:var(--mathe);font-size:1.2em;white-space:nowrap;
+}
+.rechnung .zeile{display:contents}
+.l{text-align:right;padding:.45em 0}
+.g{text-align:center;padding:.45em .45em}
+.r{text-align:left;padding:.45em 0}
+.cmd{margin-left:1em;padding:.3em 0 .3em .6em;border-left:2px solid var(--tinte);font-weight:700;min-width:3.4em}
+.cmd:empty{border-left-color:transparent}
+.cmd.offen{color:var(--leise);font-weight:400}
+
+/* ---------- Beispiel: Gedanke, Zahlen, Formel ---------- */
+.bsp{
+  display:grid;align-items:center;row-gap:1.1rem;
+  grid-template-columns:minmax(13rem,1fr) auto auto auto auto 1.8rem auto auto auto auto;
+  font-size:.95em;
+}
+.bsp .l,.bsp .g,.bsp .r,.bsp .cmd{font-family:var(--mathe);font-size:1.2em;white-space:nowrap}
+.bsp .kopf4{grid-column:span 4;font-size:.9rem;font-weight:700;color:var(--leise);text-align:center}
+.bsp .ged{display:grid;grid-template-columns:3.4rem 1fr;gap:.8rem;align-items:center;padding-right:1.2rem}
+.bsp .ged svg{width:100%;height:auto;display:block}
+.bsp .ged p{margin:0}
+@media (max-width:860px){
+  /* schmal: Gedanke über die ganze Breite, darunter Zahlen und Formel nebeneinander */
+  .bsp{grid-template-columns:auto auto auto auto minmax(1.2rem,1fr) auto auto auto auto;row-gap:.2rem;overflow-x:auto}
+  .bsp .ged{grid-column:1 / -1;padding-right:0;margin-top:.9rem}
+  .bsp .leer{display:none}
+  .bsp .cmd{min-width:0;margin-left:.6em;padding-left:.45em}
+  .bsp .luecke{border-left:2px solid var(--papier);justify-self:center;align-self:stretch;width:0}
+}
+@media (max-width:560px){
+  .bsp.blatt{padding-left:.7rem;padding-right:.7rem}
+  .bsp .l,.bsp .g,.bsp .r,.bsp .cmd{font-size:.92em}
+  .bsp .g{padding-left:.25em;padding-right:.25em}
+  .bsp .cmd{margin-left:.35em;padding-left:.3em}
+  .bsp .ziel{padding:0 .15em}
+}
+.probe{margin:1rem 0 0;color:var(--leise)}
+.merke{margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.merke h3{font-family:var(--text);font-size:.95rem;font-weight:700;margin-bottom:.35rem}
+.merke p:last-child{margin-bottom:0}
+.merke .frage{font-family:var(--mathe);font-size:1.3em;line-height:1.3;margin-bottom:.4rem}
+.paare{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0 .6rem}
+.paare span{background:var(--papier);border-radius:2em;padding:.15em .9em;font-family:var(--mathe);font-size:1.1em}
+@media (max-width:700px){.merke{grid-template-columns:1fr}}
+
+.vergleich{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.vergleich h3{font-family:var(--text);font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.vergleich .gross{margin:.1rem 0 .5rem;font-size:1.35em}
+.vergleich .oder{font-family:var(--text);font-size:.6em;color:var(--leise);margin:0 .4em}
+.vergleich p:last-child{margin-bottom:0}
+.vergleich .anders{border:2px dashed var(--tinte)}
+@media (max-width:700px){.vergleich{grid-template-columns:1fr}}
+
+.wz{white-space:nowrap}
+.wz>span{border-top:2px solid currentColor;padding:.05em .15em 0;display:inline-block;vertical-align:middle}
+.waage{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.4rem;align-items:center}
+.waage svg{width:100%;height:auto;display:block}
+.waage .wtext text{font-family:var(--mathe);font-weight:700;fill:var(--tinte)}
+.waage .gross{margin:.1rem 0 .5rem}
+.waage p:last-child{margin-bottom:0}
+@media (max-width:700px){.waage{grid-template-columns:1fr}}
+.zeig{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.1rem}
+.zeig .blatt{display:grid;gap:.1rem;padding:.7rem 1.1rem}
+.zeig .was{font-size:.85rem;font-weight:700;color:var(--leise)}
+.zeig .gross{margin:0;font-size:1.6em}
+.ged .schritt{width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid var(--tinte);display:grid;place-items:center;font-weight:700;justify-self:center}
+
+/* ---------- Üben ---------- */
+.ueben{display:grid;gap:1rem}
+.karte h3{font-size:1.3rem}
+.kartenkopf{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.2rem}
+.wie{color:var(--leise);font-size:.95rem;margin-bottom:.9rem;max-width:40rem}
+.schalter{display:inline-flex;border:2px solid var(--tinte);border-radius:2em;overflow:hidden}
+.schalter button{border:0;background:#fff;padding:.25em .9em;font-size:.9rem;font-weight:700;min-height:36px}
+.schalter button[aria-pressed="true"]{background:var(--tinte);color:#fff}
+.kontext{color:var(--leise);font-size:.9rem;margin-bottom:.1rem}
+.auftrag{margin-bottom:.5rem}
+.gross{font-family:var(--mathe);font-size:1.5em;white-space:nowrap;margin:.2rem 0 .8rem}
+.frage-klein{margin:.9rem 0 0;font-weight:700;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.chip{
+  min-height:44px;min-width:4.4rem;padding:.2em .9em;background:#fff;
+  border:2px solid var(--tinte);border-radius:2em;font-family:var(--mathe);font-size:1.15em;font-weight:600;
+}
+.chip:disabled{opacity:.3;cursor:default}
+.wackel{animation:wackel .3s}
+@keyframes wackel{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.wackel{animation:none}}
+.eingabe{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;font-family:var(--mathe);font-size:1.3em}
+.eingabe input{font:inherit;width:5.5rem;padding:.2em .5em;border:2px solid var(--tinte);border-radius:10px;background:#fff}
+.knopf{
+  min-height:44px;padding:.3em 1.1em;border-radius:2em;border:2px solid var(--tinte);
+  background:#fff;font-family:var(--text);font-size:.95rem;font-weight:700;
+}
+.knopf.voll{background:var(--tinte);color:#fff}
+.knopfzeile{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.meldung{margin:.8rem 0 0;padding:.5em .8em;border-radius:.5em;max-width:38rem}
+.meldung:empty{display:none}
+.meldung.tipp{background:var(--hinweis)}
+.meldung.ok{background:var(--tinte);color:#fff;font-weight:600}
+.meldung.ok .ziel{color:var(--tinte)}
+.weg{margin-top:.9rem;padding-top:.6rem;border-top:2px dashed var(--papier)}
+.kartenfuss{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.6rem;margin-top:1.1rem;padding-top:.9rem;border-top:2px solid var(--papier)}
+.zaehler{color:var(--leise);font-size:.9rem}
+
+.fehlersuche{display:grid;gap:.35rem;max-width:27em;font-family:var(--mathe);font-size:1.15em}
+.fehlersuche button.reihe{
+  display:grid;grid-template-columns:2rem 1fr;align-items:center;text-align:left;
+  background:#fff;border:2px solid var(--papier);border-radius:12px;padding:.1rem .6rem;min-height:3.2rem;
+}
+.fehlersuche .zeile{display:grid;grid-template-columns:minmax(0,1fr) 1.5em minmax(0,1.15fr) 4.6em;align-items:center;white-space:nowrap}
+.fehlersuche .g{padding:0}
+.fehlersuche .cmd{min-width:0;margin-left:.6em}
+.fehlersuche .znr{font-family:var(--text);font-size:.8rem;font-weight:700;color:var(--leise)}
+.fehlersuche button.gefunden{background:var(--hinweis);border-color:var(--tinte)}
+.fehlersuche button:disabled{cursor:default}
+
+.blaettern{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:space-between}
+</style>
+</head>
+<body data-seite="start">
+
+<!-- Zeichnungen: Fuß, Socke, Schuh -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="fuss">
+      <path d="M44 2 L44 76 Q44 94 60 94 L104 94 Q118 94 118 83 Q118 73 105 71 L80 66 Q68 63 68 52 L68 2" fill="#A4EC96" stroke="#1B2530" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <g id="socke">
+      <path d="M40 30 L40 77 Q40 98 59 98 L105 98 Q122 98 122 83 Q122 69 106 67 L82 62 Q72 60 72 51 L72 30 Z" fill="#9CC0F5" stroke="#1B2530" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="40" y="30" width="32" height="10" fill="#1E5BC6" stroke="#1B2530" stroke-width="3"/>
+    </g>
+    <g id="schuh">
+      <path d="M34 56 L76 56 L84 64 L108 68 Q130 71 130 88 L130 100 L34 100 Z" fill="#F0A3C6" stroke="#1B2530" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="30" y="98" width="104" height="11" rx="5.5" fill="#fff" stroke="#1B2530" stroke-width="3"/>
+      <path d="M86 70 l8 -7 M96 72 l8 -7" stroke="#1B2530" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g id="fuss-neutral">
+      <path d="M44 2 L44 76 Q44 94 60 94 L104 94 Q118 94 118 83 Q118 73 105 71 L80 66 Q68 63 68 52 L68 2" fill="#fff" stroke="#1B2530" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <g id="socke-gruen">
+      <path d="M40 30 L40 77 Q40 98 59 98 L105 98 Q122 98 122 83 Q122 69 106 67 L82 62 Q72 60 72 51 L72 30 Z" fill="#A4EC96" stroke="#1B2530" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="40" y="30" width="32" height="10" fill="#4FB85A" stroke="#1B2530" stroke-width="3"/>
+    </g>
+    <g id="sammeln">
+      <rect x="8" y="60" width="30" height="30" rx="6" fill="#A4EC96" stroke="#1B2530" stroke-width="3"/>
+      <rect x="44" y="60" width="30" height="30" rx="6" fill="#A4EC96" stroke="#1B2530" stroke-width="3"/>
+      <path d="M84 70 H100 M84 81 H100" stroke="#1B2530" stroke-width="3" stroke-linecap="round"/>
+      <rect x="110" y="60" width="30" height="30" rx="6" fill="#fff" stroke="#1B2530" stroke-width="3" stroke-dasharray="6 5"/>
+      <path d="M125 52 Q92 8 60 48 M60 48 l13 -3 M60 48 l2 -13" fill="none" stroke="#1B2530" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </defs>
+</svg>
+
+<header class="leiste">
+  <nav class="leiste-innen" aria-label="Fälle">
+    <button type="button" class="start" data-ziel="start">Übersicht</button>
+    <button type="button" data-ziel="fall1" aria-label="Fall 1">1</button>
+    <button type="button" data-ziel="fall2" aria-label="Fall 2">2</button>
+    <button type="button" data-ziel="fall3" aria-label="Fall 3">3</button>
+    <button type="button" data-ziel="fall4" aria-label="Fall 4">4</button>
+    <button type="button" data-ziel="fall5" aria-label="Fall 5">5</button>
+    <button type="button" data-ziel="fall6" aria-label="Fall 6">6</button>
+    <button type="button" data-ziel="fall7" aria-label="Fall 7">7</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======================= ÜBERSICHT ======================= -->
+<div class="seite" id="start">
+  <section class="kopf">
+    <div style="grid-column:1 / -1">
+      <h1>Gleichungen und Formeln umstellen</h1>
+      <p class="unterzeile">Zum Nachschlagen und Üben</p>
+    </div>
+    <div class="einstieg">
+      <p>Hier kannst du nachschlagen und üben, wann immer du beim Umstellen hängst. Die Idee ist bei jeder Gleichung und jeder Formel dieselbe.</p>
+    </div>
+  </section>
+
+  <section>
+    <ol class="idee blatt">
+      <li>Die markierte Variable soll allein stehen.</li>
+      <li>Frage dich in jeder Zeile, was außen an ihr dranhängt.</li>
+      <li>Räume es mit der Umkehroperation weg, auf beiden Seiten.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Wie sieht deine Aufgabe aus?</h2>
+    <p class="vorspann">Suche die Zeile, die deiner Aufgabe ähnelt. Wenn du nicht weißt, wo du anfangen sollst, löse die Beispiele von oben nach unten im Heft und beginne mit dem ersten Fall, bei dem du hängst.</p>
+    <div class="faelle">
+      <button type="button" class="fallzeile" data-ziel="fall1">
+        <span class="nr">1</span>
+        <span class="name">Eine Schicht<span class="regel">eine Umkehroperation genügt</span></span>
+        <span class="muster">3 · <i class="v ziel">x</i> = 12<br><i class="v ziel">x</i> : 4 = 3</span>
+        <span class="muster"><i class="v">A</i> = <i class="v ziel">a</i> · <i class="v">b</i></span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall2">
+        <span class="nr">2</span>
+        <span class="name">Zwei Schichten<span class="regel">erst die Strichrechnung, dann die Punktrechnung</span></span>
+        <span class="muster">2 · <i class="v ziel">x</i> + 3 = 11</span>
+        <span class="muster"><i class="v">u</i> = 2 · <i class="v ziel">a</i> + 2<i class="v">b</i></span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall3">
+        <span class="nr">3</span>
+        <span class="name">Klammer und Bruchstrich<span class="regel">erst weg, was außerhalb der Klammer steht</span></span>
+        <span class="muster">2 · (<i class="v ziel">x</i> + 3) = 14</span>
+        <span class="muster"><i class="v">m</i> = <span class="frac"><span><i class="v ziel">a</i> + <i class="v">b</i></span><span>2</span></span></span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall4">
+        <span class="nr">4</span>
+        <span class="name">Variable hinter dem Minus oder hinter dem Geteilt<span class="regel">auch unter dem Bruchstrich, erst die Variable nach vorn holen</span></span>
+        <span class="muster">10 − <i class="v ziel">x</i> = 3<br>12 : <i class="v ziel">x</i> = 3</span>
+        <span class="muster"><i class="v">v</i> = <span class="frac"><span><i class="v">s</i></span><span><i class="v ziel">t</i></span></span></span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall5">
+        <span class="nr">5</span>
+        <span class="name">Variable kommt mehrfach vor<span class="regel">erst sammeln</span></span>
+        <span class="muster">3<i class="v ziel">x</i> + 2 = <i class="v ziel">x</i> + 8</span>
+        <span class="muster">5<i class="v ziel">x</i> + <i class="v">a</i> = 3<i class="v ziel">x</i> + <i class="v">b</i></span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall6">
+        <span class="nr">6</span>
+        <span class="name">Quadrat und Wurzel<span class="regel">die Wurzel ist die Umkehroperation zum Quadrat</span></span>
+        <span class="muster"><i class="v ziel">x</i>² = 49</span>
+        <span class="muster"><i class="v">c</i>² = <i class="v ziel">a</i>² + <i class="v">b</i>²</span>
+      </button>
+      <button type="button" class="fallzeile" data-ziel="fall7">
+        <span class="nr">7</span>
+        <span class="name">Gemischtes Training<span class="regel">alle Fälle durcheinander, dazu Formeln aus der Formelsammlung</span></span>
+        <span class="muster"><i class="v">A</i> = <span class="frac"><span><i class="v">a</i> + <i class="v">c</i></span><span>2</span></span> · <i class="v ziel">h</i></span><span class="muster"></span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- ======================= FALL 1 ======================= -->
+<div class="seite" id="fall1" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">1</div>
+    <div>
+      <h1>Eine Schicht</h1>
+      <p class="unterzeile">Fall 1, an der Variable hängt nur eine Rechnung</p>
+    </div>
+    <div class="einstieg">
+      <p>An der Variable hängt genau eine Rechnung. Du machst sie mit der Umkehroperation rückgängig, dann steht die Variable allein.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross"><span>3 ·</span> <i class="v ziel">x</i> = 12</span></div>
+      <div class="blatt"><span class="was">als Formel</span><span class="gross"><i class="v">A</i> = <i class="v ziel">a</i> <span>· <i class="v">b</i></span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Hinter dem Befehlsstrich steht, was du auf beiden Seiten rechnest. Mit Zahlen und mit Buchstaben gehst du gleich vor.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">als Formel</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Die markierte Variable soll allein stehen. Was hängt an ihr? Ein Faktor mit Malpunkt. Die Umkehroperation zu Mal ist Geteilt.</p>
+      </div>
+      <span class="l"><span class="so">3 ·</span> <i class="v ziel">x</i></span><span class="g">=</span><span class="r">12</span><span class="cmd so">: 3</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">A</i></span><span class="g">=</span><span class="r"><i class="v ziel">a</i> <span class="so">· <i class="v">b</i></span></span><span class="cmd so">: <i class="v">b</i></span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">4</span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l"><span class="frac"><span><i class="v">A</i></span><span><i class="v">b</i></span></span></span><span class="g">=</span><span class="r"><i class="v ziel">a</i></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 4 für <i class="v">x</i> ein, dann steht dort <span class="m">3 · 4 = 12</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Ein Bild zum Merken</h2>
+    <p class="vorspann">Stell dir die Variable als Fuß vor. Die Rechnung, die an ihr hängt, ist eine Socke. Mit der Umkehroperation ziehst du die Socke aus, dann steht der Fuß allein da. Ab Fall 2 hilft dir dieses Bild, die richtige Reihenfolge zu finden.</p>
+    <div class="streifen kurz blatt">
+      <span class="wort">Anziehen</span>
+      <span class="pf rechts so"><span>· 3</span><span class="linie"></span></span>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Nackter Fuß, beschriftet mit x">
+        <use href="#fuss"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke">
+        <use href="#fuss"/><use href="#socke"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="80" y="89" text-anchor="middle" font-size="16">· 3</text>
+      </svg>
+      <span class="formel"><i class="v ziel">x</i></span>
+      <span></span>
+      <span class="formel"><span class="so">3 ·</span> <i class="v ziel">x</i></span>
+      <span class="wort">Ausziehen</span>
+      <span class="pf links so unten"><span>: 3</span><span class="linie"></span></span>
+      <span></span>
+    </div>
+  </section>
+
+    <section>
+    <h2>Zum Merken</h2>
+    <div class="merke" style="margin-top:0">
+      <div class="blatt">
+        <h3>Die vier Grundfälle</h3>
+        <div class="rechnung">
+          <div class="zeile"><span class="l"><i class="v ziel">x</i> + 5</span><span class="g">=</span><span class="r">12</span><span class="cmd so">− 5</span></div>
+          <div class="zeile"><span class="l"><i class="v ziel">x</i> − 5</span><span class="g">=</span><span class="r">12</span><span class="cmd so">+ 5</span></div>
+          <div class="zeile"><span class="l">3 · <i class="v ziel">x</i></span><span class="g">=</span><span class="r">12</span><span class="cmd so">: 3</span></div>
+          <div class="zeile"><span class="l"><i class="v ziel">x</i> : 4</span><span class="g">=</span><span class="r">3</span><span class="cmd so">· 4</span></div>
+        </div>
+      </div>
+      <div class="blatt">
+        <h3>Immer auf beiden Seiten</h3>
+        <p>Plus und Minus sind Umkehroperationen. Mal und Geteilt sind es auch.</p>
+        <div class="paare" aria-label="Umkehroperationen"><span>+ und −</span><span>· und :</span></div>
+        <p>Eine Gleichung ist wie eine Waage im Gleichgewicht. Was du auf einer Seite wegnimmst, musst du auch auf der anderen Seite wegnehmen. Sonst stimmt das Gleichheitszeichen nicht mehr.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Achtung bei Minus und Geteilt</h2>
+    <p class="vorspann">Bei Plus und Mal ist die Reihenfolge egal, <span class="m">5 + <i class="v">x</i></span> ist dasselbe wie <span class="m"><i class="v">x</i> + 5</span>. Bei Minus und Geteilt ist sie nicht egal. Schau deshalb genau hin, wo die Variable steht.</p>
+    <div class="vergleich">
+      <div class="blatt">
+        <h3>Die Variable steht vorn</h3>
+        <p class="gross"><i class="v ziel">x</i> − 5 = 12</p>
+        <p class="gross"><i class="v ziel">x</i> : 4 = 3 <span class="oder">oder</span> <span class="frac"><span><i class="v ziel">x</i></span><span>4</span></span> = 3</p>
+        <p>Von <i class="v">x</i> wird etwas abgezogen, oder <i class="v">x</i> wird geteilt. Das ist eine Socke. Du bist hier richtig, bei Fall 1.</p>
+      </div>
+      <div class="blatt anders">
+        <h3>Die Variable steht hinten</h3>
+        <p class="gross">5 − <i class="v ziel">x</i> = 2</p>
+        <p class="gross">12 : <i class="v ziel">x</i> = 3 <span class="oder">oder</span> <span class="frac"><span>12</span><span><i class="v ziel">x</i></span></span> = 3</p>
+        <p><i class="v">x</i> wird selbst abgezogen, oder durch <i class="v">x</i> wird geteilt. Hier reicht die Umkehroperation allein nicht. Das ist Fall 4.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="1"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall2">Weiter zu Fall 2</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 2 ======================= -->
+<div class="seite" id="fall2" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">2</div>
+    <div>
+      <h1>Zwei Schichten</h1>
+      <p class="unterzeile">Fall 2, an der Variable hängen zwei Rechnungen</p>
+    </div>
+    <div class="einstieg">
+      <p>An der Variable hängen zwei Rechnungen, meistens eine Punktrechnung und eine Strichrechnung. Es kommt darauf an, in welcher Reihenfolge du sie wegräumst.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross"><span>2 ·</span> <i class="v ziel">x</i> <span>+ 3</span> = 11</span></div>
+      <div class="blatt"><span class="was">als Formel</span><span class="gross"><i class="v">u</i> = <span>2 ·</span> <i class="v ziel">a</i> <span>+ 2<i class="v">b</i></span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Du arbeitest dich von außen nach innen vor. Mit Zahlen und mit Buchstaben gehst du gleich vor.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">als Formel</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Was hängt außen an der Variable? Die <span class="sc">Strichrechnung</span>. Sie kommt zuerst weg.</p>
+      </div>
+      <span class="l"><span class="so">2 ·</span> <i class="v ziel">x</i> <span class="sc">+ 3</span></span><span class="g">=</span><span class="r">11</span><span class="cmd sc">− 3</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">u</i></span><span class="g">=</span><span class="r"><span class="so">2 ·</span> <i class="v ziel">a</i> <span class="sc">+ 2<i class="v">b</i></span></span><span class="cmd sc">− 2<i class="v">b</i></span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Was klebt jetzt noch an der Variable? Die <span class="so">2</span> mit dem Malpunkt. Sie kommt danach weg.</p>
+      </div>
+      <span class="l"><span class="so">2 ·</span> <i class="v ziel">x</i></span><span class="g">=</span><span class="r">8</span><span class="cmd so">: 2</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">u</i> − 2<i class="v">b</i></span><span class="g">=</span><span class="r"><span class="so">2 ·</span> <i class="v ziel">a</i></span><span class="cmd so">: 2</span>
+
+      <div class="ged">
+        <span class="schritt">3</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">4</span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l"><span class="frac"><span><i class="v">u</i> − 2<i class="v">b</i></span><span>2</span></span></span><span class="g">=</span><span class="r"><i class="v ziel">a</i></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 4 für <i class="v">x</i> ein, dann steht dort <span class="m">2 · 4 + 3 = 11</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Warum zuerst die Strichrechnung?</h2>
+    <p class="vorspann">Stell dir die Variable als Fuß vor. Beim Ausrechnen wird der Fuß angezogen, beim Umstellen wieder ausgezogen.</p>
+    <div class="streifen blatt">
+      <span class="wort">Anziehen</span>
+      <span class="pf rechts so"><span>· 2</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf rechts sc"><span>+ 3</span><span class="linie"></span></span>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Nackter Fuß, beschriftet mit x">
+        <use href="#fuss"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke">
+        <use href="#fuss"/><use href="#socke"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="80" y="89" text-anchor="middle" font-size="16">· 2</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke und Schuh">
+        <use href="#fuss"/><use href="#socke"/><use href="#schuh"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="66" y="90" text-anchor="middle" font-size="16">+ 3</text>
+      </svg>
+      <span class="formel"><i class="v ziel">x</i></span>
+      <span></span>
+      <span class="formel"><span class="so">2 ·</span> <i class="v ziel">x</i></span>
+      <span></span>
+      <span class="formel"><span class="so">2 ·</span> <i class="v ziel">x</i> <span class="sc">+ 3</span></span>
+      <span class="wort">Ausziehen</span>
+      <span class="pf links so unten"><span><small>danach</small>: 2</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf links sc unten"><span><small>zuerst</small>− 3</span><span class="linie"></span></span>
+      <span></span>
+    </div>
+    <div class="deutung">
+      <p>Beim Anziehen kommt zuerst die Socke und dann der Schuh. Beim Ausziehen geht es umgekehrt. Der Schuh muss zuerst weg, vorher kommst du an die Socke gar nicht heran.</p>
+      <p>In <span class="m"><span class="so">2 ·</span> <i class="v ziel">x</i> <span class="sc">+ 3</span></span> klebt die <span class="so">2</span> direkt an <i class="v">x</i>, sie ist die Socke. Das <span class="sc">+ 3</span> hängt außen dran, es ist der Schuh.</p>
+    </div>
+  </section>
+
+    <section>
+    <h2>Zum Merken</h2>
+    <div class="merke" style="margin-top:0">
+      <div class="blatt">
+        <h3>Die Frage in jeder Zeile</h3>
+        <p class="frage">Was hängt außen an der markierten Variable?</p>
+        <p>Das kommt als Nächstes weg. In diesem Fall ist es die Strichrechnung. Beim Ausrechnen gilt Punkt vor Strich, beim Wegräumen gilt Strich vor Punkt.</p>
+      </div>
+      <div class="blatt">
+        <h3>Beim Teilen die ganze Seite</h3>
+        <p>Teilst du, dann wird die ganze Seite geteilt. Deshalb steht <span class="m"><i class="v">u</i> − 2<i class="v">b</i></span> gemeinsam über dem Bruchstrich. Ohne Bruchstrich brauchst du eine Klammer, also <span class="m">(<i class="v">u</i> − 2<i class="v">b</i>) : 2</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Achtung bei Klammern und Bruchstrichen</h2>
+    <p class="vorspann">Strich vor Punkt gilt nur, solange keine Klammer und kein Bruchstrich im Spiel ist. Schau deshalb genau hin, wo das Plus oder Minus steht.</p>
+    <div class="vergleich">
+      <div class="blatt">
+        <h3>Ohne Klammer</h3>
+        <p class="gross">2 · <i class="v ziel">x</i> + 3 = 11</p>
+        <p class="gross"><span class="frac"><span><i class="v ziel">x</i></span><span>2</span></span> + 3 = 11</p>
+        <p>Das + 3 hängt außen dran und kommt zuerst weg. Du bist hier richtig, bei Fall 2.</p>
+      </div>
+      <div class="blatt anders">
+        <h3>Mit Klammer oder langem Bruchstrich</h3>
+        <p class="gross">2 · (<i class="v ziel">x</i> + 3) = 14</p>
+        <p class="gross"><span class="frac"><span><i class="v ziel">x</i> + 3</span><span>2</span></span> = 7</p>
+        <p>Das + 3 steckt mit <i class="v">x</i> zusammen in der Klammer oder über dem Bruchstrich. Zuerst kommt die 2 weg. Das ist Fall 3.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="2"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall3">Weiter zu Fall 3</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 3 ======================= -->
+<div class="seite" id="fall3" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">3</div>
+    <div>
+      <h1>Klammer und Bruchstrich</h1>
+      <p class="unterzeile">Fall 3, die Strichrechnung steckt in der Klammer oder über dem Bruchstrich</p>
+    </div>
+    <div class="einstieg">
+      <p>Eine Klammer zeigt, was zuerst gerechnet wurde. Was mit der Variable zusammen in der Klammer steht, klebt enger an ihr als alles, was außerhalb steht. Ein Bruchstrich wirkt wie eine Klammer um alles, was darüber steht.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross"><span>2 · (</span><i class="v ziel">x</i> <span>+ 3</span><span>)</span> = 14</span></div>
+      <div class="blatt"><span class="was">als Formel</span><span class="gross"><i class="v">m</i> = <span class="frac"><span><i class="v ziel">a</i> <span>+ <i class="v">b</i></span></span><span>2</span></span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Du arbeitest dich wieder von außen nach innen vor. Außen ist jetzt alles, was nicht in der Klammer oder über dem Bruchstrich steht.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">als Formel</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Was hängt außen an der Variable? Diesmal die <span class="sc">Punktrechnung</span>. Das Plus steht mit der Variable in der Klammer oder über dem Bruchstrich und ist noch nicht dran.</p>
+      </div>
+      <span class="l"><span class="sc">2 · (</span><i class="v ziel">x</i> <span class="so">+ 3</span><span class="sc">)</span></span><span class="g">=</span><span class="r">14</span><span class="cmd sc">: 2</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">m</i></span><span class="g">=</span><span class="r"><span class="frac"><span><i class="v ziel">a</i> <span class="so">+ <i class="v">b</i></span></span><span class="sc">2</span></span></span><span class="cmd sc">· 2</span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Klammer und Bruchstrich sind weg. Jetzt klebt nur noch die <span class="so">Strichrechnung</span> an der Variable.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i> <span class="so">+ 3</span></span><span class="g">=</span><span class="r">7</span><span class="cmd so">− 3</span>
+      <span class="luecke"></span>
+      <span class="l">2 · <i class="v">m</i></span><span class="g">=</span><span class="r"><i class="v ziel">a</i> <span class="so">+ <i class="v">b</i></span></span><span class="cmd so">− <i class="v">b</i></span>
+
+      <div class="ged">
+        <span class="schritt">3</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">4</span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l">2 · <i class="v">m</i> − <i class="v">b</i></span><span class="g">=</span><span class="r"><i class="v ziel">a</i></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 4 für <i class="v">x</i> ein, dann steht dort <span class="m">2 · (4 + 3) = 14</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Warum zuerst die Punktrechnung?</h2>
+    <p class="vorspann">Auch hier hilft das Bild von Socke und Schuh aus Fall 2.</p>
+    <div class="streifen blatt">
+      <span class="wort">Anziehen</span>
+      <span class="pf rechts so"><span>+ 3</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf rechts sc"><span>· 2</span><span class="linie"></span></span>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Nackter Fuß, beschriftet mit x">
+        <use href="#fuss"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke">
+        <use href="#fuss"/><use href="#socke"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="80" y="89" text-anchor="middle" font-size="16">+ 3</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke und Schuh">
+        <use href="#fuss"/><use href="#socke"/><use href="#schuh"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="66" y="90" text-anchor="middle" font-size="16">· 2</text>
+      </svg>
+      <span class="formel"><i class="v ziel">x</i></span>
+      <span></span>
+      <span class="formel"><i class="v ziel">x</i> <span class="so">+ 3</span></span>
+      <span></span>
+      <span class="formel"><span class="sc">2 · (</span><i class="v ziel">x</i> <span class="so">+ 3</span><span class="sc">)</span></span>
+      <span class="wort">Ausziehen</span>
+      <span class="pf links so unten"><span><small>danach</small>− 3</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf links sc unten"><span><small>zuerst</small>: 2</span><span class="linie"></span></span>
+      <span></span>
+    </div>
+    <div class="deutung">
+      <p>Die Klammer verrät die Reihenfolge beim Anziehen. Das <span class="so">+ 3</span> steht mit <i class="v">x</i> in der Klammer, es wurde zuerst angezogen und ist die Socke. Die <span class="sc">2</span> vor der Klammer kam danach. Sie ist der Schuh und muss zuerst weg.</p>
+    </div>
+  </section>
+
+    <section>
+    <h2>Zum Merken</h2>
+    <div class="merke" style="margin-top:0">
+      <div class="blatt">
+        <h3>Die Frage bleibt dieselbe</h3>
+        <p class="frage">Was hängt außen an der markierten Variable?</p>
+        <p>Außen ist alles, was nicht mit der Variable zusammen in der Klammer oder über dem Bruchstrich steht. Das kommt zuerst weg.</p>
+      </div>
+      <div class="blatt">
+        <h3>Der andere Weg</h3>
+        <p>Du kannst eine Klammer auch zuerst ausmultiplizieren. Aus <span class="m">2 · (<i class="v">x</i> + 3) = 14</span> wird dann <span class="m">2 · <i class="v">x</i> + 6 = 14</span>, und du bist wieder bei Fall 2. Wie das Ausmultiplizieren geht, steht beim Thema Terme.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Achtung, vergleiche mit Fall 2</h2>
+    <div class="vergleich">
+      <div class="blatt anders">
+        <h3>Ohne Klammer</h3>
+        <p class="gross">2 · <i class="v ziel">x</i> + 3 = 11</p>
+        <p class="gross"><span class="frac"><span><i class="v ziel">x</i></span><span>2</span></span> + 3 = 11</p>
+        <p>Das + 3 hängt außen dran und kommt zuerst weg. Das ist Fall 2.</p>
+      </div>
+      <div class="blatt">
+        <h3>Mit Klammer oder langem Bruchstrich</h3>
+        <p class="gross">2 · (<i class="v ziel">x</i> + 3) = 14</p>
+        <p class="gross"><span class="frac"><span><i class="v ziel">x</i> + 3</span><span>2</span></span> = 7</p>
+        <p>Das + 3 steckt mit <i class="v">x</i> zusammen in der Klammer oder über dem Bruchstrich. Zuerst kommt die 2 weg. Du bist hier richtig, bei Fall 3.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="3"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall4">Weiter zu Fall 4</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 4 ======================= -->
+<div class="seite" id="fall4" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">4</div>
+    <div>
+      <h1>Erst die Variable nach vorn holen</h1>
+      <p class="unterzeile">Fall 4, die Variable steht hinter dem Minus oder hinter dem Geteilt</p>
+    </div>
+    <div class="einstieg">
+      <p>Manchmal wird die Variable selbst abgezogen, oder es wird durch sie geteilt. Dann reicht die Umkehroperation aus Fall 1 nicht. Du brauchst einen Schritt davor.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross">10 − <i class="v ziel">x</i> = 3</span></div>
+      <div class="blatt"><span class="was">als Formel</span><span class="gross"><i class="v">v</i> = <span class="frac"><span><i class="v">s</i></span><span><i class="v ziel">t</i></span></span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Der erste Befehl ist immer die Variable selbst. Hinter einem Minus rechnest du plus die Variable, hinter einem Geteilt oder unter einem Bruchstrich rechnest du mal die Variable.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">als Formel</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Die Variable steht hinter dem Minus oder unter dem Bruchstrich. Hol sie zuerst nach vorn. Dafür rechnest du mit der Variable selbst.</p>
+      </div>
+      <span class="l">10 − <i class="v ziel">x</i></span><span class="g">=</span><span class="r">3</span><span class="cmd">+ <i class="v">x</i></span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">v</i></span><span class="g">=</span><span class="r"><span class="frac"><span><i class="v">s</i></span><span><i class="v ziel">t</i></span></span></span><span class="cmd">· <i class="v">t</i></span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Jetzt steht die Variable mit Plus oder Mal da. An ihr hängt nur noch <span class="so">eine Rechnung</span>, wie in Fall 1.</p>
+      </div>
+      <span class="l">10</span><span class="g">=</span><span class="r"><span class="so">3 +</span> <i class="v ziel">x</i></span><span class="cmd so">− 3</span>
+      <span class="luecke"></span>
+      <span class="l"><span class="so"><i class="v">v</i> ·</span> <i class="v ziel">t</i></span><span class="g">=</span><span class="r"><i class="v">s</i></span><span class="cmd so">: <i class="v">v</i></span>
+
+      <div class="ged">
+        <span class="schritt">3</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l">7</span><span class="g">=</span><span class="r"><i class="v ziel">x</i></span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v ziel">t</i></span><span class="g">=</span><span class="r"><span class="frac"><span><i class="v">s</i></span><span><i class="v">v</i></span></span></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 7 für <i class="v">x</i> ein, dann steht dort <span class="m">10 − 7 = 3</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Warum reicht Fall 1 hier nicht?</h2>
+    <div class="einbild blatt">
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Ein Fuß mit der Zahl 10 trägt eine grüne Socke mit der Aufschrift minus x">
+        <use href="#fuss-neutral"/><use href="#socke-gruen"/><text x="56" y="23" text-anchor="middle" font-size="17">10</text>
+        <text x="80" y="89" text-anchor="middle" font-size="16">− <tspan font-style="italic">x</tspan></text>
+      </svg>
+      <div>
+        <p>In <span class="m">10 − <i class="v ziel">x</i> = 3</span> ist die 10 der Fuß. Die Variable steckt selbst in der Socke, zusammen mit dem Minus.</p>
+        <p>Rechnest du − 10, dann bleibt <span class="m">− <i class="v">x</i></span> übrig. Das Minus hängt immer noch an der Variable. Deshalb holst du die Variable zuerst auf die andere Seite. Dort steht sie mit einem Plus und du machst weiter wie in Fall 1.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Achtung, vergleiche mit Fall 1</h2>
+    <div class="vergleich">
+      <div class="blatt anders">
+        <h3>Die Variable steht vorn</h3>
+        <p class="gross"><i class="v ziel">x</i> − 5 = 12</p>
+        <p class="gross"><i class="v ziel">x</i> : 4 = 3 <span class="oder">oder</span> <span class="frac"><span><i class="v ziel">x</i></span><span>4</span></span> = 3</p>
+        <p>Von <i class="v">x</i> wird etwas abgezogen, oder <i class="v">x</i> wird geteilt. Hier genügt eine Umkehroperation. Das ist Fall 1.</p>
+      </div>
+      <div class="blatt">
+        <h3>Die Variable steht hinten</h3>
+        <p class="gross">5 − <i class="v ziel">x</i> = 2</p>
+        <p class="gross">12 : <i class="v ziel">x</i> = 3 <span class="oder">oder</span> <span class="frac"><span>12</span><span><i class="v ziel">x</i></span></span> = 3</p>
+        <p><i class="v">x</i> wird selbst abgezogen, oder durch <i class="v">x</i> wird geteilt. Du bist hier richtig, bei Fall 4.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="4"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="fall3">Zurück zu Fall 3</button>
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall5">Weiter zu Fall 5</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 5 ======================= -->
+<div class="seite" id="fall5" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">5</div>
+    <div>
+      <h1>Erst sammeln</h1>
+      <p class="unterzeile">Fall 5, die Variable steht auf beiden Seiten</p>
+    </div>
+    <div class="einstieg">
+      <p>Die Variable kommt auf beiden Seiten vor. Solange das so ist, kannst du sie nicht freilegen. Du sammelst sie deshalb zuerst auf einer Seite. Danach geht es weiter wie in Fall 2.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross">3<i class="v ziel">x</i> + 2 = <i class="v ziel">x</i> + 8</span></div>
+      <div class="blatt"><span class="was">mit Buchstaben</span><span class="gross">5<i class="v ziel">x</i> + <i class="v">a</i> = 3<i class="v ziel">x</i> + <i class="v">b</i></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Der erste Befehl sammelt die Variable auf einer Seite. Ab dann kennst du den Weg schon.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">mit Buchstaben</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Die Variable steht auf beiden Seiten. Nimm auf beiden Seiten so viele <i class="v">x</i> weg, wie auf der Seite mit weniger <i class="v">x</i> stehen.</p>
+      </div>
+      <span class="l">3<i class="v ziel">x</i> + 2</span><span class="g">=</span><span class="r"><i class="v ziel">x</i> + 8</span><span class="cmd">− <i class="v">x</i></span>
+      <span class="luecke"></span>
+      <span class="l">5<i class="v ziel">x</i> + <i class="v">a</i></span><span class="g">=</span><span class="r">3<i class="v ziel">x</i> + <i class="v">b</i></span><span class="cmd">− 3<i class="v">x</i></span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Jetzt steht die Variable nur noch auf einer Seite. Der Rest ist Fall 2. Zuerst kommt die <span class="sc">Strichrechnung</span> weg.</p>
+      </div>
+      <span class="l"><span class="so">2</span><i class="v ziel">x</i> <span class="sc">+ 2</span></span><span class="g">=</span><span class="r">8</span><span class="cmd sc">− 2</span>
+      <span class="luecke"></span>
+      <span class="l"><span class="so">2</span><i class="v ziel">x</i> <span class="sc">+ <i class="v">a</i></span></span><span class="g">=</span><span class="r"><i class="v">b</i></span><span class="cmd sc">− <i class="v">a</i></span>
+
+      <div class="ged">
+        <span class="schritt">3</span>
+        <p>Danach die <span class="so">Punktrechnung</span>.</p>
+      </div>
+      <span class="l"><span class="so">2</span><i class="v ziel">x</i></span><span class="g">=</span><span class="r">6</span><span class="cmd so">: 2</span>
+      <span class="luecke"></span>
+      <span class="l"><span class="so">2</span><i class="v ziel">x</i></span><span class="g">=</span><span class="r"><i class="v">b</i> − <i class="v">a</i></span><span class="cmd so">: 2</span>
+
+      <div class="ged">
+        <span class="schritt">4</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">3</span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r"><span class="frac"><span><i class="v">b</i> − <i class="v">a</i></span><span>2</span></span></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 3 für <i class="v">x</i> ein. Links steht <span class="m">3 · 3 + 2 = 11</span>, rechts steht <span class="m">3 + 8 = 11</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Warum darfst du auf beiden Seiten etwas wegnehmen?</h2>
+    <div class="waage blatt">
+      <svg viewBox="0 0 440 180" role="img" aria-label="Waage im Gleichgewicht. Links drei Kisten mit x und zwei Gewichte, rechts eine Kiste mit x und acht Gewichte. Auf jeder Seite ist eine Kiste gestrichelt gezeichnet, sie wird weggenommen.">
+        <path d="M220 128 L198 172 L242 172 Z" fill="#1B2530"/>
+        <rect x="36" y="120" width="368" height="8" rx="4" fill="#1B2530"/>
+        <rect x="116" y="110" width="8" height="12" fill="#1B2530"/><rect x="316" y="110" width="8" height="12" fill="#1B2530"/>
+        <rect x="26" y="104" width="188" height="8" rx="4" fill="#1B2530"/><rect x="226" y="104" width="188" height="8" rx="4" fill="#1B2530"/>
+        <g font-size="19" font-style="italic" text-anchor="middle" class="wtext">
+          <rect x="34" y="72" width="30" height="30" rx="5" fill="#A4EC96" stroke="#1B2530" stroke-width="2.5"/><text x="49" y="94">x</text>
+          <rect x="70" y="72" width="30" height="30" rx="5" fill="#A4EC96" stroke="#1B2530" stroke-width="2.5"/><text x="85" y="94">x</text>
+          <rect x="106" y="72" width="30" height="30" rx="5" fill="#fff" stroke="#1B2530" stroke-width="2.5" stroke-dasharray="5 4"/><text x="121" y="94" opacity=".45">x</text>
+          <rect x="236" y="72" width="30" height="30" rx="5" fill="#fff" stroke="#1B2530" stroke-width="2.5" stroke-dasharray="5 4"/><text x="251" y="94" opacity=".45">x</text>
+        </g>
+        <g fill="#FFE08A" stroke="#1B2530" stroke-width="2.5">
+          <circle cx="160" cy="91" r="11"/><circle cx="188" cy="91" r="11"/>
+          <circle cx="290" cy="91" r="11"/><circle cx="318" cy="91" r="11"/><circle cx="346" cy="91" r="11"/><circle cx="374" cy="91" r="11"/>
+          <circle cx="290" cy="65" r="11"/><circle cx="318" cy="65" r="11"/><circle cx="346" cy="65" r="11"/><circle cx="374" cy="65" r="11"/>
+        </g>
+      </svg>
+      <div>
+        <p class="gross">3<i class="v ziel">x</i> + 2 = <i class="v ziel">x</i> + 8</p>
+        <p>In jeder Kiste steckt gleich viel, nämlich <i class="v">x</i>. Nimmst du auf beiden Seiten eine Kiste weg, bleibt die Waage im Gleichgewicht. Danach liegen nur noch links Kisten.</p>
+        <p class="gross">2<i class="v ziel">x</i> + 2 = 8</p>
+      </div>
+    </div>
+  </section>
+
+    <section>
+    <h2>Zum Merken</h2>
+    <div class="merke" style="margin-top:0">
+      <div class="blatt">
+        <h3>Die kleinere Anzahl wegnehmen</h3>
+        <p>Nimm immer so viele <i class="v">x</i> weg, wie auf der Seite mit weniger <i class="v">x</i> stehen. Dann bleibt keine negative Anzahl übrig.</p>
+        <div class="rechnung">
+          <div class="zeile"><span class="l">2<i class="v ziel">x</i> + 9</span><span class="g">=</span><span class="r">5<i class="v ziel">x</i></span><span class="cmd">− 2<i class="v">x</i></span></div>
+          <div class="zeile"><span class="l">9</span><span class="g">=</span><span class="r">3<i class="v ziel">x</i></span><span class="cmd so">: 3</span></div>
+          <div class="zeile"><span class="l">3</span><span class="g">=</span><span class="r"><i class="v ziel">x</i></span><span class="cmd"></span></div>
+        </div>
+      </div>
+      <div class="blatt">
+        <h3>x ohne Zahl davor</h3>
+        <p>Steht keine Zahl vor der Variable, dann ist es genau ein <i class="v">x</i>. <span class="m"><i class="v">x</i></span> bedeutet <span class="m">1 · <i class="v">x</i></span>.</p>
+        <p>Deshalb ergibt <span class="m">3<i class="v">x</i> − <i class="v">x</i></span> zusammen <span class="m">2<i class="v">x</i></span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Fall 2 oder Fall 5?</h2>
+    <p class="vorspann">Zähle, auf wie vielen Seiten die Variable steht.</p>
+    <div class="vergleich">
+      <div class="blatt">
+        <h3>Die Variable steht auf beiden Seiten</h3>
+        <p class="gross">3<i class="v ziel">x</i> + 2 = <i class="v ziel">x</i> + 8</p>
+        <p>Du sammelst zuerst. Du bist hier richtig, bei Fall 5.</p>
+      </div>
+      <div class="blatt anders">
+        <h3>Die Variable steht nur auf einer Seite</h3>
+        <p class="gross">2<i class="v ziel">x</i> + 2 = 8</p>
+        <p>Es gibt nichts zu sammeln. Das ist Fall 2.</p>
+        <button type="button" class="knopf" data-ziel="fall2">Zu Fall 2</button>
+      </div>
+    </div>
+    <p class="probe">Steht die Variable mehrmals auf derselben Seite, zum Beispiel in <span class="m">3<i class="v">x</i> + 2<i class="v">x</i> = 20</span>, dann fasst du zuerst zusammen. Das wird beim Thema Terme behandelt.</p>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="5"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="fall4">Zurück zu Fall 4</button>
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall6">Weiter zu Fall 6</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 6 ======================= -->
+<div class="seite" id="fall6" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">6</div>
+    <div>
+      <h1>Quadrat und Wurzel</h1>
+      <p class="unterzeile">Fall 6, die Variable steht im Quadrat</p>
+    </div>
+    <div class="einstieg">
+      <p>Steht die Variable im Quadrat, dann ist das Quadrat die innerste Schicht. Es klebt noch enger an der Variable als eine Zahl davor. Deshalb kommt es ganz zum Schluss weg, und zwar mit der Wurzel.</p>
+    </div>
+    <div class="zeig">
+      <div class="blatt"><span class="was">mit Zahlen</span><span class="gross"><i class="v ziel">x</i><span>²</span> <span>+ 9</span> = 25</span></div>
+      <div class="blatt"><span class="was">als Formel</span><span class="gross"><i class="v">c</i>² = <i class="v ziel">a</i><span>²</span> <span>+ <i class="v">b</i>²</span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>So stellst du um</h2>
+    <p class="vorspann">Du räumst wie immer von außen nach innen weg. Das Quadrat ist zuletzt dran.</p>
+    <div class="bsp blatt">
+      <span class="leer"></span><span class="kopf4">mit Zahlen</span><span class="luecke"></span><span class="kopf4">als Formel</span>
+
+      <div class="ged">
+        <span class="schritt">1</span>
+        <p>Was hängt außen an der Variable? Die <span class="sc">Strichrechnung</span>. Sie kommt zuerst weg.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i><span class="so">²</span> <span class="sc">+ 9</span></span><span class="g">=</span><span class="r">25</span><span class="cmd sc">− 9</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">c</i>²</span><span class="g">=</span><span class="r"><i class="v ziel">a</i><span class="so">²</span> <span class="sc">+ <i class="v">b</i>²</span></span><span class="cmd sc">− <i class="v">b</i>²</span>
+
+      <div class="ged">
+        <span class="schritt">2</span>
+        <p>Jetzt klebt nur noch das <span class="so">Quadrat</span> an der Variable. Die Umkehroperation zum Quadrat ist die Wurzel.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i><span class="so">²</span></span><span class="g">=</span><span class="r">16</span><span class="cmd so">√</span>
+      <span class="luecke"></span>
+      <span class="l"><i class="v">c</i>² − <i class="v">b</i>²</span><span class="g">=</span><span class="r"><i class="v ziel">a</i><span class="so">²</span></span><span class="cmd so">√</span>
+
+      <div class="ged">
+        <span class="schritt">3</span>
+        <p>Die Variable steht allein. Fertig.</p>
+      </div>
+      <span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">4</span><span class="cmd"></span>
+      <span class="luecke"></span>
+      <span class="l"><span class="wz">√<span><i class="v">c</i>² − <i class="v">b</i>²</span></span></span><span class="g">=</span><span class="r"><i class="v ziel">a</i></span><span class="cmd"></span>
+    </div>
+    <p class="probe">Probe mit Zahlen. Setze 4 für <i class="v">x</i> ein, dann steht dort <span class="m">4² + 9 = 25</span>. Das stimmt.</p>
+  </section>
+
+  <section>
+    <h2>Warum kommt die Wurzel zuletzt?</h2>
+    <p class="vorspann">Beim Ausrechnen wird zuerst quadriert, das Quadrat ist also die Socke. Die Strichrechnung kommt danach, sie ist der Schuh. Beim Ausziehen geht es umgekehrt.</p>
+    <div class="streifen blatt">
+      <span class="wort">Anziehen</span>
+      <span class="pf rechts so"><span>hoch 2</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf rechts sc"><span>+ 9</span><span class="linie"></span></span>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Nackter Fuß, beschriftet mit x">
+        <use href="#fuss"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke">
+        <use href="#fuss"/><use href="#socke"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="80" y="89" text-anchor="middle" font-size="15">hoch 2</text>
+      </svg>
+      <span></span>
+      <svg class="zeichnung" viewBox="0 0 150 112" role="img" aria-label="Fuß mit Socke und Schuh">
+        <use href="#fuss"/><use href="#socke"/><use href="#schuh"/><text x="56" y="24" text-anchor="middle" font-size="19" font-style="italic">x</text>
+        <text x="66" y="90" text-anchor="middle" font-size="16">+ 9</text>
+      </svg>
+      <span class="formel"><i class="v ziel">x</i></span>
+      <span></span>
+      <span class="formel"><i class="v ziel">x</i><span class="so">²</span></span>
+      <span></span>
+      <span class="formel"><i class="v ziel">x</i><span class="so">²</span> <span class="sc">+ 9</span></span>
+      <span class="wort">Ausziehen</span>
+      <span class="pf links so unten"><span><small>danach</small>√</span><span class="linie"></span></span>
+      <span></span>
+      <span class="pf links sc unten"><span><small>zuerst</small>− 9</span><span class="linie"></span></span>
+      <span></span>
+    </div>
+  </section>
+
+    <section>
+    <h2>Zum Merken</h2>
+    <div class="merke" style="margin-top:0">
+      <div class="blatt">
+        <h3>Die Reihenfolge beim Wegräumen</h3>
+        <p>Zuerst die Strichrechnung, dann die Punktrechnung, zuletzt das Quadrat.</p>
+        <div class="rechnung">
+          <div class="zeile"><span class="l">3 · <i class="v ziel">x</i>²</span><span class="g">=</span><span class="r">48</span><span class="cmd">: 3</span></div>
+          <div class="zeile"><span class="l"><i class="v ziel">x</i>²</span><span class="g">=</span><span class="r">16</span><span class="cmd so">√</span></div>
+          <div class="zeile"><span class="l"><i class="v ziel">x</i></span><span class="g">=</span><span class="r">4</span><span class="cmd"></span></div>
+        </div>
+      </div>
+      <div class="blatt">
+        <h3>Die Wurzel gilt für die ganze Seite</h3>
+        <p>Aus einer Summe darfst du die Wurzel nicht einzeln ziehen. Richtig ist <span class="m"><span class="wz">√<span>9 + 16</span></span> = <span class="wz">√<span>25</span></span> = 5</span>. Einzeln gerechnet käme <span class="m">3 + 4 = 7</span> heraus, und das ist falsch.</p>
+        <p>Räume deshalb erst alles andere weg und ziehe die Wurzel ganz zum Schluss.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Quadrat oder mal 2?</h2>
+    <p class="vorspann">Die kleine hochgestellte 2 und die 2 vor der Variable bedeuten etwas Verschiedenes.</p>
+    <div class="vergleich">
+      <div class="blatt">
+        <h3>Die 2 steht oben</h3>
+        <p class="gross"><i class="v ziel">x</i>² = 36</p>
+        <p><span class="m"><i class="v">x</i>²</span> bedeutet <span class="m"><i class="v">x</i> · <i class="v">x</i></span>. Du ziehst die Wurzel und erhältst <span class="m"><i class="v">x</i> = 6</span>. Du bist hier richtig, bei Fall 6.</p>
+      </div>
+      <div class="blatt anders">
+        <h3>Die 2 steht davor</h3>
+        <p class="gross">2 · <i class="v ziel">x</i> = 36</p>
+        <p><span class="m">2 · <i class="v">x</i></span> bedeutet <span class="m"><i class="v">x</i> + <i class="v">x</i></span>. Du teilst durch 2 und erhältst <span class="m"><i class="v">x</i> = 18</span>. Das ist Fall 1.</p>
+        <button type="button" class="knopf" data-ziel="fall1">Zu Fall 1</button>
+      </div>
+    </div>
+    <p class="probe">Bei Längen und Flächen zählt nur die positive Lösung. Als reine Zahlengleichung hat <span class="m"><i class="v">x</i>² = 36</span> zwei Lösungen, nämlich 6 und − 6. Das wird bei den quadratischen Gleichungen behandelt.</p>
+  </section>
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben. Übe so lange, bis es sich leicht anfühlt.</p>
+    <div class="ueben" data-fall="6"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="fall5">Zurück zu Fall 5</button>
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+    <button type="button" class="knopf voll" data-ziel="fall7">Weiter zu Fall 7</button>
+  </section>
+</div>
+
+<!-- ======================= FALL 7 ======================= -->
+<div class="seite" id="fall7" hidden>
+  <section class="kopf">
+    <div class="nummer" aria-hidden="true">7</div>
+    <div>
+      <h1>Gemischtes Training</h1>
+      <p class="unterzeile">Fall 7, alle Fälle durcheinander</p>
+    </div>
+    <div class="einstieg">
+      <p>Hier weißt du vorher nicht, welcher Fall kommt. Schau dir jede Aufgabe zuerst an. Wo steht die Variable, und was hängt an ihr? Danach entscheidest du, wie du anfängst.</p>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Üben</h2>
+    <p class="vorspann">Jede Übung erzeugt immer wieder neue Aufgaben aus allen sechs Fällen.</p>
+    <div class="ueben" data-fall="7"></div>
+    <div class="ueben-extra" id="u7nach" style="margin-top:1rem"></div>
+  </section>
+
+  <section class="blaettern">
+    <button type="button" class="knopf" data-ziel="fall6">Zurück zu Fall 6</button>
+    <button type="button" class="knopf" data-ziel="start">Zur Übersicht</button>
+  </section>
+</div>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- kleine Helfer ---------- */
+  var V = function(s){ return '<i class="v">' + s + '</i>'; };
+  var Z = function(s){ return '<i class="v ziel">' + s + '</i>'; };
+  var B = function(o,u){ return '<span class="frac"><span>' + o + '</span><span>' + u + '</span></span>'; };
+  var X = Z('x');
+  var UM = { '+':'−', '−':'+', '·':':', ':':'·' };
+  function R(a,b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a){ return a[R(0, a.length - 1)]; }
+  function misch(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--){ var j = R(0,i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function knopf(cls, text){ var b = el('button', cls, text); b.type = 'button'; return b; }
+  function zellen(z, offen){
+    return '<span class="l">' + z[0] + '</span><span class="g">=</span><span class="r">' + z[1] + '</span><span class="cmd' + (offen ? ' offen' : '') + '">' + (offen ? '?' : (z[2] || '')) + '</span>';
+  }
+  function melde(p, art, html){ p.className = 'meldung ' + art; p.innerHTML = html; }
+  function wackeln(b){ b.classList.remove('wackel'); void b.offsetWidth; b.classList.add('wackel'); }
+
+  var SCHON_DA = 'Diese Rechnung steht schon in der Aufgabe. Zum Wegräumen brauchst du die Umkehroperation.';
+  var FAMILIE = 'Das passt nicht zum Rechenzeichen. Plus und Minus gehören zusammen, Mal und Geteilt gehören zusammen.';
+
+  /* ================= Aufgaben erzeugen ================= */
+  /* Aufgabe: { art, kontext, ziel, lines:[[links, rechts, befehl]], chips:[{h,i,t}], zuFrueh, wert, probe } */
+
+  /* ----- Fall 1, Zahlen ----- */
+  function f1Zahl(){
+    var op = pick(['+','−','·',':']), a, x, c;
+    if (op === '+'){ a = R(2,30); x = R(1,40); c = x + a; }
+    else if (op === '−'){ a = R(2,30); x = a + R(0,40); c = x - a; }
+    else if (op === '·'){ a = R(2,12); x = R(2,12); c = a * x; }
+    else { a = R(2,12); c = R(2,12); x = a * c; }
+    var vorn = R(0,1) === 1;   /* nur bei + und · darf die Variable auch hinten stehen */
+    var ex = function(v){ return (op === '·' || op === '+') && !vorn ? a + ' ' + op + ' ' + v : v + ' ' + op + ' ' + a; };
+    return { art:'zahl', op:op, a:a, x:x, c:c, ziel:X,
+      lines: [[ex(X), '' + c, UM[op] + ' ' + a], [X, '' + x, '']],
+      chips: misch(['+','−','·',':'].map(function(o){ return { h:o + ' ' + a, i:(o === UM[op] ? 0 : -1), t:(o === op ? SCHON_DA : FAMILIE) }; })),
+      wert: x, probe: ex(x) + ' = ' + c };
+  }
+
+  /* ----- Fall 1, Formeln ----- */
+  var POOL1 = [
+    { k:'Flächeninhalt eines Rechtecks', res:V('A'), zn:'a', expr:function(z){ return z + ' · ' + V('b'); }, op:'·', o:V('b') },
+    { k:'Flächeninhalt eines Rechtecks', res:V('A'), zn:'b', expr:function(z){ return V('a') + ' · ' + z; }, op:'·', o:V('a') },
+    { k:'Umfang eines Quadrats', res:V('u'), zn:'a', expr:function(z){ return '4 · ' + z; }, op:'·', o:'4' },
+    { k:'Weg, Geschwindigkeit und Zeit', res:V('s'), zn:'t', expr:function(z){ return V('v') + ' · ' + z; }, op:'·', o:V('v') },
+    { k:'Weg, Geschwindigkeit und Zeit', res:V('s'), zn:'v', expr:function(z){ return z + ' · ' + V('t'); }, op:'·', o:V('t') },
+    { k:'Umfang eines Kreises', res:V('u'), zn:'d', expr:function(z){ return 'π · ' + z; }, op:'·', o:'π' },
+    { k:'Durchmesser und Radius', res:V('d'), zn:'r', expr:function(z){ return '2 · ' + z; }, op:'·', o:'2' },
+    { k:'Volumen eines Prismas', res:V('V'), zn:'h', expr:function(z){ return V('G') + ' · ' + z; }, op:'·', o:V('G') },
+    { k:'Gesamtpreis aus Warenwert und Versand', res:V('P'), zn:'W', expr:function(z){ return z + ' + ' + V('V'); }, op:'+', o:V('V') },
+    { k:'Restbetrag nach einer Anzahlung', res:V('R'), zn:'P', expr:function(z){ return z + ' − ' + V('A'); }, op:'−', o:V('A') },
+    { k:'Anteil pro Person', res:V('z'), zn:'K', expr:function(z){ return B(z, V('n')); }, op:':', o:V('n') }
+  ];
+  function nach(res, op, o){
+    return op === '+' ? res + ' − ' + o : op === '−' ? res + ' + ' + o : op === '·' ? B(res, o) : res + ' · ' + o;
+  }
+  function f1Formel(){
+    var p = pick(POOL1), z = Z(p.zn);
+    return { art:'formel', kontext:p.k, ziel:z, p:p,
+      lines: [[p.res, p.expr(z), UM[p.op] + ' ' + p.o], [nach(p.res, p.op, p.o), z, '']],
+      chips: misch(['+','−','·',':'].map(function(o){ return { h:o + ' ' + p.o, i:(o === UM[p.op] ? 0 : -1), t:(o === p.op ? SCHON_DA : FAMILIE) }; })) };
+  }
+
+  /* ----- Fall 2, Zahlen ----- */
+  function f2Zahl(opt){
+    opt = opt || {};
+    var mal = opt.nurMal ? true : R(0,2) > 0;
+    var a = R(2,9), q = R(1,12), plus = R(0,1) === 1;
+    var n = mal ? a * q : q;            /* Wert von a · x bzw. x : a */
+    var x = mal ? q : a * q, b;
+    if (opt.bVielfach){ b = a * R(1, plus ? 4 : Math.min(4, q)); }
+    else { b = plus ? R(1,20) : R(1, Math.min(20, n)); }
+    var c = plus ? n + b : n - b;
+    var innen = function(v){ return mal ? a + ' · ' + v : v + ' : ' + a; };
+    var ex = function(v){ return innen(v) + (plus ? ' + ' : ' − ') + b; };
+    var cmd1 = (plus ? '− ' : '+ ') + b, cmd2 = (mal ? ': ' : '· ') + a;
+    return { art:'zahl', a:a, b:b, n:n, x:x, c:c, plus:plus, innen:innen, ziel:X,
+      lines: [[ex(X), '' + c, cmd1], [innen(X), '' + n, cmd2], [X, '' + x, '']],
+      chips: misch([
+        { h:'+ ' + b, i:(plus ? -1 : 0) }, { h:'− ' + b, i:(plus ? 0 : -1) },
+        { h:'· ' + a, i:(mal ? -1 : 1) }, { h:': ' + a, i:(mal ? 1 : -1) } ]),
+      zuFrueh: 'Die ' + a + ' klebt direkt an ' + X + ', sie ist die Socke. Räume zuerst weg, was außen dran hängt.',
+      wert: x, probe: ex(x) + ' = ' + c };
+  }
+
+  /* ----- Fall 2, Formeln ----- */
+  var POOL2 = [
+    { k:'Umfang eines Rechtecks', res:V('u'), zn:'a', ko:'2', bo:'2' + V('b'), bop:'+' },
+    { k:'Umfang eines Rechtecks', res:V('u'), zn:'b', ko:'2', bo:'2' + V('a'), bop:'+' },
+    { k:'Umfang eines gleichschenkligen Dreiecks', res:V('u'), zn:'a', ko:'2', bo:V('c'), bop:'+' },
+    { k:'Lineare Funktion', res:V('y'), zn:'x', ko:V('m'), bo:V('n'), bop:'+' },
+    { k:'Grad Celsius in Grad Fahrenheit', res:V('F'), zn:'C', ko:'1,8', bo:'32', bop:'+' },
+    { k:'Kosten aus Monatspreis und Grundgebühr', res:V('K'), zn:'m', ko:V('p'), bo:V('g'), bop:'+' }
+  ];
+  function f2Formel(){
+    var p = R(0,2) === 0
+      ? { k:'Lineare Funktion', res:V('y'), zn:'x', ko:'' + R(2,9), bo:'' + R(1,20), bop:pick(['+','−']) }
+      : pick(POOL2);
+    var z = Z(p.zn), kv = p.ko + ' · ' + z, um = UM[p.bop], l2 = p.res + ' ' + um + ' ' + p.bo;
+    return { art:'formel', kontext:p.k, ziel:z, p:p, kv:kv, um:um, l2:l2,
+      lines: [[p.res, kv + ' ' + p.bop + ' ' + p.bo, um + ' ' + p.bo], [l2, kv, ': ' + p.ko], [B(l2, p.ko), z, '']],
+      chips: misch([
+        { h:'+ ' + p.bo, i:(p.bop === '+' ? -1 : 0) }, { h:'− ' + p.bo, i:(p.bop === '+' ? 0 : -1) },
+        { h:'· ' + p.ko, i:-1 }, { h:': ' + p.ko, i:1 } ]),
+      zuFrueh: p.ko + ' klebt direkt an ' + z + ', das ist die Socke. Räume zuerst weg, was außen dran hängt.' };
+  }
+
+  /* ----- Fall 3, Zahlen: a · (x ± b) = c oder (x ± b) : a = c als Bruch ----- */
+  function f3Zahl(opt){
+    opt = opt || {};
+    var mal = opt.nurMal ? true : R(0,1) === 1, plus = R(0,1) === 1;
+    var a = R(2,9), b, x, innenwert, c;
+    if (mal){
+      b = opt.bVielfach ? a * R(1,3) : R(1,12);
+      if (plus){ x = R(1,12); innenwert = x + b; } else { x = b + R(1,12); innenwert = x - b; }
+      c = a * innenwert;
+    } else {
+      c = R(1,12); innenwert = a * c;
+      if (plus){ b = R(1, innenwert - 1); x = innenwert - b; } else { b = R(1,12); x = innenwert + b; }
+    }
+    var z1 = plus ? ' + ' : ' − ';
+    var innen = function(v){ return v + z1 + b; };
+    var ex = function(v){ return mal ? a + ' · (' + innen(v) + ')' : B(innen(v), '' + a); };
+    var cmd1 = (mal ? ': ' : '· ') + a, cmd2 = (plus ? '− ' : '+ ') + b;
+    return { art:'zahl', a:a, b:b, x:x, c:c, innenwert:innenwert, plus:plus, mal:mal, innen:innen, ziel:X,
+      lines: [[ex(X), '' + c, cmd1], [innen(X), '' + innenwert, cmd2], [X, '' + x, '']],
+      chips: misch([
+        { h:'· ' + a, i:(mal ? -1 : 0) }, { h:': ' + a, i:(mal ? 0 : -1) },
+        { h:'+ ' + b, i:(plus ? -1 : 1) }, { h:'− ' + b, i:(plus ? 1 : -1) } ]),
+      zuFrueh: 'Das ' + (plus ? '+ ' : '− ') + b + ' steht mit ' + X + ' zusammen ' + (mal ? 'in der Klammer' : 'über dem Bruchstrich') + ' und klebt enger an ' + X + '. Außen hängt hier die ' + a + (mal ? ' vor der Klammer.' : ' unter dem Bruchstrich.'),
+      wert: x, probe: (mal ? a + ' · (' + x + z1 + b + ')' : '(' + x + z1 + b + ') : ' + a) + ' = ' + c };
+  }
+
+  /* ----- Fall 3, Formeln ----- */
+  var POOL3 = [
+    { k:'Umfang eines Rechtecks', res:V('u'), zn:'a', ko:'2', no:V('b'), nop:'+', mal:true },
+    { k:'Umfang eines Rechtecks', res:V('u'), zn:'b', ko:'2', no:V('a'), nop:'+', mal:true },
+    { k:'Mittelwert von zwei Zahlen', res:V('m'), zn:'a', ko:'2', no:V('b'), nop:'+', mal:false },
+    { k:'Grad Fahrenheit in Grad Celsius', res:V('C'), zn:'F', ko:'1,8', no:'32', nop:'−', mal:false }
+  ];
+  function f3Formel(){
+    var p = R(0,2) === 0
+      ? { k:'Gleichung mit zwei Variablen', res:V('y'), zn:'x', ko:'' + R(2,9), no:'' + R(1,12), nop:pick(['+','−']), mal:R(0,1) === 1 }
+      : pick(POOL3);
+    var z = Z(p.zn), um = UM[p.nop], innen = z + ' ' + p.nop + ' ' + p.no;
+    var l2 = p.mal ? B(p.res, p.ko) : p.ko + ' · ' + p.res;
+    var cmd1 = (p.mal ? ': ' : '· ') + p.ko, cmd2 = um + ' ' + p.no;
+    return { art:'formel', kontext:p.k, ziel:z, p:p, innen:innen, l2:l2, um:um, cmd1:cmd1, cmd2:cmd2,
+      lines: [[p.res, p.mal ? p.ko + ' · (' + innen + ')' : B(innen, p.ko), cmd1], [l2, innen, cmd2], [l2 + ' ' + um + ' ' + p.no, z, '']],
+      chips: misch([
+        { h:'· ' + p.ko, i:(p.mal ? -1 : 0) }, { h:': ' + p.ko, i:(p.mal ? 0 : -1) },
+        { h:'+ ' + p.no, i:(p.nop === '+' ? -1 : 1) }, { h:'− ' + p.no, i:(p.nop === '+' ? 1 : -1) } ]),
+      zuFrueh: 'Das ' + p.nop + ' ' + p.no + ' steht mit ' + z + ' zusammen ' + (p.mal ? 'in der Klammer' : 'über dem Bruchstrich') + ' und klebt enger an ' + z + '. Außen hängt hier ' + p.ko + (p.mal ? ' vor der Klammer.' : ' unter dem Bruchstrich.') };
+  }
+
+  /* ----- Fall 4, Zahlen: a − x = c oder a : x = c ----- */
+  var VORN_MINUS = 'Die Variable hängt an einem Minus. Hol sie zuerst mit plus der Variable nach vorn.';
+  var VORN_GETEILT = 'Durch die Variable wird geteilt. Hol sie zuerst mit mal der Variable nach vorn.';
+  function f4Zahl(){
+    var minus = R(0,1) === 1, x, c, a, bruch = R(0,1) === 1;
+    if (minus){ x = R(1,20); c = R(1,20); a = x + c; } else { x = R(2,12); c = R(2,12); a = c * x; }
+    var ex = function(v){ return minus ? a + ' − ' + v : (bruch ? B('' + a, v) : a + ' : ' + v); };
+    var vx = V('x');
+    return { art:'zahl', minus:minus, a:a, c:c, x:x, ex:ex, ziel:X,
+      lines: minus
+        ? [[ex(X), '' + c, '+ ' + vx], ['' + a, c + ' + ' + X, '− ' + c], ['' + x, X, '']]
+        : [[ex(X), '' + c, '· ' + vx], ['' + a, c + ' · ' + X, ': ' + c], ['' + x, X, '']],
+      chips: misch(minus
+        ? [ { h:'+ ' + vx, i:0 }, { h:'− ' + c, i:1 }, { h:'− ' + a, i:-1, t:'Dann bleibt links − ' + vx + ' übrig. Das Minus hängt immer noch an der Variable. ' + VORN_MINUS }, { h:'· ' + vx, i:-1, t:VORN_MINUS } ]
+        : [ { h:'· ' + vx, i:0 }, { h:': ' + c, i:1 }, { h:': ' + a, i:-1, t:'Dann steht links 1 : ' + vx + '. Die Variable steht immer noch hinter dem Geteilt. ' + VORN_GETEILT }, { h:'+ ' + vx, i:-1, t:VORN_GETEILT } ]),
+      zuFrueh: 'Das kommt gleich. ' + (minus ? VORN_MINUS : VORN_GETEILT),
+      wert: x, probe: (minus ? a + ' − ' + x : a + ' : ' + x) + ' = ' + c };
+  }
+
+  /* ----- Fall 4, Formeln: res = m − z oder res = m / z ----- */
+  var POOL4 = [
+    { k:'Geschwindigkeit aus Weg und Zeit', res:'v', zn:'t', m:'s', minus:false },
+    { k:'Anteil pro Person', res:'z', zn:'n', m:'K', minus:false },
+    { k:'Kreiszahl aus Umfang und Durchmesser', res:'π', zn:'d', m:'u', minus:false, resFest:true },
+    { k:'Restbetrag nach einer Anzahlung', res:'R', zn:'A', m:'P', minus:true },
+    { k:'Winkel im rechtwinkligen Dreieck', res:'β', zn:'α', m:'90°', minus:true, mFest:true },
+    { k:'Differenz von zwei Zahlen', res:'d', zn:'b', m:'a', minus:true }
+  ];
+  function f4Formel(){
+    var p = pick(POOL4), z = Z(p.zn), vz = V(p.zn);
+    var res = p.resFest ? p.res : V(p.res), m = p.mFest ? p.m : V(p.m);
+    return { art:'formel', kontext:p.k, ziel:z, p:p, res:res, m:m, vz:vz,
+      lines: p.minus
+        ? [[res, m + ' − ' + z, '+ ' + vz], [res + ' + ' + z, m, '− ' + res], [z, m + ' − ' + res, '']]
+        : [[res, B(m, z), '· ' + vz], [res + ' · ' + z, m, ': ' + res], [z, B(m, res), '']],
+      chips: misch(p.minus
+        ? [ { h:'+ ' + vz, i:0 }, { h:'− ' + res, i:1 }, { h:'− ' + m, i:-1, t:'Dann bleibt rechts − ' + vz + ' übrig. Das Minus hängt immer noch an der Variable. ' + VORN_MINUS }, { h:'· ' + vz, i:-1, t:VORN_MINUS } ]
+        : [ { h:'· ' + vz, i:0 }, { h:': ' + res, i:1 }, { h:': ' + m, i:-1, t:'Dann steht die Variable immer noch unter dem Bruchstrich. ' + VORN_GETEILT }, { h:'+ ' + vz, i:-1, t:VORN_GETEILT } ]),
+      zuFrueh: 'Das kommt gleich. ' + (p.minus ? VORN_MINUS : VORN_GETEILT) };
+  }
+
+  /* ----- Fall 5, Zahlen ----- */
+  var XV = V('x');
+  function term5(n, v){ return (n === 1 ? '' : n) + v; }
+  var SPAETER5 = 'Das kommt später. Sammle zuerst die Variable auf einer Seite, danach räumst du von außen nach innen weg.';
+  function f5Zahl(opt){
+    opt = opt || {};
+    var a = R(3,9), c = R(1, a - 2), k = a - c;
+    var x = opt.xVielfachA ? a * R(1,2) : R(1,12);
+    var b = opt.bVielfachK ? k * R(1,4) : R(1,15);
+    var d = k * x + b;
+    var links = opt.links !== undefined ? opt.links : R(0,1) === 1;   /* mehr x auf der linken Seite? */
+    var S = function(l, r, cmd){ return links ? [l, r, cmd] : [r, l, cmd]; };
+    var cmd0 = '− ' + term5(c, XV), cmd1 = '− ' + b, cmd2 = ': ' + k;
+    var viel = function(v){ return a + ' · ' + v + ' + ' + b; }, wenig = function(v){ return c + ' · ' + v + ' + ' + d; };
+    return { art:'zahl', a:a, c:c, k:k, x:x, b:b, d:d, cmd0:cmd0, cmd1:cmd1, cmd2:cmd2, ziel:X,
+      lines: [ S(term5(a, X) + ' + ' + b, term5(c, X) + ' + ' + d, cmd0), S(term5(k, X) + ' + ' + b, '' + d, cmd1),
+               S(term5(k, X), '' + (d - b), cmd2), S(X, '' + x, '') ],
+      chips: misch([
+        { h:cmd0, i:0 },
+        { h:'− ' + term5(a, XV), i:-1, t:'Das geht, aber dann bleibt auf der anderen Seite eine negative Anzahl ' + XV + ' übrig. Nimm lieber die kleinere Anzahl weg.' },
+        { h:cmd1, i:1 },
+        { h:'− ' + d, i:-1, t:'Das geht, bringt dich aber noch nicht weiter. Sammle zuerst die Variable auf einer Seite.' },
+        { h:cmd2, i:2 },
+        { h:': ' + a, i:-1, t:'Die ' + a + ' gehört nur zu einem Teil der Gleichung. Sammle zuerst die Variable auf einer Seite.' } ]),
+      zuFrueh: SPAETER5,
+      wert: x, probe: (links ? viel(x) + ' = ' + wenig(x) : wenig(x) + ' = ' + viel(x)) };
+  }
+
+  /* ----- Fall 5, mit Buchstaben ----- */
+  function f5Formel(){
+    var a = R(3,9), c = R(1, a - 2), k = a - c, paar = pick([['a','b'],['m','n'],['p','q']]);
+    var p = V(paar[0]), q = V(paar[1]);
+    var cmd0 = '− ' + term5(c, XV);
+    return { art:'formel', kontext:'Gleichung mit Buchstaben', ziel:X, a:a, c:c, k:k, p:p, q:q, cmd0:cmd0,
+      lines: [ [term5(a, X) + ' + ' + p, term5(c, X) + ' + ' + q, cmd0], [term5(k, X) + ' + ' + p, q, '− ' + p],
+               [term5(k, X), q + ' − ' + p, ': ' + k], [X, B(q + ' − ' + p, '' + k), ''] ],
+      chips: misch([
+        { h:cmd0, i:0 },
+        { h:'− ' + term5(a, XV), i:-1, t:'Das geht, aber dann bleibt auf der anderen Seite eine negative Anzahl ' + XV + ' übrig. Nimm lieber die kleinere Anzahl weg.' },
+        { h:'− ' + p, i:1 },
+        { h:'− ' + q, i:-1, t:'Das geht, bringt dich aber noch nicht weiter. Sammle zuerst die Variable auf einer Seite.' },
+        { h:': ' + k, i:2 },
+        { h:': ' + a, i:-1, t:'Die ' + a + ' gehört nur zu einem Teil der Gleichung. Sammle zuerst die Variable auf einer Seite.' } ]),
+      zuFrueh: SPAETER5 };
+  }
+
+  /* ----- Fall 6, Zahlen ----- */
+  var wz = function(h){ return '<span class="wz">√<span>' + h + '</span></span>'; };
+  var WURZEL = '√ Wurzel';
+  var HALB = 'Das Quadrat bedeutet, dass die Variable mit sich selbst multipliziert wird. Teilen durch 2 macht das nicht rückgängig. Die Umkehroperation zum Quadrat ist die Wurzel.';
+  var ENG6 = 'Das Quadrat klebt am engsten an der Variable. Räume zuerst weg, was außen dran hängt.';
+  function f6Zahl(){
+    var sorte = pick(['einfach','plus','plus','minus','mal']), x = R(2,12), q = x * x, X2 = X + '²', a, b, c;
+    if (sorte === 'einfach'){
+      return { art:'zahl', sorte:sorte, x:x, q:q, ziel:X, lines:[[X2, '' + q, '√'], [X, '' + x, '']],
+        chips: misch([{ h:WURZEL, i:0 }, { h:': 2', i:-1, t:HALB }, { h:'· 2', i:-1, t:HALB }]),
+        zuFrueh:ENG6, wert:x, probe: x + '² = ' + q };
+    }
+    if (sorte === 'mal'){
+      a = R(3,5); c = a * q;
+      return { art:'zahl', sorte:sorte, x:x, q:q, ziel:X, lines:[[a + ' · ' + X2, '' + c, ': ' + a], [X2, '' + q, '√'], [X, '' + x, '']],
+        chips: misch([{ h:': ' + a, i:0 }, { h:'· ' + a, i:-1 }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]),
+        zuFrueh:ENG6, wert:x, probe: a + ' · ' + x + '² = ' + c };
+    }
+    var plus = sorte === 'plus';
+    b = plus ? R(1,30) : R(1, Math.min(30, q - 1)); c = plus ? q + b : q - b;
+    return { art:'zahl', sorte:sorte, x:x, q:q, ziel:X,
+      lines:[[X2 + (plus ? ' + ' : ' − ') + b, '' + c, (plus ? '− ' : '+ ') + b], [X2, '' + q, '√'], [X, '' + x, '']],
+      chips: misch([{ h:'− ' + b, i:(plus ? 0 : -1) }, { h:'+ ' + b, i:(plus ? -1 : 0) }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]),
+      zuFrueh:ENG6, wert:x, probe: x + '²' + (plus ? ' + ' : ' − ') + b + ' = ' + c };
+  }
+
+  /* ----- Fall 6, Formeln ----- */
+  function f6Formel(){
+    var n = R(1,6), z, a = V('a'), b = V('b'), c = V('c'), A = V('A'), h = V('h');
+    if (n === 1){ z = Z('a');
+      return { art:'formel', kontext:'Flächeninhalt eines Quadrats', ziel:z, lines:[[A, z + '²', '√'], [wz(A), z, '']],
+        chips: misch([{ h:WURZEL, i:0 }, { h:': 2', i:-1, t:HALB }, { h:'· 2', i:-1, t:HALB }]), zuFrueh:ENG6 }; }
+    if (n === 2){ z = Z('r');
+      return { art:'formel', kontext:'Flächeninhalt eines Kreises', ziel:z, lines:[[A, 'π · ' + z + '²', ': π'], [B(A, 'π'), z + '²', '√'], [wz(B(A, 'π')), z, '']],
+        chips: misch([{ h:': π', i:0 }, { h:'· π', i:-1 }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]), zuFrueh:ENG6 }; }
+    if (n === 3 || n === 4){
+      var zn = n === 3 ? 'a' : 'b', o = n === 3 ? b : a; z = Z(zn);
+      return { art:'formel', kontext:'Satz des Pythagoras', ziel:z,
+        lines:[[c + '²', (n === 3 ? z + '² + ' + o + '²' : o + '² + ' + z + '²'), '− ' + o + '²'], [c + '² − ' + o + '²', z + '²', '√'], [wz(c + '² − ' + o + '²'), z, '']],
+        chips: misch([{ h:'− ' + o + '²', i:0 }, { h:'+ ' + o + '²', i:-1 }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]), zuFrueh:ENG6 }; }
+    if (n === 5){ z = Z('a');
+      return { art:'formel', kontext:'Oberfläche eines Würfels', ziel:z, lines:[[V('O'), '6 · ' + z + '²', ': 6'], [B(V('O'), '6'), z + '²', '√'], [wz(B(V('O'), '6')), z, '']],
+        chips: misch([{ h:': 6', i:0 }, { h:'· 6', i:-1 }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]), zuFrueh:ENG6 }; }
+    z = Z('a');
+    return { art:'formel', kontext:'Volumen einer quadratischen Säule', ziel:z, lines:[[V('V'), z + '² · ' + h, ': ' + h], [B(V('V'), h), z + '²', '√'], [wz(B(V('V'), h)), z, '']],
+      chips: misch([{ h:': ' + h, i:0 }, { h:'· ' + h, i:-1 }, { h:WURZEL, i:1 }, { h:': 2', i:-1, t:HALB }]), zuFrueh:ENG6 };
+  }
+
+  /* ----- Fall 7: Formeln aus der Formelsammlung (nur zum Rechnen im Heft) ----- */
+  function sammlung(){
+    var a = V('a'), b = V('b'), c = V('c'), h = V('h'), r = V('r'), A = V('A'), Vv = V('V'), p = V('p'), G = V('G'), W = V('W'), K = V('K'), Zi = V('Z'), u = V('u'), g = V('g'), M = V('M'), s = V('s'), v = V('v');
+    var L = [
+      { k:'Flächeninhalt eines Trapezes', z:'h', l:function(z){ return [[A, B(a + ' + ' + c, '2') + ' · ' + z, '· 2'], ['2 · ' + A, '(' + a + ' + ' + c + ') · ' + z, ': (' + a + ' + ' + c + ')'], [B('2 · ' + A, a + ' + ' + c), z, '']]; } },
+      { k:'Flächeninhalt eines Trapezes', z:'a', l:function(z){ return [[A, B(z + ' + ' + c, '2') + ' · ' + h, '· 2'], ['2 · ' + A, '(' + z + ' + ' + c + ') · ' + h, ': ' + h], [B('2 · ' + A, h), z + ' + ' + c, '− ' + c], [B('2 · ' + A, h) + ' − ' + c, z, '']]; } },
+      { k:'Volumen eines Zylinders', z:'h', l:function(z){ return [[Vv, 'π · ' + r + '² · ' + z, ': (π · ' + r + '²)'], [B(Vv, 'π · ' + r + '²'), z, '']]; } },
+      { k:'Volumen eines Zylinders', z:'r', l:function(z){ return [[Vv, 'π · ' + z + '² · ' + h, ': (π · ' + h + ')'], [B(Vv, 'π · ' + h), z + '²', '√'], [wz(B(Vv, 'π · ' + h)), z, '']]; } },
+      { k:'Volumen eines Kegels', z:'h', l:function(z){ return [[Vv, B('1', '3') + ' · π · ' + r + '² · ' + z, '· 3'], ['3 · ' + Vv, 'π · ' + r + '² · ' + z, ': (π · ' + r + '²)'], [B('3 · ' + Vv, 'π · ' + r + '²'), z, '']]; } },
+      { k:'Jahreszinsen', z:'K', l:function(z){ return [[Zi, B(z + ' · ' + p, '100'), '· 100'], ['100 · ' + Zi, z + ' · ' + p, ': ' + p], [B('100 · ' + Zi, p), z, '']]; } },
+      { k:'Jahreszinsen', z:'p', l:function(z){ return [[Zi, B(K + ' · ' + z, '100'), '· 100'], ['100 · ' + Zi, K + ' · ' + z, ': ' + K], [B('100 · ' + Zi, K), z, '']]; } },
+      { k:'Prozentwert', z:'p', l:function(z){ return [[W, B(G + ' · ' + z, '100'), '· 100'], ['100 · ' + W, G + ' · ' + z, ': ' + G], [B('100 · ' + W, G), z, '']]; } },
+      { k:'Prozentwert', z:'G', l:function(z){ return [[W, B(z + ' · ' + p, '100'), '· 100'], ['100 · ' + W, z + ' · ' + p, ': ' + p], [B('100 · ' + W, p), z, '']]; } },
+      { k:'Umfang eines Kreises', z:'r', l:function(z){ return [[u, '2 · π · ' + z, ': (2 · π)'], [B(u, '2 · π'), z, '']]; } },
+      { k:'Flächeninhalt eines Kreises', z:'r', l:function(z){ return [[A, 'π · ' + z + '²', ': π'], [B(A, 'π'), z + '²', '√'], [wz(B(A, 'π')), z, '']]; } },
+      { k:'Flächeninhalt eines Dreiecks', z:'g', l:function(z){ return [[A, B(z + ' · ' + h, '2'), '· 2'], ['2 · ' + A, z + ' · ' + h, ': ' + h], [B('2 · ' + A, h), z, '']]; } },
+      { k:'Volumen eines Quaders', z:'c', l:function(z){ return [[Vv, a + ' · ' + b + ' · ' + z, ': (' + a + ' · ' + b + ')'], [B(Vv, a + ' · ' + b), z, '']]; } },
+      { k:'Mantelfläche eines Zylinders', z:'h', l:function(z){ return [[M, '2 · π · ' + r + ' · ' + z, ': (2 · π · ' + r + ')'], [B(M, '2 · π · ' + r), z, '']]; } },
+      { k:'Satz des Pythagoras', z:'b', l:function(z){ return [[c + '²', a + '² + ' + z + '²', '− ' + a + '²'], [c + '² − ' + a + '²', z + '²', '√'], [wz(c + '² − ' + a + '²'), z, '']]; } },
+      { k:'Weg, Geschwindigkeit und Zeit', z:'t', l:function(z){ return [[v, B(s, z), '· ' + V('t')], [v + ' · ' + z, s, ': ' + v], [z, B(s, v), '']]; } }
+    ];
+    var e = pick(L), z = Z(e.z);
+    return { art:'formel', kontext:e.k, ziel:z, lines:e.l(z) };
+  }
+
+  var ERZEUGE = { 1:{ zahl:f1Zahl, formel:f1Formel }, 2:{ zahl:f2Zahl, formel:f2Formel }, 3:{ zahl:f3Zahl, formel:f3Formel }, 4:{ zahl:f4Zahl, formel:f4Formel },
+    5:{ zahl:f5Zahl, formel:f5Formel }, 6:{ zahl:f6Zahl, formel:f6Formel }, 8:{ zahl:sammlung, formel:sammlung } };
+  ERZEUGE[7] = { zahl:function(){ return ERZEUGE[R(1,6)].zahl(); }, formel:function(){ return ERZEUGE[R(1,6)].formel(); } };
+
+  /* ----- Fehleraufgaben Fall 5 ----- */
+  function fehler5(art, ohne){
+    var t, s;
+    if (art === 'zahl'){
+      if (ohne){ t = f5Zahl(); return { ziel:t.ziel, lines:t.lines, fehler:-1 }; }
+      s = R(1,3);
+      if (s === 1){
+        t = f5Zahl({ xVielfachA:true, links:true });
+        return { ziel:t.ziel, lines:[t.lines[0], [term5(t.a, X) + ' + ' + t.b, '' + t.d, t.cmd1], [term5(t.a, X), '' + (t.d - t.b), ': ' + t.a], [X, '' + ((t.d - t.b) / t.a), '']], fehler:1,
+          erkl:'In Zeile 2 wurde ' + t.cmd0 + ' nur rechts gerechnet. Links muss <span class="m">' + term5(t.k, X) + ' + ' + t.b + '</span> stehen.' };
+      }
+      if (s === 2){
+        t = f5Zahl({ bVielfachK:true, links:true });
+        return { ziel:t.ziel, lines:[t.lines[0], t.lines[1], [term5(t.k, X), '' + (t.d + t.b), t.cmd2], [X, '' + ((t.d + t.b) / t.k), '']], fehler:2,
+          erkl:'In Zeile 3 wurde rechts falsch gerechnet. ' + t.d + ' ' + t.cmd1 + ' ergibt ' + (t.d - t.b) + '.' };
+      }
+      t = f5Zahl({ links:true });
+      var w = (t.d - t.b) - t.k; if (w < 0 || w === t.x) w = t.d - t.b;
+      return { ziel:t.ziel, lines:[t.lines[0], t.lines[1], t.lines[2], [X, '' + w, '']], fehler:3,
+        erkl:'In Zeile 4 stimmt die Rechnung nicht. ' + (t.d - t.b) + ' ' + t.cmd2 + ' ergibt ' + t.x + '.' };
+    }
+    t = f5Formel();
+    if (ohne) return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 };
+    if (R(0,1) === 0){
+      return { kontext:t.kontext, ziel:t.ziel,
+        lines:[t.lines[0], [term5(t.a, X) + ' + ' + t.p, t.q, '− ' + t.p], [term5(t.a, X), t.q + ' − ' + t.p, ': ' + t.a], [X, B(t.q + ' − ' + t.p, '' + t.a), '']], fehler:1,
+        erkl:'In Zeile 2 wurde ' + t.cmd0 + ' nur rechts gerechnet. Links muss <span class="m">' + term5(t.k, X) + ' + ' + t.p + '</span> stehen.' };
+    }
+    return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], t.lines[1], t.lines[2], [X, t.q + ' − ' + t.p + ' : ' + t.k, '']], fehler:3,
+      erkl:'In Zeile 4 fehlt der Bruchstrich oder die Klammer. So wird nur ' + t.p + ' durch ' + t.k + ' geteilt. Richtig ist <span class="m">' + X + ' = ' + t.lines[3][1] + '</span>.' };
+  }
+
+  /* ----- Fehleraufgaben Fall 6 ----- */
+  function fehler6(art, ohne){
+    var t;
+    if (art === 'zahl'){
+      t = f6Zahl();
+      if (ohne) return { ziel:t.ziel, lines:t.lines, fehler:-1 };
+      if (R(0,1) === 0){
+        var drei = pick([[3,4,5],[4,3,5],[6,8,10],[8,6,10],[5,12,13],[12,5,13],[8,15,17]]), x = drei[0], b = drei[1], c = drei[2];
+        return { ziel:X, lines:[[X + '² + ' + (b * b), '' + (c * c), '√'], [X + ' + ' + b, '' + c, '− ' + b], [X, '' + (c - b), '']], fehler:1,
+          erkl:'In Zeile 2 wurde die Wurzel aus jedem Summanden einzeln gezogen. Bei einer Summe ist das nicht erlaubt. Räume zuerst + ' + (b * b) + ' weg und ziehe danach die Wurzel. Richtig ist <span class="m">' + X + ' = ' + x + '</span>.' };
+      }
+      var halb = t.q % 2 === 0 && t.q / 2 !== t.x, w = halb ? t.q / 2 : t.q;
+      return { ziel:t.ziel, lines:t.lines.slice(0, -1).concat([[X, '' + w, '']]), fehler:t.lines.length - 1,
+        erkl:(halb ? 'In der letzten Zeile wurde durch 2 geteilt. ' : 'In der letzten Zeile wurde keine Wurzel gezogen. ') + 'Die Umkehroperation zum Quadrat ist die Wurzel, und die Wurzel aus ' + t.q + ' ist ' + t.x + '.' };
+    }
+    if (ohne){ t = f6Formel(); return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 }; }
+    var a = V('a'), bb = V('b'), cc = V('c'), A = V('A'), O = V('O'), za = Z('a'), zb = Z('b'), zr = Z('r');
+    return pick([
+      { kontext:'Satz des Pythagoras', ziel:za, lines:[[cc + '²', za + '² + ' + bb + '²', '√'], [cc, za + ' + ' + bb, '− ' + bb], [cc + ' − ' + bb, za, '']], fehler:1,
+        erkl:'In Zeile 2 wurde die Wurzel aus jedem Summanden einzeln gezogen. Bei einer Summe ist das nicht erlaubt. Räume zuerst + ' + bb + '² weg. Richtig ist <span class="m">' + wz(cc + '² − ' + bb + '²') + ' = ' + za + '</span>.' },
+      { kontext:'Satz des Pythagoras', ziel:zb, lines:[[cc + '²', a + '² + ' + zb + '²', '− ' + a + '²'], [cc + '² − ' + a + '²', zb + '²', '√'], [cc + ' − ' + a, zb, '']], fehler:2,
+        erkl:'In Zeile 3 wurde die Wurzel aus jedem Teil einzeln gezogen. Die Wurzel gilt für die ganze Seite. Richtig ist <span class="m">' + wz(cc + '² − ' + a + '²') + ' = ' + zb + '</span>.' },
+      { kontext:'Flächeninhalt eines Kreises', ziel:zr, lines:[[A, 'π · ' + zr + '²', ': π'], [B(A, 'π'), zr + '²', ': 2'], [B(A, '2 · π'), zr, '']], fehler:2,
+        erkl:'In Zeile 3 wurde durch 2 geteilt. Die Umkehroperation zum Quadrat ist die Wurzel. Richtig ist <span class="m">' + wz(B(A, 'π')) + ' = ' + zr + '</span>.' },
+      { kontext:'Oberfläche eines Würfels', ziel:za, lines:[[O, '6 · ' + za + '²', ': 6'], [O, za + '²', '√'], [wz(O), za, '']], fehler:1,
+        erkl:'In Zeile 2 wurde : 6 nur rechts gerechnet. Der Befehl gilt für beide Seiten. Richtig ist <span class="m">' + B(O, '6') + ' = ' + za + '²</span>.' },
+      { kontext:'Flächeninhalt eines Quadrats', ziel:za, lines:[[A, za + '²', ': 2'], [B(A, '2'), za, '']], fehler:1,
+        erkl:'Hier wurde durch 2 geteilt. Das Quadrat bedeutet aber ' + a + ' · ' + a + '. Die Umkehroperation ist die Wurzel. Richtig ist <span class="m">' + wz(A) + ' = ' + za + '</span>.' }
+    ]);
+  }
+
+
+  /* ----- Fehleraufgaben Fall 3 ----- */
+  function fehler3(art, ohne){
+    var t, s = R(1,3);
+    if (art === 'zahl'){
+      t = f3Zahl({ nurMal:true, bVielfach:true });
+      if (ohne) return { ziel:t.ziel, lines:t.lines, fehler:-1 };
+      var z1 = t.plus ? ' + ' : ' − ', cmd2 = t.lines[1][2];
+      if (s === 1){
+        var w = t.plus ? t.c - t.b : t.c + t.b;
+        return { ziel:t.ziel, lines:[[t.lines[0][0], '' + t.c, cmd2], [t.a + ' · ' + X, '' + w, ': ' + t.a], [X, '' + (w / t.a), '']], fehler:1,
+          erkl:'In Zeile 2 wurde ' + cmd2 + ' gerechnet, obwohl' + z1 + t.b + ' in der Klammer steckt. Zuerst muss die ' + t.a + ' vor der Klammer weg, also : ' + t.a + '.' };
+      }
+      if (s === 2){
+        var w2 = t.plus ? t.c - t.b : t.c + t.b;
+        return { ziel:t.ziel, lines:[t.lines[0], [t.innen(X), '' + t.c, cmd2], [X, '' + w2, '']], fehler:1,
+          erkl:'In Zeile 2 wurde : ' + t.a + ' nur links gerechnet. Rechts muss ' + t.c + ' : ' + t.a + ' = ' + t.innenwert + ' stehen.' };
+      }
+      var w3 = t.plus ? t.innenwert + t.b : t.innenwert - t.b;
+      if (w3 < 0) w3 = t.innenwert;
+      return { ziel:t.ziel, lines:[t.lines[0], t.lines[1], [X, '' + w3, '']], fehler:2,
+        erkl:'In Zeile 3 stimmt die Rechnung nicht. ' + t.innenwert + ' ' + cmd2 + ' ergibt ' + t.x + '.' };
+    }
+    t = f3Formel();
+    if (ohne) return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 };
+    var p = t.p, wo = p.mal ? 'in der Klammer' : 'über dem Bruchstrich';
+    if (s === 1){
+      var l2f = p.res + ' ' + t.um + ' ' + p.no;
+      return { kontext:t.kontext, ziel:t.ziel,
+        lines:[[p.res, t.lines[0][1], t.cmd2], [l2f, p.mal ? p.ko + ' · ' + t.ziel : B(t.ziel, p.ko), t.cmd1], [p.mal ? B(l2f, p.ko) : p.ko + ' · (' + l2f + ')', t.ziel, '']], fehler:1,
+        erkl:'In Zeile 2 wurde ' + t.cmd2 + ' gerechnet, obwohl ' + p.nop + ' ' + p.no + ' ' + wo + ' steckt. Zuerst muss ' + p.ko + ' weg, also ' + t.cmd1 + '.' };
+    }
+    if (s === 2){
+      return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], [p.res, t.innen, t.cmd2], [p.res + ' ' + t.um + ' ' + p.no, t.ziel, '']], fehler:1,
+        erkl:'In Zeile 2 wurde ' + t.cmd1 + ' nur rechts gerechnet. Der Befehl gilt für beide Seiten. Richtig ist <span class="m">' + t.l2 + ' = ' + t.innen + '</span>.' };
+    }
+    return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], t.lines[1], [t.l2 + ' ' + p.nop + ' ' + p.no, t.ziel, '']], fehler:2,
+      erkl:'In Zeile 3 steht links die falsche Rechnung. Der Befehl heißt ' + t.cmd2 + '. Richtig ist <span class="m">' + t.lines[2][0] + ' = ' + t.ziel + '</span>.' };
+  }
+
+  /* ----- Fehleraufgaben Fall 4 ----- */
+  function fehler4(art, ohne){
+    var t, s = R(1,2);
+    if (art === 'zahl'){
+      t = f4Zahl();
+      if (ohne) return { ziel:t.ziel, lines:t.lines, fehler:-1 };
+      if (s === 1){
+        return { ziel:t.ziel,
+          lines:[[t.lines[0][0], '' + t.c, (t.minus ? '+ ' : '· ') + t.a], [X, '' + (t.minus ? t.c + t.a : t.c * t.a), '']], fehler:1,
+          erkl:'Hier wurde gerechnet wie in Fall 1. Die Variable steht aber ' + (t.minus ? 'hinter dem Minus' : 'hinter dem Geteilt') + '. ' + (t.minus ? VORN_MINUS : VORN_GETEILT) + ' Richtig ist <span class="m">' + X + ' = ' + t.x + '</span>.' };
+      }
+      return { ziel:t.ziel, lines:[t.lines[0], t.lines[1], ['' + (t.minus ? t.a + t.c : t.a * t.c), X, '']], fehler:2,
+        erkl:'In Zeile 3 stimmt die Rechnung nicht. ' + t.a + ' ' + t.lines[1][2] + ' ergibt ' + t.x + '.' };
+    }
+    t = f4Formel();
+    if (ohne) return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 };
+    var p = t.p;
+    if (s === 1){
+      return { kontext:t.kontext, ziel:t.ziel,
+        lines:[[t.res, t.lines[0][1], (p.minus ? '+ ' : '· ') + t.m], [t.res + (p.minus ? ' + ' : ' · ') + t.m, t.ziel, '']], fehler:1,
+        erkl:'Hier wurde gerechnet wie in Fall 1. Die Variable steht aber ' + (p.minus ? 'hinter dem Minus' : 'unter dem Bruchstrich') + '. ' + (p.minus ? VORN_MINUS : VORN_GETEILT) + ' Richtig ist <span class="m">' + t.ziel + ' = ' + t.lines[2][1] + '</span>.' };
+    }
+    return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], t.lines[1], [t.ziel, t.m + (p.minus ? ' + ' : ' · ') + t.res, '']], fehler:2,
+      erkl:'In Zeile 3 steht rechts die falsche Rechnung. Der Befehl heißt ' + t.lines[1][2] + '. Richtig ist <span class="m">' + t.ziel + ' = ' + t.lines[2][1] + '</span>.' };
+  }
+
+  /* ================= Fehleraufgaben erzeugen ================= */
+  /* Ergebnis: { kontext, ziel, lines, fehler (Index oder -1), erkl } */
+  function fehlerAufgabe(fall, art){
+    var t, ohne = R(0,3) === 0;
+    if (fall === 7) fall = R(1,6);
+    if (fall === 5) return fehler5(art, ohne);
+    if (fall === 6) return fehler6(art, ohne);
+    if (fall === 3) return fehler3(art, ohne);
+    if (fall === 4) return fehler4(art, ohne);
+    if (fall === 1 && art === 'zahl'){
+      t = f1Zahl();
+      if (ohne) return { ziel:t.ziel, lines:t.lines, fehler:-1 };
+      var kand = (t.op === '+' ? [t.c + t.a, t.c] : t.op === '−' ? [t.c - t.a, t.c] : t.op === '·' ? [t.c - t.a, t.c * t.a, t.c] : [t.c + t.a, t.c])
+        .filter(function(k){ return k >= 0 && k !== t.x; });
+      return { ziel:t.ziel, lines:[t.lines[0], [X, '' + pick(kand), '']], fehler:1,
+        erkl:'Rechts muss ' + t.c + ' ' + t.lines[0][2] + ' gerechnet werden. Richtig ist <span class="m">' + X + ' = ' + t.x + '</span>.' };
+    }
+    if (fall === 1){
+      t = f1Formel();
+      if (ohne) return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 };
+      var p = t.p, gut = t.lines[1][0], cmd = t.lines[0][2];
+      if (R(0,1) === 0){
+        return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], [p.res, t.ziel, '']], fehler:1,
+          erkl:'Der Befehl ' + cmd + ' wurde nur auf der rechten Seite ausgeführt. Richtig ist <span class="m">' + gut + ' = ' + t.ziel + '</span>.' };
+      }
+      var schief = p.op === '·' ? p.res + ' − ' + p.o : p.op === ':' ? B(p.res, p.o) : p.op === '+' ? p.res + ' + ' + p.o : p.res + ' − ' + p.o;
+      return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], [schief, t.ziel, '']], fehler:1,
+        erkl:'Der Befehl heißt ' + cmd + '. Auf der linken Seite steht aber eine andere Rechnung. Richtig ist <span class="m">' + gut + ' = ' + t.ziel + '</span>.' };
+    }
+    if (art === 'zahl'){
+      t = f2Zahl({ nurMal:true, bVielfach:true });
+      if (ohne) return { ziel:t.ziel, lines:t.lines, fehler:-1 };
+      var sorte = R(1,3), w = t.plus ? t.c + t.b : t.c - t.b, cmd1 = t.lines[0][2];
+      if (sorte === 2 && w < 0) sorte = 1;
+      if (sorte === 1){
+        return { ziel:t.ziel, lines:[t.lines[0], [t.innen(X), '' + t.c, t.lines[1][2]], [X, '' + (t.c / t.a), '']], fehler:1,
+          erkl:'In Zeile 2 wurde ' + cmd1 + ' nur links gerechnet. Rechts muss ' + t.c + ' ' + cmd1 + ' = ' + t.n + ' stehen.' };
+      }
+      if (sorte === 2){
+        return { ziel:t.ziel, lines:[t.lines[0], [t.innen(X), '' + w, t.lines[1][2]], [X, '' + (w / t.a), '']], fehler:1,
+          erkl:'In Zeile 2 wurde rechts falsch gerechnet. ' + t.c + ' ' + cmd1 + ' ergibt ' + t.n + '.' };
+      }
+      var f3 = t.n - t.a; if (f3 < 0 || f3 === t.x) f3 = t.n * t.a;
+      return { ziel:t.ziel, lines:[t.lines[0], t.lines[1], [X, '' + f3, '']], fehler:2,
+        erkl:'In Zeile 3 stimmt die Rechnung nicht. ' + t.n + ' : ' + t.a + ' ergibt ' + t.x + '.' };
+    }
+    t = f2Formel();
+    if (ohne) return { kontext:t.kontext, ziel:t.ziel, lines:t.lines, fehler:-1 };
+    var q = t.p, s = R(1,3);
+    if (s === 1){
+      return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], t.lines[1], [t.l2 + ' : ' + q.ko, t.ziel, '']], fehler:2,
+        erkl:'In Zeile 3 fehlt die Klammer. So wird nur ' + q.bo + ' durch ' + q.ko + ' geteilt. Richtig ist <span class="m">' + B(t.l2, q.ko) + ' = ' + t.ziel + '</span>.' };
+    }
+    if (s === 2){
+      return { kontext:t.kontext, ziel:t.ziel, lines:[t.lines[0], [q.res, t.kv, ': ' + q.ko], [B(q.res, q.ko), t.ziel, '']], fehler:1,
+        erkl:'In Zeile 2 wurde ' + t.um + ' ' + q.bo + ' nur rechts gerechnet. Der Befehl gilt für beide Seiten. Richtig ist <span class="m">' + t.l2 + ' = ' + t.kv + '</span>.' };
+    }
+    return { kontext:t.kontext, ziel:t.ziel,
+      lines:[[q.res, t.lines[0][1], ': ' + q.ko], [q.res + ' : ' + q.ko, t.ziel + ' ' + q.bop + ' ' + q.bo, t.um + ' ' + q.bo], [q.res + ' : ' + q.ko + ' ' + t.um + ' ' + q.bo, t.ziel, '']], fehler:1,
+      erkl:'In Zeile 2 wurde nur ' + t.kv + ' durch ' + q.ko + ' geteilt, ' + q.bo + ' aber nicht. Sicherer ist es, zuerst wegzuräumen, was außen dran hängt, also zuerst ' + t.um + ' ' + q.bo + '.' };
+  }
+
+  /* ================= Übungskarten ================= */
+  function karte(titel, wie, baue){
+    var box = el('div', 'karte blatt');
+    var kopf = el('div', 'kartenkopf'); box.appendChild(kopf);
+    kopf.appendChild(el('h3', '', titel));
+    var sch = el('div', 'schalter'); kopf.appendChild(sch);
+    var bZ = knopf('', 'Zahlen'), bF = knopf('', 'Formeln'); sch.appendChild(bZ); sch.appendChild(bF);
+    box.appendChild(el('p', 'wie', wie));
+    var raum = el('div'); box.appendChild(raum);
+    var fuss = el('div', 'kartenfuss'); box.appendChild(fuss);
+    var neu = knopf('knopf voll', 'Neue Aufgabe'); fuss.appendChild(neu);
+    var zaehler = el('span', 'zaehler', 'Richtig gelöst 0'); fuss.appendChild(zaehler);
+    var art = 'zahl', anzahl = 0;
+    function punkt(){ anzahl++; zaehler.textContent = 'Richtig gelöst ' + anzahl; }
+    function los(){
+      bZ.setAttribute('aria-pressed', art === 'zahl'); bF.setAttribute('aria-pressed', art === 'formel');
+      raum.innerHTML = ''; baue(raum, art, punkt);
+    }
+    bZ.addEventListener('click', function(){ art = 'zahl'; los(); });
+    bF.addEventListener('click', function(){ art = 'formel'; los(); });
+    neu.addEventListener('click', los);
+    los();
+    return box;
+  }
+  function kopfzeilen(raum, t, auftrag){
+    if (t.kontext) raum.appendChild(el('p', 'kontext', t.kontext));
+    raum.appendChild(el('p', 'auftrag', auftrag));
+  }
+  function auftragText(t){
+    return t.art === 'zahl' ? 'Löse die Gleichung. ' + t.ziel + ' soll allein stehen.' : 'Stelle die Formel nach ' + t.ziel + ' um.';
+  }
+  function rechnung(lines){
+    var r = el('div', 'rechnung');
+    lines.forEach(function(z){ r.appendChild(el('div', 'zeile', zellen(z))); });
+    return r;
+  }
+
+  /* ----- Übung A: Befehl antippen ----- */
+  function ueA(fall){ return function(raum, art, punkt){
+    var t = ERZEUGE[fall][art]();
+    kopfzeilen(raum, t, auftragText(t));
+    var r = el('div', 'rechnung'); raum.appendChild(r);
+    var frage = el('p', 'frage-klein', 'Was rechnest du als Nächstes auf beiden Seiten?'); raum.appendChild(frage);
+    var chips = el('div', 'chips'); raum.appendChild(chips);
+    var meldung = el('p', 'meldung'); meldung.setAttribute('aria-live', 'polite'); raum.appendChild(meldung);
+    var stand = 0, letzter = t.lines.length - 1;
+    var aktuell = el('div', 'zeile', zellen(t.lines[0], true)); r.appendChild(aktuell);
+    t.chips.forEach(function(c){
+      var b = knopf('chip', c.h);
+      b.addEventListener('click', function(){
+        if (c.i > stand){ wackeln(b); melde(meldung, 'tipp', t.zuFrueh); return; }
+        if (c.i !== stand){ wackeln(b); melde(meldung, 'tipp', c.t || SCHON_DA); return; }
+        aktuell.innerHTML = zellen(t.lines[stand]);
+        stand++; b.disabled = true;
+        var fertig = stand === letzter;
+        aktuell = el('div', 'zeile', zellen(t.lines[stand], !fertig)); r.appendChild(aktuell);
+        if (fertig){
+          Array.prototype.forEach.call(chips.children, function(x){ x.disabled = true; });
+          frage.hidden = true;
+          melde(meldung, 'ok', 'Stimmt. ' + t.ziel + ' steht allein.' + (t.probe ? ' Probe <span class="m">' + t.probe + '</span>.' : ''));
+          punkt();
+        } else { melde(meldung, '', ''); }
+      });
+      chips.appendChild(b);
+    });
+  }; }
+
+  /* ----- Übung B: Im Heft rechnen ----- */
+  function ueB(fall){ return function(raum, art, punkt){
+    var t = ERZEUGE[fall][art](), gezaehlt = false;
+    kopfzeilen(raum, t, t.art === 'zahl'
+      ? 'Löse die Gleichung im Heft. Schreibe jede Zeile mit Befehlsstrich auf.'
+      : 'Stelle die Formel im Heft nach ' + t.ziel + ' um. Schreibe jede Zeile mit Befehlsstrich auf.');
+    raum.appendChild(el('p', 'gross', t.lines[0][0] + ' = ' + t.lines[0][1]));
+    var meldung = el('p', 'meldung'); meldung.setAttribute('aria-live', 'polite');
+    var weg = el('div', 'weg'); weg.hidden = true;
+    weg.appendChild(rechnung(t.lines));
+    var zeigen = knopf('knopf', 'Lösungsweg zeigen');
+    if (t.art === 'zahl'){
+      var ein = el('div', 'eingabe'); raum.appendChild(ein);
+      var lab = el('label', '', X + ' ='); ein.appendChild(lab);
+      var feld = document.createElement('input'); feld.type = 'text'; feld.inputMode = 'numeric'; feld.autocomplete = 'off';
+      feld.setAttribute('aria-label', 'Dein Ergebnis für x'); ein.appendChild(feld);
+      var pruefen = knopf('knopf voll', 'Prüfen'); ein.appendChild(pruefen);
+      var pruefe = function(){
+        var roh = feld.value.replace(/\s/g, '').replace(',', '.');
+        if (roh === '' || isNaN(Number(roh))){ melde(meldung, 'tipp', 'Trage dein Ergebnis als Zahl ein.'); return; }
+        if (Number(roh) === t.wert){
+          melde(meldung, 'ok', 'Stimmt. Probe <span class="m">' + t.probe + '</span>.');
+          if (!gezaehlt){ gezaehlt = true; punkt(); }
+          feld.disabled = true; pruefen.disabled = true;
+        } else {
+          melde(meldung, 'tipp', 'Noch nicht. Mach die Probe und setze deine Zahl für ' + X + ' ein. Du kannst dir auch den Lösungsweg zeigen lassen.');
+        }
+      };
+      pruefen.addEventListener('click', pruefe);
+      feld.addEventListener('keydown', function(e){ if (e.key === 'Enter') pruefe(); });
+      var kz = el('div', 'knopfzeile'); kz.appendChild(zeigen); raum.appendChild(kz);
+      zeigen.addEventListener('click', function(){ weg.hidden = false; zeigen.hidden = true; gezaehlt = true; });
+      raum.appendChild(meldung); raum.appendChild(weg);
+    } else {
+      var kz2 = el('div', 'knopfzeile'); kz2.appendChild(zeigen); raum.appendChild(kz2);
+      raum.appendChild(weg);
+      var selbst = el('div', 'knopfzeile'); selbst.hidden = true; raum.appendChild(selbst);
+      var ja = knopf('knopf voll', 'Hatte ich genauso'), nein = knopf('knopf', 'Hatte ich anders');
+      selbst.appendChild(ja); selbst.appendChild(nein);
+      raum.appendChild(meldung);
+      zeigen.addEventListener('click', function(){ weg.hidden = false; zeigen.hidden = true; selbst.hidden = false; });
+      ja.addEventListener('click', function(){ selbst.hidden = true; melde(meldung, 'ok', 'Gut. Weiter mit der nächsten Aufgabe.'); punkt(); });
+      nein.addEventListener('click', function(){ selbst.hidden = true; melde(meldung, 'tipp', 'Vergleiche Zeile für Zeile. Suche die erste Zeile, die bei dir anders aussieht. Dort liegt der Unterschied.'); });
+    }
+  }; }
+
+  /* ----- Übung C: Fehler finden ----- */
+  function ueC(fall){ return function(raum, art, punkt){
+    var q = fehlerAufgabe(fall, art);
+    kopfzeilen(raum, q, (art === 'zahl' ? 'Die Gleichung soll gelöst werden.' : 'Die Formel soll nach ' + q.ziel + ' umgestellt werden.'));
+    var liste = el('div', 'fehlersuche'); raum.appendChild(liste);
+    var kz = el('div', 'knopfzeile'); raum.appendChild(kz);
+    var keiner = knopf('knopf', 'Kein Fehler, alles richtig'); kz.appendChild(keiner);
+    var meldung = el('p', 'meldung'); meldung.setAttribute('aria-live', 'polite'); raum.appendChild(meldung);
+    var versuche = 0;
+    function schluss(){ Array.prototype.forEach.call(liste.children, function(x){ x.disabled = true; }); keiner.disabled = true; if (versuche === 0) punkt(); }
+    q.lines.forEach(function(z, i){
+      var b = knopf('reihe', '<span class="znr">' + (i + 1) + '</span><span class="zeile">' + zellen(z) + '</span>');
+      b.setAttribute('aria-label', 'Zeile ' + (i + 1));
+      b.addEventListener('click', function(){
+        if (i === q.fehler){ b.classList.add('gefunden'); melde(meldung, 'ok', 'Fehler gefunden. ' + q.erkl); schluss(); return; }
+        versuche++;
+        if (q.fehler === -1){ melde(meldung, 'tipp', 'Diese Zeile stimmt. Rechne jede Zeile im Kopf nach, bevor du dich entscheidest.'); }
+        else if (i === 0){ melde(meldung, 'tipp', 'Zeile 1 ist die Aufgabe selbst, sie stimmt. Prüfe, ob der Befehl auf beiden Seiten richtig ausgeführt wurde.'); }
+        else if (i < q.fehler){ melde(meldung, 'tipp', 'Bis zu dieser Zeile stimmt alles. Lies weiter.'); }
+        else { melde(meldung, 'tipp', 'Diese Zeile führt einen früheren Fehler fort. Suche die Stelle, an der er entsteht.'); }
+      });
+      liste.appendChild(b);
+    });
+    keiner.addEventListener('click', function(){
+      if (q.fehler === -1){ melde(meldung, 'ok', 'Stimmt. In dieser Rechnung ist alles richtig.'); schluss(); }
+      else { versuche++; wackeln(keiner); melde(meldung, 'tipp', 'Doch, hier steckt ein Fehler. Prüfe in jeder Zeile, ob der Befehl auf beiden Seiten richtig ausgeführt wurde.'); }
+    });
+  }; }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ueben'), function(u){
+    var fall = Number(u.getAttribute('data-fall'));
+    u.appendChild(karte('Befehl antippen', 'Tippe an, was du als Nächstes auf beiden Seiten rechnest. Die neue Zeile erscheint von selbst.', ueA(fall)));
+    u.appendChild(karte('Im Heft rechnen', 'Rechne auf Papier und vergleiche danach.', ueB(fall)));
+    u.appendChild(karte('Fehler finden', 'Tippe die Zeile an, in der zum ersten Mal etwas Falsches steht. Manchmal ist auch alles richtig.', ueC(fall)));
+  });
+
+  /* ================= Fall 7: zusätzliche Karten ================= */
+  (function(){
+    var nachher = document.getElementById('u7nach');
+    if (nachher){
+      var ks = karte('Formeln aus der Formelsammlung', 'Hier hängen oft mehr als zwei Rechnungen an der Variable. Rechne auf Papier und vergleiche danach mit dem Lösungsweg.', ueB(8));
+      ks.querySelector('.schalter').hidden = true;
+      nachher.appendChild(ks);
+    }
+  })();
+
+  /* ================= Seitenwechsel ================= */
+  var seiten = document.querySelectorAll('.seite');
+  function zeige(id){
+    Array.prototype.forEach.call(seiten, function(s){ s.hidden = s.id !== id; });
+    document.body.setAttribute('data-seite', id);
+    Array.prototype.forEach.call(document.querySelectorAll('.leiste button'), function(b){
+      if (b.getAttribute('data-ziel') === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-ziel]') : null;
+    if (b && !b.disabled) zeige(b.getAttribute('data-ziel'));
+  });
+  zeige('start');
+})();
+</script>
+</body>
+</html>
