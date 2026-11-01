@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brüche kürzen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--ink:#1e293b;--muted:#475569;--blau:#2563eb;--kuerz:#c2410c;--teil:#fbbf24;--ok:#15803d;--okbg:#dcfce7;--no:#b91c1c;--nobg:#fee2e2;--tipp:#fef9c3;--linie:#cbd5e1;--akz:#2563eb;--bg:#fff}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:auto}
+body{margin:0;font-family:Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.55;color:var(--ink);background:#fff}
+button,input{font:inherit;color:inherit}
+p{margin:.5rem 0}
+
+/* Kopfzeile */
+.kopf{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.45rem 1rem;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);border-bottom:2px solid #e2e8f0}
+.kopf .titel{font-weight:900;white-space:nowrap}
+.kopf nav{display:flex;gap:.25rem;margin-left:auto;flex-wrap:wrap}
+.kopf nav a{cursor:pointer;width:1.9rem;height:1.9rem;border-radius:50%;display:grid;place-items:center;text-decoration:none;font-weight:800;color:var(--muted);background:#f1f5f9;font-size:.85rem}
+.kopf nav a.aktiv{background:var(--blau);color:#fff}
+.sterne{font-weight:900;background:#fef3c7;border-radius:999px;padding:.1rem .7rem;white-space:nowrap}
+.sterne.pop{animation:pop .5s}
+@keyframes pop{50%{transform:scale(1.35)}}
+@media(max-width:600px){.kopf .titel{display:none}.kopf nav{margin-left:0}.kopf nav a{width:1.7rem;height:1.7rem}.sterne{margin-left:auto}}
+
+/* Start */
+.seite.hero{background:linear-gradient(160deg,#dbeafe,#fef3c7);text-align:center;padding-top:2.4rem}
+.hero h1{font-size:clamp(2.2rem,7vw,3.2rem);margin:.2rem 0 .3rem;font-weight:900;line-height:1.1}
+.hero .unter{font-size:1.15rem;color:var(--muted);margin:0 auto;max-width:34rem}
+.hero .bild{max-width:380px}
+.hero .gleichung{font-size:1.7em}
+
+/* Stationen */
+.seite{display:none;padding:1.6rem 1rem 6.5rem;background:var(--bg);min-height:calc(100dvh - 3.1rem)}
+.seite.aktiv{display:block;animation:rein .35s ease}
+.seite.zurueck.aktiv{animation:reinL .35s ease}
+@keyframes rein{from{opacity:0;transform:translateX(28px)}}
+@keyframes reinL{from{opacity:0;transform:translateX(-28px)}}
+.seite .karte:first-of-type{margin-top:.8rem}
+.sperre{background:#fff;border:2px dashed var(--linie);border-radius:14px;padding:1rem;text-align:center;font-weight:700;color:var(--muted)}
+.merk:not([hidden]) ~ .sperre{display:none}
+.merk{margin-top:.6rem}
+details.lk{max-width:560px;margin:2rem auto 0;text-align:left;background:rgba(255,255,255,.7);border-radius:14px;padding:.6rem 1rem;font-size:.95rem}
+details.lk summary{font-weight:900;cursor:pointer}
+.blaettern{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;align-items:center;gap:.7rem;padding:.6rem max(1rem,calc((100vw - 760px)/2));background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-top:2px solid #e2e8f0}
+.nb{border:0;border-radius:14px;padding:.65rem 1.1rem;font-weight:900;cursor:pointer;background:#f1f5f9;color:var(--ink);min-height:3rem}
+.nb.vor{background:var(--blau);color:#fff;box-shadow:0 3px 0 #1e3a8a}
+.nb:disabled{opacity:.35;cursor:default;box-shadow:none}
+.nb.puls{animation:puls 1.2s ease-in-out 3}
+@keyframes puls{50%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(37,99,235,.25)}}
+.fortschritt{flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.8rem;font-weight:800;color:var(--muted)}
+.balken{width:100%;height:.55rem;background:#e2e8f0;border-radius:999px;overflow:hidden}
+.balken i{display:block;height:100%;background:linear-gradient(90deg,#60a5fa,#22c55e);border-radius:999px;transition:width .35s}
+@media(max-width:480px){.nb span{display:none}.nb{padding:.65rem .95rem}}
+.innen{max-width:760px;margin:0 auto}
+.marke{display:inline-block;font-weight:900;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--akz);background:#fff;border-radius:999px;padding:.15rem .8rem;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{font-size:1.8rem;margin:.5rem 0 .5rem;font-weight:900;line-height:1.2}
+h3{margin:.2rem 0 .5rem;font-weight:900;font-size:1.2rem}
+.karte{background:#fff;border-radius:18px;padding:1.1rem 1.2rem;margin:1.2rem 0;box-shadow:0 2px 0 rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.07)}
+.klein{font-size:.88rem;color:var(--muted)}
+.weiterlesen{text-align:center;font-weight:900;color:var(--akz);font-size:1.1rem;margin-top:1.5rem}
+
+/* Merke */
+.merk{background:#fff;border:3px solid var(--akz);border-radius:18px;padding:1rem 1.2rem;margin:1.2rem 0}
+.merk .kasten{background:color-mix(in srgb,var(--akz) 12%,#fff);border-radius:12px;padding:.6rem .9rem;font-weight:700;margin:.4rem 0 .8rem}
+.eb{width:100%;border-collapse:separate;border-spacing:0 .5rem}
+.eb th{text-align:left;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:0 .8rem}
+.eb td{background:#f8fafc;padding:.6rem .8rem;vertical-align:middle}
+.eb td:first-child{border-radius:12px 0 0 12px;width:52%}
+.eb td:last-child{border-radius:0 12px 12px 0;text-align:center}
+.eb td .bild{max-width:260px}
+.eb .mittel{font-size:1.25em}
+@media(max-width:600px){.eb,.eb tbody,.eb tr,.eb td{display:block;width:auto!important}.eb th{display:none}.eb td:first-child{border-radius:12px 12px 0 0}.eb td:last-child{border-radius:0 0 12px 12px;margin-bottom:.6rem}}
+details.experte{background:#fff;border:2px dashed #a78bfa;border-radius:14px;padding:.5rem 1rem;margin:1rem 0}
+details.experte summary{font-weight:900;cursor:pointer;color:#6d28d9}
+.vergleich{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.vergleich>div{border-radius:14px;padding:.7rem .9rem}
+.vergleich .e{background:#dbeafe}.vergleich .k{background:#ffedd5}
+@media(max-width:600px){.vergleich{grid-template-columns:1fr}}
+
+/* Bedienelemente */
+.leiste{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.5rem 0}
+.leiste.mitte{justify-content:center}
+.lbl{font-weight:800;color:var(--muted);margin:.4rem .2rem 0 0}
+.chip{border:2px solid var(--linie);background:#fff;border-radius:12px;padding:.25rem .7rem;cursor:pointer;font-weight:800;min-height:2.6rem;transition:transform .1s}
+.chip:hover{transform:translateY(-1px);border-color:#94a3b8}
+.chip.an{border-color:var(--akz);background:color-mix(in srgb,var(--akz) 12%,#fff)}
+.chip.gross{font-size:1.2rem;min-width:3.4rem}
+.chip.fertig{border-color:var(--ok);color:var(--ok)}
+.chip .fr{font-size:.85em}
+.btn{background:var(--blau);color:#fff;border:0;border-radius:12px;padding:.55rem 1.1rem;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #1e3a8a}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.orange{background:var(--kuerz);box-shadow:0 3px 0 #7c2d12}
+.btn.weiter{background:var(--ok);box-shadow:0 3px 0 #14532d}
+.regler{display:flex;align-items:center;gap:.7rem;font-weight:800;margin:.6rem 0;flex-wrap:wrap}
+.regler input{flex:1;min-width:160px;accent-color:var(--blau);height:2rem}
+.regler b{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--blau);color:#fff}
+.fb{margin:.6rem 0;border-radius:12px}
+.fb.ok,.fb.no,.fb.hinweis{padding:.6rem .9rem}
+.fb.ok{background:var(--okbg)}.fb.no{background:var(--nobg)}.fb.hinweis{background:var(--tipp)}
+.info{padding:.6rem .9rem;border-radius:12px;background:#f8fafc;margin:.5rem 0}
+.info.ok{background:var(--okbg)}.info.no{background:var(--nobg)}
+.info ul{margin:.3rem 0;padding-left:1.2rem}
+
+/* Brüche */
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;font-weight:800;margin:0 .08em}
+.fr>span{padding:0 .2em;text-align:center;min-width:1.1em;white-space:nowrap}
+.fr:not(.ein)>span:first-child{border-bottom:.12em solid currentColor}
+.fr.ein>i{display:block;align-self:stretch;height:.12em;background:currentColor;margin:.1em 0}
+.fr input,input.einzel{width:2.3em;text-align:center;font-weight:800;border:2px solid #94a3b8;border-radius:.35em;padding:.05em 0;background:#fff}
+input.einzel{width:2em}
+.fr input:focus,input.einzel:focus{outline:3px solid #93c5fd;outline-offset:1px}
+input.richtig{border-color:var(--ok);background:var(--okbg)}
+input.falsch{border-color:var(--no);background:var(--nobg)}
+.gleichung{font-size:1.45em;text-align:center;margin:.5rem 0}
+.zeigen{font-size:1.3em;text-align:center;margin:.2rem 0;overflow-x:auto}
+@media(min-width:760px){#w2{display:grid;grid-template-columns:1fr 1fr;align-items:center;column-gap:1rem}#w2>.leiste,#w2>.info{grid-column:1 / -1}.seite .vergleich{margin-top:.2rem}}
+@media(max-width:480px){.zeigen,.gleichung{font-size:1.2em}}
+.glz{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .2em;font-weight:800}
+.glz b{font-size:.6em;height:1.3em;line-height:1.3em;color:var(--kuerz)}
+
+/* Kette mit Bögen */
+.kette{display:inline-grid;grid-template-columns:4.4em 3em 4.4em;align-items:center;justify-items:center;margin:.2rem 0}
+.kette .bogen{grid-column:1 / span 3;width:7.4em;display:flex;flex-direction:column;align-items:center}
+.kette .bogen svg{width:100%;height:1em;overflow:visible}
+.kette .bogen path{fill:none;stroke:currentColor;stroke-width:2.5;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.kette .bogen b{font-size:.62em;line-height:1.25}
+.kette .k-gl{display:flex;flex-direction:column;align-items:center;font-weight:800}
+.kette .k-gl b{font-size:.62em;height:1.4em;line-height:1.4em}
+.kette.erw .bogen,.kette.erw .k-gl b{color:var(--blau)}
+.kette.kuerz .bogen,.kette.kuerz .k-gl b{color:var(--kuerz)}
+.kette .k-gl input.einzel{font-size:1.4em}
+
+/* Bilder */
+.bildbox{min-height:2rem}
+.bild{width:100%;max-width:420px;display:block;margin:.5rem auto}
+.bild.kreisbild{max-width:190px}
+.bild .gef{fill:var(--teil)}
+.bild .leer{fill:#fff}
+.bild line.fein{stroke:#64748b;stroke-width:1.3;transition:opacity 1.1s ease}
+.bild.zusammen line.fein{opacity:.13}
+.bild line.dick{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round}
+.bild .rand{fill:none;stroke:var(--ink);stroke-width:3}
+.bild .fehl{fill:rgba(220,38,38,.2);stroke:var(--no);stroke-width:3;stroke-dasharray:6 4}
+
+/* Übungsserien */
+.s-kopf{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}
+.punkte{display:flex;gap:.3rem}
+.punkte span{width:.95rem;height:.95rem;border-radius:50%;background:#e2e8f0}
+.punkte .jetzt{background:#93c5fd}.punkte .gut{background:#22c55e}.punkte .halb{background:#f59e0b}
+.s-intro{color:var(--muted)}
+.aufg{min-height:5rem}
+.knoepfe{display:flex;gap:.5rem;flex-wrap:wrap}
+.wahlen{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin:.6rem 0}
+.wahl{border:3px solid var(--linie);background:#fff;border-radius:14px;padding:.45rem 1.3rem;font-weight:900;font-size:1.15rem;cursor:pointer}
+.wahl:hover{border-color:#94a3b8}
+.wahl.gew{border-color:var(--ink)}
+.wahl:disabled{cursor:default;opacity:.8}
+.gross{font-size:1.3em;text-align:center}
+.loesung{margin-top:.5rem;font-size:1.15em}
+.geschafft{font-size:1.25em;font-weight:900;text-align:center;padding:1.2rem}
+.sach{font-size:1.05rem;background:#f8fafc;border-left:5px solid var(--akz);border-radius:8px;padding:.6rem .9rem}
+.forsch{border-collapse:collapse;margin:.5rem auto;font-size:1.2em}
+.forsch td,.forsch th{padding:.35rem .7rem;text-align:center;border-bottom:1px solid #e2e8f0}
+.forsch th{font-size:.65em;text-transform:uppercase;color:var(--muted)}
+
+/* Paare */
+.paare{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.6rem;margin:.8rem 0}
+.pk{min-height:6.2rem;border:3px solid var(--linie);border-radius:16px;background:#fff;cursor:pointer;display:grid;place-items:center;font-size:1.45em;padding:.3rem;transition:transform .15s}
+.pk:hover{transform:translateY(-2px)}
+.pk.sel{border-color:var(--blau);background:#eff6ff}
+.pk.treffer{border-color:var(--ok);background:var(--okbg);cursor:default;opacity:.7;transform:none}
+.pk.falsch{animation:wackeln .45s;border-color:var(--no)}
+.pk .bild{max-width:110px;margin:0}
+.pk .bild.kreisbild{max-width:78px}
+@keyframes wackeln{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* Selbsteinschätzung */
+.ich{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.5rem 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap}
+.smileys{display:flex;gap:.3rem}
+.smileys button{font-size:1.5rem;background:#fff;border:2px solid #e2e8f0;border-radius:12px;width:3rem;height:3rem;cursor:pointer;filter:grayscale(.7)}
+.smileys button.an{border-color:var(--akz);filter:none;background:#fdf2f8}
+
+</style>
+</head>
+<body>
+
+<header class="kopf">
+  <span class="titel">✂️ Brüche kürzen</span>
+  <nav aria-label="Stationen">
+    <a href="#" data-st="0" title="Station 0">0</a><a href="#" data-st="1" title="Station 1">1</a><a href="#" data-st="2" title="Station 2">2</a><a href="#" data-st="3" title="Station 3">3</a><a href="#" data-st="4" title="Station 4">4</a><a href="#" data-st="5" title="Station 5">5</a><a href="#" data-st="6" title="Station 6">6</a>
+  </nav>
+  <span class="sterne">⭐ <span class="sternzahl">0</span></span>
+</header>
+
+<main id="seiten">
+<section class="seite hero" data-st="s">
+  <div class="innen">
+  <h1>Brüche kürzen</h1>
+  <p class="unter">Aus vielen kleinen Teilen werden wenige große Teile. Der Wert des Bruchs bleibt gleich.</p>
+  <div id="heroBild"></div>
+  <div class="gleichung" id="heroText"></div>
+  <p class="klein">Blättere mit „Weiter ➜“ unten. Für jede Aufgabe, die beim ersten Versuch stimmt, bekommst du einen Stern ⭐</p>
+  <div class="leiste mitte"><button class="btn weiter" data-geh="1">Los geht's ➜</button></div>
+  <details class="lk">
+  <summary>Hinweise für die Lehrkraft</summary>
+  <ul>
+    <li><b>Dauer</b> ca. 45 Minuten. Stationen 0 bis 4 sind der Kern. Station 5 und 6 für alle, die schneller sind, oder gemeinsam zum Schluss.</li>
+    <li><b>Aufbau</b>: Station 0 wiederholt das Erweitern als Rechnung und im Bild. Station 1 führt Kürzen über die Umkehroperation ein (·3 hin, :3 zurück). Station 2 entdeckt das am Bild (Teile zusammenfassen). Der Merksatz erscheint nach dem Forscherauftrag, in Station 4 nach dem ersten vollständig gekürzten Bruch.</li>
+    <li><b>Schreibweise</b> wie beim Erweitern: Bögen über dem Zähler und unter dem Nenner, beim Kürzen steht :3 unter dem Gleichheitszeichen (beim Erweitern ·3 darüber). Außerdem die Rechnung im Bruch.</li>
+    <li><b>Übungen</b> in Station 2 bis 5 werden zufällig erzeugt. Nach zwei falschen Versuchen wird der Lösungsweg gezeigt.</li>
+    <li><b>Sterne</b> werden nicht gespeichert und beginnen beim Neuladen bei 0.</li>
+    <li><b>Abschlussidee</b>: Zwei Lernende erklären am Bruchkreis, warum 6/9 dasselbe ist wie 2/3.</li>
+  </ul>
+</details>
+  </div>
+</section>
+<section class="seite" data-st="0" style="--bg:#eff6ff;--akz:#2563eb">
+<div class="innen">
+  <span class="marke">Station 0 · Rückblick</span>
+  <h2>Erinnerst du dich? Erweitern</h2>
+  <p>Beim Erweitern multiplizierst du Zähler und Nenner mit der gleichen Zahl. Im Bild wird jedes Teil zerschnitten. Der Wert des Bruchs bleibt gleich.</p>
+  <div class="karte" id="w0"></div>
+</div>
+</section>
+<section class="seite" data-st="0" style="--bg:#eff6ff;--akz:#2563eb">
+<div class="innen">
+  <span class="marke">Station 0 · Rückblick</span>
+  <h2>Erweitere selbst</h2>
+  
+  <div class="karte" id="u00"></div>
+</div>
+</section>
+<section class="seite" data-st="1" style="--bg:#fefce8;--akz:#a16207">
+<div class="innen">
+  <span class="marke">Station 1 · Rückweg</span>
+  <h2>Wie kommst du zurück?</h2>
+  <p>Du hast einen Bruch erweitert. Wie kommst du zum Ausgangsbruch zurück?</p>
+  <div class="karte" id="wr"></div>
+</div>
+</section>
+<section class="seite" data-st="1" style="--bg:#fefce8;--akz:#a16207">
+<div class="innen">
+  <span class="marke">Station 1 · Rückweg</span>
+  <h2>Finde den Rückweg</h2>
+  
+  <div class="karte" id="u0"></div>
+</div>
+</section>
+<section class="seite" data-st="2" style="--bg:#f0fdf4;--akz:#15803d">
+<div class="innen">
+  <span class="marke">Station 2 · Im Bild</span>
+  <h2>Was bedeutet Kürzen im Bild?</h2>
+  <p>Klick auf beide Knöpfe und beobachte das Bild.</p>
+  <div class="karte" id="w2"></div>
+  <div class="vergleich">
+    <div class="e"><b>Erweitern ✂️</b><br>Zähler und Nenner werden mit der gleichen Zahl <b>multipliziert</b>.<br>Jedes Teil wird zerschnitten.</div>
+    <div class="k"><b>Kürzen 🧩</b><br>Zähler und Nenner werden durch die gleiche Zahl <b>dividiert</b>.<br>Gleich viele Teile werden zusammengefasst.</div>
+  </div>
+</div>
+</section>
+<section class="seite" data-st="2" style="--bg:#f0fdf4;--akz:#15803d">
+<div class="innen">
+  <span class="marke">Station 2 · Im Bild</span>
+  <h2>Klappt das immer?</h2>
+  <p>Probiere verschiedene Gruppen aus. Finde heraus, wann es passt.</p>
+  <div class="karte" id="w1"></div>
+</div>
+</section>
+<section class="seite" data-st="2" style="--bg:#f0fdf4;--akz:#15803d">
+<div class="innen">
+  <span class="marke">Station 2 · Im Bild</span>
+  <h2>Forscherauftrag</h2>
+  
+  <div class="karte" id="w1f"></div>
+</div>
+</section>
+<section class="seite" data-st="2" style="--bg:#f0fdf4;--akz:#15803d">
+<div class="innen">
+  <span class="marke">Station 2 · Merke</span>
+  <h2>Merke: Kürzen</h2>
+  
+  <div class="merk" id="m1" hidden>
+    <div class="kasten">Kürzen ist die Umkehrung des Erweiterns. Du dividierst Zähler und Nenner durch die gleiche Zahl. Diese Zahl heißt <b>Kürzungszahl</b>. Im Bild fasst du gleich viele Teile zusammen. Der Wert des Bruchs bleibt gleich, er beschreibt den gleichen Anteil.</div>
+    <table class="eb" id="m1tab"></table>
+  </div>
+  <p class="sperre">🔒 Der Merksatz erscheint, wenn du den Forscherauftrag gelöst hast. Blättere eine Seite zurück.</p>
+</div>
+</section>
+<section class="seite" data-st="3" style="--bg:#faf5ff;--akz:#7e22ce">
+<div class="innen">
+  <span class="marke">Station 3 · Übungsplatz · 1 von 4</span>
+  <h2>Jetzt bist du dran</h2>
+  <p>Du kannst die Bruchkreise dazunehmen.</p>
+  <div class="karte" id="u1"></div>
+</div>
+</section>
+<section class="seite" data-st="3" style="--bg:#faf5ff;--akz:#7e22ce">
+<div class="innen">
+  <span class="marke">Station 3 · Übungsplatz · 2 von 4</span>
+  <h2>Kürze mit der Zahl</h2>
+  
+  <div class="karte" id="u2"></div>
+</div>
+</section>
+<section class="seite" data-st="3" style="--bg:#faf5ff;--akz:#7e22ce">
+<div class="innen">
+  <span class="marke">Station 3 · Übungsplatz · 3 von 4</span>
+  <h2>Geht das?</h2>
+  
+  <div class="karte" id="u3"></div>
+</div>
+</section>
+<section class="seite" data-st="3" style="--bg:#faf5ff;--akz:#7e22ce">
+<div class="innen">
+  <span class="marke">Station 3 · Übungsplatz · 4 von 4</span>
+  <h2>Welche Zahl fehlt?</h2>
+  
+  <div class="karte" id="u4"></div>
+</div>
+</section>
+<section class="seite" data-st="4" style="--bg:#fff7ed;--akz:#c2410c">
+<div class="innen">
+  <span class="marke">Station 4 · So weit wie möglich</span>
+  <h2>Vollständig kürzen</h2>
+  <p>Manchmal kannst du mehrmals kürzen. Kürze Schritt für Schritt. Klick am Ende auf „Es geht nicht weiter“.</p>
+  <div class="karte" id="w4"></div>
+</div>
+</section>
+<section class="seite" data-st="4" style="--bg:#fff7ed;--akz:#c2410c">
+<div class="innen">
+  <span class="marke">Station 4 · Merke</span>
+  <h2>Merke: Vollständig kürzen</h2>
+  
+  <div class="merk" id="m4" hidden>
+    <div class="kasten">Ein Bruch ist vollständig gekürzt, wenn Zähler und Nenner keinen gemeinsamen Teiler mehr haben außer 1.</div>
+    <table class="eb" id="m4tab"></table>
+    <details class="experte">
+      <summary>🎓 Expertenwissen: der ggT</summary>
+      <p>Die größte Zahl, durch die Zähler und Nenner teilbar sind, heißt <b>größter gemeinsamer Teiler</b>, kurz <b>ggT</b>.</p>
+      <p>Beispiel für 12 und 18:</p>
+      <ul>
+        <li>Teiler von 12: 1, 2, 3, 4, 6, 12</li>
+        <li>Teiler von 18: 1, 2, 3, 6, 9, 18</li>
+        <li>Gemeinsame Teiler: 1, 2, 3, 6. Der größte davon ist 6.</li>
+      </ul>
+      <p>Man schreibt ggT(12; 18) = 6. Wer mit dem ggT kürzt, ist nach einem Schritt fertig.</p>
+    </details>
+  </div>
+  <p class="sperre">🔒 Der Merksatz erscheint, wenn du einen Bruch vollständig gekürzt hast. Blättere eine Seite zurück.</p>
+</div>
+</section>
+<section class="seite" data-st="4" style="--bg:#fff7ed;--akz:#c2410c">
+<div class="innen">
+  <span class="marke">Station 4 · Üben</span>
+  <h2>Kürze vollständig</h2>
+  
+  <div class="karte" id="u5"></div>
+</div>
+</section>
+<section class="seite" data-st="4" style="--bg:#fff7ed;--akz:#c2410c">
+<div class="innen">
+  <span class="marke">Station 4 · Üben</span>
+  <h2>Schon fertig?</h2>
+  
+  <div class="karte" id="u6"></div>
+</div>
+</section>
+<section class="seite" data-st="5" style="--bg:#ecfeff;--akz:#0e7490">
+<div class="innen">
+  <span class="marke">Station 5 · Brüche im Alltag</span>
+  <h2>Anteile einfach angeben</h2>
+  <p>„Drei Viertel“ versteht man leichter als „18 von 24“. Schreib den Anteil als Bruch. Im Zähler steht der Teil, im Nenner das Ganze. Kürze dann vollständig.</p>
+  <div class="karte" id="u7"></div>
+</div>
+</section>
+<section class="seite" data-st="6" style="--bg:#fdf2f8;--akz:#be185d">
+<div class="innen">
+  <span class="marke">Station 6 · Abschluss</span>
+  <h2>Finde die Paare</h2>
+  <p>Je zwei Karten zeigen denselben Anteil. Klick nacheinander auf zwei passende Karten.</p>
+  <div class="karte" id="w6"></div>
+</div>
+</section>
+<section class="seite" data-st="6" style="--bg:#fdf2f8;--akz:#be185d">
+<div class="innen">
+  <span class="marke">Station 6 · Abschluss</span>
+  <h2>Das kann ich schon</h2>
+  <p>Schätze dich ein: 😀 kann ich sicher, 🙂 klappt meistens, 🤔 übe ich noch.</p>
+  <div class="karte" id="w6b"></div>
+  <p class="weiterlesen">Du hast <span class="sternzahl">0</span> Sterne gesammelt ⭐</p>
+</div>
+</section>
+</main>
+
+<nav class="blaettern" aria-label="Blättern">
+  <button class="nb" id="nvZur" aria-label="Zurück">⬅ <span>Zurück</span></button>
+  <div class="fortschritt"><div class="balken"><i id="nvBalken"></i></div><span id="nvText"></span></div>
+  <button class="nb vor" id="nvVor" aria-label="Weiter"><span>Weiter</span> ➜</button>
+</nav>
+
+<script>
+/* ---------- Hilfen ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ggT=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const kleinsterTeiler=(a,b)=>{for(let t=2;t<=Math.min(a,b);t++)if(a%t===0&&b%t===0)return t;return 1};
+const zuf=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const wahl=a=>a[Math.floor(Math.random()*a.length)];
+const mische=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const touch=matchMedia('(pointer:coarse)').matches;
+const zahl=inp=>{const v=((inp&&inp.value)||'').replace(/\s/g,'');return /^\d+$/.test(v)?Number(v):NaN};
+const lies=(r,id)=>[zahl($('#'+id+'z',r)),zahl($('#'+id+'n',r))];
+const lob=()=>wahl(['Super!','Genau!','Richtig!','Stark!','Klasse!','Prima!']);
+
+let sterne=0;
+function stern(k=1){sterne+=k;$$('.sternzahl').forEach(e=>e.textContent=sterne);const s=$('.sterne');s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop')}
+
+/* ---------- Bausteine ---------- */
+const fr=(z,n)=>`<span class="fr"><span>${z}</span><span>${n}</span></span>`;
+const frIn=id=>`<span class="fr ein"><input id="${id}z" inputmode="numeric" autocomplete="off" aria-label="Zähler"><i></i><input id="${id}n" inputmode="numeric" autocomplete="off" aria-label="Nenner"></span>`;
+const frTeil=(o,u)=>`<span class="fr ein"><span>${o}</span><i></i><span>${u}</span></span>`;
+const imMal=(z,n,k)=>fr(`${z}&thinsp;·&thinsp;${k}`,`${n}&thinsp;·&thinsp;${k}`);
+const imBruch=(z,n,k)=>fr(`${z}&thinsp;:&thinsp;${k}`,`${n}&thinsp;:&thinsp;${k}`);
+const glz=(u,o='')=>`<span class="glz"><b>${o}</b><span>=</span><b>${u}</b></span>`;
+
+function svgBogen(lage){
+  return lage==='oben'
+   ?`<svg viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><path d="M6,24 Q50,-8 94,24"/><path d="M85,20 L94,24 L93,13"/></svg>`
+   :`<svg viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><path d="M6,2 Q50,34 94,2"/><path d="M85,6 L94,2 L93,13"/></svg>`;
+}
+/* Rechnung mit Bögen; op '·' (erweitern, Zahl über =) oder ':' (kürzen, Zahl unter =) */
+function kette(links,rechts,op,k,bogenK=k){
+  const lab=op+k, blab=op+bogenK, erw=op==='·';
+  return `<div class="kette ${erw?'erw':'kuerz'}">
+    <div class="bogen"><b>${blab}</b>${svgBogen('oben')}</div>
+    <div>${links}</div>
+    <div class="k-gl"><b>${erw?lab:''}</b><span>=</span><b>${erw?'':lab}</b></div>
+    <div>${rechts}</div>
+    <div class="bogen">${svgBogen('unten')}<b>${blab}</b></div>
+  </div>`;
+}
+
+/* Bild: Streifen oder Kreis, z von n Teilen gefärbt, g = Gruppengröße */
+function bild(z,n,o={}){
+  const g=o.g||1, art=o.art||'streifen', okZ=z%g===0, okN=n%g===0;
+  const zus=o.zus?' zusammen':'';
+  let s='';
+  if(art==='kreis'){
+    const c=80,r=74;
+    const P=i=>{const a=-Math.PI/2+2*Math.PI*i/n;return [(c+r*Math.cos(a)).toFixed(2),(c+r*Math.sin(a)).toFixed(2)]};
+    const sektor=(a,b,cls)=>{
+      if(b-a>=n)return `<circle cx="${c}" cy="${c}" r="${r}" class="${cls}"/>`;
+      const [x1,y1]=P(a),[x2,y2]=P(b),gr=(b-a)/n>.5?1:0;
+      return `<path d="M${c},${c} L${x1},${y1} A${r},${r} 0 ${gr} 1 ${x2},${y2} Z" class="${cls}"/>`;
+    };
+    s+=`<svg class="bild kreisbild${zus}" viewBox="0 0 160 160" role="img" aria-label="Kreis mit ${n} Teilen, ${z} davon gefärbt">`;
+    s+=`<circle cx="${c}" cy="${c}" r="${r}" class="leer"/>`;
+    if(z>0)s+=sektor(0,z,'gef');
+    if(n>1)for(let i=0;i<n;i++){const [x,y]=P(i);s+=`<line x1="${c}" y1="${c}" x2="${x}" y2="${y}" class="${g>1&&i%g===0?'dick':'fein'}"/>`}
+    if(g>1){
+      if(!okZ){const a=Math.floor(z/g)*g;s+=sektor(a,Math.min(a+g,n),'fehl')}
+      if(!okN){const a=Math.floor(n/g)*g;if(a<n)s+=sektor(a,n,'fehl')}
+    }
+    return s+`<circle cx="${c}" cy="${c}" r="${r}" class="rand"/></svg>`;
+  }
+  const W=320,H=62,x0=4,y0=7,w=312,h=48,pw=w/n;
+  s+=`<svg class="bild${zus}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Streifen mit ${n} Teilen, ${z} davon gefärbt">`;
+  for(let i=0;i<n;i++)s+=`<rect x="${(x0+i*pw).toFixed(2)}" y="${y0}" width="${(pw+.3).toFixed(2)}" height="${h}" class="${i<z?'gef':'leer'}"/>`;
+  for(let i=1;i<n;i++){const x=(x0+i*pw).toFixed(2);s+=`<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0+h}" class="${g>1&&i%g===0?'dick':'fein'}"/>`}
+  if(g>1){
+    if(!okZ){const a=Math.floor(z/g)*g,b=Math.min(a+g,n);s+=`<rect class="fehl" x="${(x0+a*pw).toFixed(2)}" y="${y0-4}" width="${((b-a)*pw).toFixed(2)}" height="${h+8}" rx="4"/>`}
+    if(!okN){const a=Math.floor(n/g)*g;if(a<n)s+=`<rect class="fehl" x="${(x0+a*pw).toFixed(2)}" y="${y0-4}" width="${((n-a)*pw).toFixed(2)}" height="${h+8}" rx="4"/>`}
+  }
+  return s+`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" class="rand"/></svg>`;
+}
+function zusammenfassen(box,verz=350){const s=$('svg',box);if(s)setTimeout(()=>s.classList.add('zusammen'),verz)}
+function zerschneiden(box){const s=$('svg',box);if(!s)return;s.classList.add('zusammen');void s.getBoundingClientRect();requestAnimationFrame(()=>requestAnimationFrame(()=>s.classList.remove('zusammen')))}
+function chipsAn(el,sel,btn){$$(sel,el).forEach(b=>b.classList.toggle('an',b===btn))}
+
+/* ---------- Übungsserie ---------- */
+function serie(el,titel,anzahl,erzeuge,intro=''){
+  el.innerHTML=`<div class="s-kopf"><h3>${titel}</h3><div class="punkte">${'<span></span>'.repeat(anzahl)}</div></div>${intro?`<p class="s-intro">${intro}</p>`:''}<div class="aufg"></div><div class="fb" aria-live="polite"></div><div class="knoepfe"><button class="btn pruef">Prüfen</button><button class="btn weiter" hidden>Weiter ➜</button></div>`;
+  const aufg=$('.aufg',el),fb=$('.fb',el),bp=$('.pruef',el),bw=$('.weiter',el);
+  let punkte,nr,versuch,patzer,akt,erst,modus;
+  function reset(){nr=0;erst=0;punkte=$$('.punkte span',el);punkte.forEach(p=>p.className='');neu()}
+  function neu(){
+    if(nr>=anzahl){ende();return}
+    modus='aufgabe';versuch=0;patzer=false;akt=erzeuge(nr);
+    aufg.innerHTML=akt.html;fb.className='fb';fb.innerHTML='';
+    bw.hidden=true;bp.hidden=!!akt.wahl;punkte[nr].className='jetzt';
+    if(akt.init)akt.init(aufg,auswerten);
+    const i=$('input',aufg);if(i&&!touch)i.focus({preventScroll:true});
+  }
+  function abschliessen(gut){
+    punkte[nr].className=gut?'gut':'halb';if(gut){erst++;stern()}
+    nr++;bw.hidden=false;bp.hidden=true;bw.textContent=nr>=anzahl?'Fertig ✓':'Weiter ➜';
+    $$('input,.wahl',aufg).forEach(x=>x.disabled=true);
+    if(!touch)bw.focus({preventScroll:true});
+  }
+  function auswerten(r){
+    if(modus!=='aufgabe'||!bw.hidden)return;
+    if(r.leer){fb.className='fb hinweis';fb.innerHTML='✏️ Trag erst Zahlen ein.';return}
+    if(r.ok){fb.className='fb ok';fb.innerHTML='✅ '+(r.msg||lob());abschliessen(versuch===0&&!patzer);return}
+    if(r.teil){patzer=true;fb.className='fb hinweis';fb.innerHTML='👍 '+r.msg;return}
+    versuch++;
+    if(akt.wahl||versuch>=2){
+      fb.className='fb no';
+      fb.innerHTML='💡 '+(r.msg||'')+(akt.loesung?`<div class="loesung">So geht es: ${akt.loesung}</div>`:'');
+      abschliessen(false);
+    }else{fb.className='fb no';fb.innerHTML='🤔 '+(r.msg||'Noch nicht. Versuch es noch einmal.')}
+  }
+  function ende(){
+    modus='ende';
+    aufg.innerHTML=`<div class="geschafft">🎉 Geschafft! ${erst} von ${anzahl} Aufgaben beim ersten Versuch richtig.</div>`;
+    fb.className='fb';fb.innerHTML='';bp.hidden=true;bw.hidden=false;bw.textContent='Neue Aufgaben ↻';blinkWeiter();
+  }
+  bp.onclick=()=>auswerten(akt.pruefe(aufg));
+  bw.onclick=()=>{if(modus==='ende')reset();else neu()};
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();if(!bp.hidden)bp.click();else if(!bw.hidden)bw.click()}});
+  reset();
+}
+
+/* ---------- Start-Animation ---------- */
+(function(){
+  const b=$('#heroBild');b.innerHTML=bild(8,12,{g:4});
+  $('#heroText').innerHTML=`${fr(8,12)} ${glz(':4')} ${fr(2,3)}`;
+  let an=false;setInterval(()=>{an=!an;const s=$('svg',b);if(s)s.classList.toggle('zusammen',an)},2200);
+})();
+
+/* ---------- Station 0: Erweitern ---------- */
+(function(){
+  const el=$('#w0'),basen=[[1,2],[1,3],[2,3],[3,4],[2,5]];
+  let [z,n]=basen[2],k=1,art='streifen';
+  el.innerHTML=`<div class="leiste"><span class="lbl">Bruch:</span>${basen.map(([a,b],i)=>`<button class="chip${i===2?' an':''}" data-i="${i}">${fr(a,b)}</button>`).join('')}</div>
+   <div class="leiste"><span class="lbl">Bild:</span><button class="chip an" data-art="streifen">Streifen</button><button class="chip" data-art="kreis">Kreis</button></div>
+   <label class="regler">Erweitern mit <b id="w0k">1</b><input type="range" min="1" max="6" value="1" id="w0r" aria-label="Erweiterungszahl"></label>
+   <div class="bildbox" id="w0b"></div><div id="w0t"></div>`;
+  function male(anim){
+    const box=$('#w0b');box.innerHTML=bild(z*k,n*k,{g:k,art});if(anim&&k>1)zerschneiden(box);
+    $('#w0k').textContent=k;
+    $('#w0t').innerHTML=k===1
+      ?`<p class="info">Schieb den Regler nach rechts.</p>`
+      :`<div class="zeigen">${kette(fr(z,n),fr(z*k,n*k),'·',k)}</div><div class="gleichung">${fr(z,n)} = ${imMal(z,n,k)} = ${fr(z*k,n*k)}</div><p class="info">Jedes Teil wird in ${k} Stücke geschnitten.</p>`;
+  }
+  el.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
+    if(b.dataset.i){[z,n]=basen[b.dataset.i];chipsAn(el,'[data-i]',b)}
+    if(b.dataset.art){art=b.dataset.art;chipsAn(el,'[data-art]',b)}
+    male(true)});
+  $('#w0r').addEventListener('input',e=>{k=+e.target.value;male(true)});
+  male(false);
+})();
+
+/* ---------- Station 1: Zusammenfassen ---------- */
+(function(){
+  const el=$('#w1'),brueche=[[6,9],[6,8],[8,12],[4,10],[10,15]];
+  let [z,n]=brueche[0],art='streifen',g=1;
+  el.innerHTML=`<div class="leiste"><span class="lbl">Bruch:</span>${brueche.map(([a,b],i)=>`<button class="chip${i?'':' an'}" data-i="${i}">${fr(a,b)}</button>`).join('')}</div>
+   <div class="leiste"><span class="lbl">Bild:</span><button class="chip an" data-art="streifen">Streifen</button><button class="chip" data-art="kreis">Kreis</button></div>
+   <div class="leiste"><span class="lbl">Fasse zusammen:</span>${[2,3,4,5].map(t=>`<button class="chip" data-g="${t}">je ${t}</button>`).join('')}<button class="chip" data-g="1">↺ zurück</button></div>
+   <div class="bildbox" id="w1b"></div><div id="w1t"></div>`;
+  function male(){
+    const box=$('#w1b'),t=$('#w1t');box.innerHTML=bild(z,n,{g,art});
+    const okZ=z%g===0,okN=n%g===0;
+    if(g===1){t.innerHTML=`<div class="info">Wähle oben, wie viele Teile du zusammenfassen willst.</div>`;return}
+    if(okZ&&okN){
+      zusammenfassen(box,450);
+      t.innerHTML=`<div class="info ok"><b>Es passt!</b> Aus ${n} Teilen werden ${n/g}. Aus ${z} gefärbten Teilen werden ${z/g}.<div class="zeigen">${kette(fr(z,n),fr(z/g,n/g),':',g)}</div></div>`;
+    }else{
+      let s='<div class="info no"><b>Das passt nicht.</b><ul>';
+      if(!okN)s+=`<li>${n} ist nicht durch ${g} teilbar. Eine Gruppe bleibt unvollständig.</li>`;
+      if(!okZ)s+=`<li>${z} ist nicht durch ${g} teilbar. Eine Gruppe ist nur zum Teil gefärbt.</li>`;
+      t.innerHTML=s+'</ul></div>';
+    }
+  }
+  el.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
+    if(b.dataset.i){[z,n]=brueche[b.dataset.i];g=1;chipsAn(el,'[data-i]',b);chipsAn(el,'[data-g]',null)}
+    if(b.dataset.art){art=b.dataset.art;chipsAn(el,'[data-art]',b)}
+    if(b.dataset.g){g=+b.dataset.g;chipsAn(el,'[data-g]',g>1?b:null)}
+    male()});
+  male();
+})();
+
+/* Forscherauftrag */
+(function(){
+  const el=$("#w1f"),zeilen=[[6,9,3],[8,12,4],[10,15,5]];
+  let fehl=0;
+  el.innerHTML=`<h3>🔍 Forscherauftrag</h3><p>Wie heißt der gekürzte Bruch?</p>
+   <table class="forsch"><tr><th>Bruch</th><th>kürzen</th><th>neuer Bruch</th></tr>
+   ${zeilen.map(([a,b,k],i)=>`<tr><td>${fr(a,b)}</td><td style="font-size:.85em;color:var(--kuerz)">:${k}</td><td>${frIn('fo'+i)}</td></tr>`).join('')}</table>
+   <button class="btn" id="fpr">Prüfen</button><div class="fb" id="ffb" aria-live="polite"></div>
+   <div id="fq" hidden><p><b>Was bedeutet „mit 3 kürzen“ im Bild?</b></p><div class="wahlen" id="fqw" style="flex-direction:column;align-items:stretch"></div><div class="fb" id="fqfb"></div></div>`;
+  $('#fpr').onclick=()=>{
+    let alle=true;
+    zeilen.forEach(([a,b,k],i)=>{const zi=$('#fo'+i+'z'),ni=$('#fo'+i+'n');const okz=zahl(zi)===a/k,okn=zahl(ni)===b/k;
+      zi.className=okz?'richtig':'falsch';ni.className=okn?'richtig':'falsch';if(!(okz&&okn))alle=false});
+    const f=$('#ffb');
+    if(alle){f.className='fb ok';f.innerHTML='✅ Alles richtig! Jetzt die Forscherfrage:';$('#fq').hidden=false;$('#fpr').hidden=true}
+    else{fehl++;f.className='fb no';f.innerHTML=fehl<2?'🤔 Noch nicht alles richtig. Dividiere Zähler und Nenner durch die Kürzungszahl.':'💡 Lösung: '+zeilen.map(([a,b,k])=>`${fr(a,b)} = ${fr(a/k,b/k)}`).join(' &nbsp; ');if(fehl>=2){$('#fq').hidden=false;$('#fpr').hidden=true}}
+  };
+  const opt=mische([['Je 3 Teile werden zu einem großen Teil.',true],['3 Teile werden weggenommen.',false],['Jedes Teil wird in 3 Stücke geschnitten.',false]]);
+  $('#fqw').innerHTML=opt.map(([t,r],i)=>`<button class="wahl" style="font-size:1rem;text-align:left" data-r="${r}">${t}</button>`).join('');
+  let geloest=false,versucht=false;
+  $('#fqw').addEventListener('click',e=>{const b=e.target.closest('.wahl');if(!b||geloest)return;const f=$('#fqfb');
+    if(b.dataset.r==='true'){geloest=true;b.classList.add('gew');f.className='fb ok';f.innerHTML='✅ Genau! Blättere weiter zum Merksatz.';if(!versucht)stern();$('#m1').hidden=false;blinkWeiter()}
+    else{versucht=true;b.disabled=true;f.className='fb no';f.innerHTML='🤔 Blättere eine Seite zurück und probiere im Bild „je 3“ aus.'}});
+})();
+
+$('#m1tab').innerHTML=`<tr><th>Erklärung</th><th>Beispiel</th></tr>
+ <tr><td>Dividiere Zähler und Nenner durch die gleiche Zahl.</td><td class="mittel">${fr(6,9)} = ${imBruch(6,9,3)} = ${fr(2,3)}</td></tr>
+ <tr><td>Mit Bögen schreibst du es so. Die :3 steht unter dem Gleichheitszeichen.</td><td class="mittel">${kette(fr(6,9),fr(2,3),':',3)}</td></tr>
+ <tr><td>Im Bild fasst du je 3 Teile zu einem großen Teil zusammen.</td><td>${bild(6,9,{g:3,zus:1})}</td></tr>
+ <tr><td>Beide Brüche haben den gleichen Wert. Sie beschreiben den gleichen Anteil.</td><td>${bild(6,9)}${bild(2,3)}</td></tr>`;
+
+/* ---------- Station 2: Hin und zurück ---------- */
+(function(){
+  const el=$('#w2'),paare=[[2,3,3],[3,4,2],[1,2,4],[3,5,2]];
+  let [a,b,k]=paare[0],richtung='erw';
+  el.innerHTML=`<div class="leiste"><span class="lbl">Brüche:</span>${paare.map(([x,y,kk],i)=>`<button class="chip${i?'':' an'}" data-i="${i}">${fr(x,y)} und ${fr(x*kk,y*kk)}</button>`).join('')}</div>
+   <div class="leiste mitte"><button class="btn" data-r="erw">✂️ Erweitern</button><button class="btn orange" data-r="kuerz">🧩 Kürzen</button></div>
+   <div class="bildbox" id="w2b"></div><div class="zeigen" id="w2k"></div><div class="info" id="w2t"></div>`;
+  function male(anim){
+    const box=$('#w2b');box.innerHTML=bild(a*k,b*k,{g:k,zus:richtung==='kuerz'&&!anim});
+    if(richtung==='erw'){
+      if(anim)zerschneiden(box);
+      $('#w2k').innerHTML=kette(fr(a,b),fr(a*k,b*k),'·',k);
+      $('#w2t').innerHTML=`Erweitern mit ${k}: Jedes Teil wird in ${k} Stücke geschnitten.`;
+    }else{
+      if(anim)zusammenfassen(box,80);
+      $('#w2k').innerHTML=kette(fr(a*k,b*k),fr(a,b),':',k);
+      $('#w2t').innerHTML=`Kürzen mit ${k}: Je ${k} Teile werden zu einem großen Teil.`;
+    }
+  }
+  el.addEventListener('click',e=>{const c=e.target.closest('[data-i],[data-r]');if(!c)return;
+    if(c.dataset.i){[a,b,k]=paare[c.dataset.i];chipsAn(el,'[data-i]',c);male(false)}
+    if(c.dataset.r){richtung=c.dataset.r;male(true)}});
+  male(false);
+})();
+
+serie($('#u00'),'✂️ Erweitere',3,()=>{
+  const b=zuf(2,7),a=zuf(1,b-1),k=zuf(2,5);
+  return{html:`<p class="gross">Erweitere mit ${k}.</p><div class="zeigen">${kette(fr(a,b),frIn('ew'),'·',k)}</div>`,
+    pruefe:r=>{const [x,y]=lies(r,'ew');if(isNaN(x)||isNaN(y))return{leer:1};return x===a*k&&y===b*k?{ok:1}:{msg:`Multipliziere Zähler und Nenner mit ${k}.`}},
+    loesung:`${fr(a,b)} = ${imMal(a,b,k)} = ${fr(a*k,b*k)}`};
+});
+
+(function(){
+  const el=$('#wr'),paare=[[2,3,3],[3,4,2],[1,2,4],[3,5,2]];let [a,b,k]=paare[0];
+  el.innerHTML=`<div class="leiste"><span class="lbl">Bruch:</span>${paare.map(([x,y],i)=>`<button class="chip${i?'':' an'}" data-i="${i}">${fr(x,y)}</button>`).join('')}</div>
+   <p class="lbl">Hinweg</p><div class="zeigen" id="wrh"></div>
+   <div class="leiste mitte"><button class="btn orange" id="wrb">Und zurück? ↩</button></div>
+   <div id="wrz" hidden></div>`;
+  function male(){
+    $('#wrh').innerHTML=kette(fr(a,b),fr(a*k,b*k),'·',k);
+    $('#wrz').innerHTML=`<p class="lbl">Rückweg</p><div class="zeigen">${kette(fr(a*k,b*k),fr(a,b),':',k)}</div><div class="gleichung">${fr(a*k,b*k)} = ${imBruch(a*k,b*k,k)} = ${fr(a,b)}</div><p class="info">Die Division ist die Umkehrung der Multiplikation. Aus ·${k} wird :${k}. Das nennt man <b>Kürzen</b>. Die Zahl ${k} heißt <b>Kürzungszahl</b>.</p>`;
+    $('#wrz').hidden=true;$('#wrb').hidden=false;
+  }
+  el.addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(!c)return;[a,b,k]=paare[c.dataset.i];chipsAn(el,'[data-i]',c);male()});
+  $('#wrb').onclick=()=>{$('#wrz').hidden=false;$('#wrb').hidden=true};
+  male();
+})();
+
+serie($('#u0'),'🔁 Finde den Rückweg',4,()=>{
+  const b=zuf(2,8),a=zuf(1,b-1),k=zuf(2,6);
+  return{html:`<p>Hinweg:</p><div class="zeigen">${kette(fr(a,b),fr(a*k,b*k),'·',k)}</div><p>Trag die Zahl für den Rückweg ein.</p><div class="zeigen">${kette(fr(a*k,b*k),fr(a,b),':',`<input id="rwk" class="einzel" inputmode="numeric" autocomplete="off" aria-label="Kürzungszahl">`,'?')}</div>`,
+    pruefe:r=>{const v=zahl($('#rwk',r));if(isNaN(v))return{leer:1};return v===k?{ok:1,msg:`${lob()} Mit ·${k} hin, mit :${k} zurück.`}:{msg:`Schau auf den Hinweg. Dort steht ·${k}.`}},
+    loesung:`:${k}, denn ${a*k} : ${k} = ${a} und ${b*k} : ${k} = ${b}.`};
+});
+
+/* ---------- Station 3: Übungen ---------- */
+serie($('#u1'),'🧩 Bild kürzen',5,()=>{
+  const n=wahl([4,6,8,9,10,12]),teiler=[2,3,4,5,6].filter(t=>n%t===0&&t<n),g=wahl(teiler),z=g*zuf(1,n/g-1),art=wahl(['streifen','kreis']);
+  return{html:`<p>Fasse Teile zusammen, bis es passt. Schreib den neuen Bruch auf.</p><div class="bildbox">${bild(z,n,{art})}</div>
+     <div class="leiste mitte">${[2,3,4,5,6].map(t=>`<button class="chip" data-g="${t}">je ${t}</button>`).join('')}</div><p class="klein bmsg" style="text-align:center"></p>
+     <div class="gleichung">${fr(z,n)} = ${frIn('bk')}</div>`,
+    init:r=>{r.addEventListener('click',e=>{const c=e.target.closest('[data-g]');if(!c)return;const t=+c.dataset.g;chipsAn(r,'[data-g]',c);const box=$('.bildbox',r);box.innerHTML=bild(z,n,{g:t,art});const passt=z%t===0&&n%t===0;if(passt)zusammenfassen(box);$('.bmsg',r).textContent=passt?'Passt! Zähle jetzt die großen Teile.':'Das passt nicht (rot). Probiere eine andere Gruppe.'})},
+    pruefe:r=>{const [x,y]=lies(r,'bk');if(isNaN(x)||isNaN(y))return{leer:1};if(y===0)return{msg:'Der Nenner darf nicht 0 sein.'};
+      const gleich=x*n===z*y;
+      if(gleich&&y<n)return{ok:1};
+      if(gleich&&y===n)return{msg:'Das ist noch der alte Bruch. Fasse zuerst Teile zusammen.'};
+      if(gleich)return{msg:'Gleicher Wert, aber erweitert. Hier sollen die Teile größer werden.'};
+      return{msg:'Das passt noch nicht. Zähle die großen Teile: Wie viele gibt es insgesamt? Wie viele sind gefärbt?'}},
+    loesung:`je ${g} zusammenfassen: ${fr(z,n)} = ${fr(z/g,n/g)}`};
+});
+
+serie($('#u2'),'➗ Kürze mit der Zahl',5,()=>{
+  const k=wahl([2,3,4,5,6,10]),b=zuf(2,9),a=zuf(1,b-1),Z=a*k,N=b*k;
+  return{html:`<p class="gross">Kürze mit ${k}.</p><div class="zeigen">${kette(fr(Z,N),frIn('km'),':',k)}</div><div class="tippbild"></div>`,
+    pruefe:r=>{const [x,y]=lies(r,'km');if(isNaN(x)||isNaN(y))return{leer:1};if(x===a&&y===b)return{ok:1};
+      let m=`Dividiere Zähler und Nenner durch ${k}: ${Z} : ${k} und ${N} : ${k}.`;
+      if(N<=24){const box=$('.tippbild',r);box.innerHTML=bild(Z,N,{g:k});zusammenfassen(box);m+=' Im Bild siehst du die Gruppen.'}
+      return{msg:m}},
+    loesung:`${fr(Z,N)} = ${imBruch(Z,N,k)} = ${fr(a,b)}`};
+});
+
+serie($('#u3'),'🤔 Geht das?',5,()=>{
+  const soll=Math.random()<.5;let z,n,k;
+  for(let t=0;t<300;t++){k=wahl([2,3,5]);n=wahl([6,8,9,10,12,14,15,16,18,20,21,25]);z=zuf(1,n-1);if((z%k===0&&n%k===0)===soll)break}
+  const geht=z%k===0&&n%k===0,nicht=[z,n].filter(x=>x%k);
+  const erkl=geht?`${z} : ${k} = ${z/k} und ${n} : ${k} = ${n/k}. Also ${fr(z,n)} = ${fr(z/k,n/k)}.`:`${nicht.join(' und ')} ${nicht.length>1?'sind':'ist'} nicht durch ${k} teilbar.`;
+  return{wahl:true,html:`<p class="gross">Kann man ${fr(z,n)} mit ${k} kürzen?</p><div class="wahlen"><button class="wahl" data-a="ja">👍 Ja</button><button class="wahl" data-a="nein">👎 Nein</button></div>`,
+    init:(r,aus)=>$$('.wahl',r).forEach(b=>b.onclick=()=>{b.classList.add('gew');const ja=b.dataset.a==='ja';aus(ja===geht?{ok:1,msg:(geht?'Ja! ':'Richtig, das geht nicht. ')+erkl}:{msg:(geht?'Doch, das geht. ':'Leider nicht. ')+erkl})}),
+    loesung:''};
+},'Kürzen geht nur, wenn Zähler und Nenner durch die gleiche Zahl teilbar sind.');
+
+serie($('#u4'),'🔎 Welche Zahl fehlt?',5,()=>{
+  const b=zuf(2,8),a=zuf(1,b-1),k=zuf(2,6),Z=a*k,N=b*k,oben=Math.random()<.5;
+  const inp=`<input id="lu" class="einzel" inputmode="numeric" autocomplete="off" aria-label="fehlende Zahl">`;
+  return{html:`<p>Finde zuerst die Kürzungszahl. Trag dann die fehlende Zahl ein.</p><div class="zeigen">${kette(fr(Z,N),oben?frTeil(inp,b):frTeil(a,inp),':','?')}</div>`,
+    pruefe:r=>{const v=zahl($('#lu',r));if(isNaN(v))return{leer:1};if(v===(oben?a:b))return{ok:1,msg:`${lob()} Gekürzt wurde mit ${k}.`};
+      return{msg:oben?`Aus dem Nenner ${N} wurde ${b}. Durch welche Zahl wurde dividiert? Dividiere den Zähler durch die gleiche Zahl.`:`Aus dem Zähler ${Z} wurde ${a}. Durch welche Zahl wurde dividiert? Dividiere den Nenner durch die gleiche Zahl.`}},
+    loesung:`gekürzt mit ${k}: ${kette(fr(Z,N),fr(a,b),':',k)}`};
+});
+
+/* ---------- Station 4: Kürzungsleiter ---------- */
+(function(){
+  const el=$('#w4'),starts=[[12,18],[24,36],[16,24],[30,45],[18,30]];
+  let sz,sn,z,n,schritte,tok=0,gelobt;
+  el.innerHTML=`<div class="leiste"><span class="lbl">Start:</span>${starts.map(([x,y],i)=>`<button class="chip${i?'':' an'}" data-i="${i}">${fr(x,y)}</button>`).join('')}</div>
+   <div class="zeigen" id="w4k"></div><div class="bildbox" id="w4b"></div>
+   <div class="leiste mitte"><span class="lbl">Kürze mit:</span>${[2,3,5,7].map(t=>`<button class="chip gross" data-t="${t}">:${t}</button>`).join('')}</div>
+   <div class="leiste mitte"><button class="chip fertig" data-f="1">Es geht nicht weiter ✓</button><button class="chip" data-s="1">↺ von vorn</button></div>
+   <div class="fb" id="w4f" aria-live="polite"></div>`;
+  const fb=(c,h)=>{const f=$('#w4f');f.className='fb '+c;f.innerHTML=h};
+  function zeile(){let s=fr(sz,sn),cz=sz,cn=sn;for(const t of schritte){cz/=t;cn/=t;s+=glz(':'+t)+fr(cz,cn)}return s}
+  function start(i){[sz,sn]=starts[i];z=sz;n=sn;schritte=[];gelobt=false;tok++;$('#w4k').innerHTML=zeile();$('#w4b').innerHTML=bild(z,n);fb('','')}
+  let aktStart=0;
+  function teile(t){
+    const my=++tok,box=$('#w4b');
+    if(z%t===0&&n%t===0){
+      box.innerHTML=bild(z,n,{g:t});zusammenfassen(box,200);z/=t;n/=t;schritte.push(t);$('#w4k').innerHTML=zeile();
+      fb('ok',`Je ${t} Teile zusammengefasst. Jetzt hast du ${fr(z,n)}.`);
+      setTimeout(()=>{if(my===tok)box.innerHTML=bild(z,n)},1700);
+    }else{
+      box.innerHTML=bild(z,n,{g:t});const nicht=[z,n].filter(x=>x%t);
+      fb('no',`:${t} geht hier nicht. ${nicht.join(' und ')} ${nicht.length>1?'sind':'ist'} nicht durch ${t} teilbar. Im Bild siehst du es rot.`);
+      setTimeout(()=>{if(my===tok)box.innerHTML=bild(z,n)},2300);
+    }
+  }
+  function fertig(){
+    if(ggT(z,n)===1){
+      fb('ok',`🎉 Vollständig gekürzt! ${z} und ${n} haben keinen gemeinsamen Teiler mehr außer 1.${schritte.length>1?` Du hast ${schritte.length} Schritte gebraucht. Geht es auch in einem Schritt? Teile ${sz} und ${sn} durch ${sz/z}.`:''}`);
+      if(!gelobt){gelobt=true;stern()}
+      const m=$('#m4');if(m.hidden){m.hidden=false;blinkWeiter()}
+    }else fb('hinweis',`Da geht noch was: ${z} und ${n} sind beide durch ${kleinsterTeiler(z,n)} teilbar.`);
+  }
+  el.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;
+    if(c.dataset.i){aktStart=+c.dataset.i;chipsAn(el,'[data-i]',c);start(aktStart)}
+    if(c.dataset.t)teile(+c.dataset.t);
+    if(c.dataset.f)fertig();
+    if(c.dataset.s)start(aktStart)});
+  start(0);
+})();
+
+$('#m4tab').innerHTML=`<tr><th>Erklärung</th><th>Beispiel</th></tr>
+ <tr><td>Kürze, bis Zähler und Nenner keinen gemeinsamen Teiler mehr haben außer 1.</td><td class="mittel">${fr(12,18)}${glz(':2')}${fr(6,9)}${glz(':3')}${fr(2,3)}</td></tr>
+ <tr><td>Probiere 2, 3, 5 und 7 der Reihe nach.</td><td class="mittel">${fr(24,36)}${glz(':2')}${fr(12,18)}${glz(':2')}${fr(6,9)}${glz(':3')}${fr(2,3)}</td></tr>
+ <tr><td>Mit der größten Kürzungszahl bist du in einem Schritt fertig.</td><td class="mittel">${kette(fr(12,18),fr(2,3),':',6)}</td></tr>`;
+
+serie($('#u5'),'🏁 Vollständig kürzen',5,()=>{
+  let a,b;do{b=zuf(2,12);a=zuf(1,b-1)}while(ggT(a,b)!==1);
+  let k;do{k=wahl([4,6,8,9,10,12,15])}while(b*k>150);
+  const Z=a*k,N=b*k;
+  return{html:`<p>Kürze vollständig. Trag nur das Ergebnis ein.</p><div class="gleichung">${fr(Z,N)} = ${frIn('vk')}</div>`,
+    pruefe:r=>{const [x,y]=lies(r,'vk');if(isNaN(x)||isNaN(y))return{leer:1};if(y===0)return{msg:'Der Nenner darf nicht 0 sein.'};
+      if(x*N!==Z*y)return{msg:'Der Wert hat sich verändert. Dividiere Zähler und Nenner immer durch die gleiche Zahl.'};
+      if(y>=N)return{msg:'Gleicher Wert, aber noch nicht gekürzt. Zähler und Nenner sollen kleiner werden.'};
+      const t=kleinsterTeiler(x,y);if(t>1)return{teil:1,msg:`Gut gekürzt! Es geht aber noch weiter: ${x} und ${y} sind beide durch ${t} teilbar.`};
+      return{ok:1}},
+    loesung:kette(fr(Z,N),fr(a,b),':',k)};
+});
+
+serie($('#u6'),'✔️ Schon fertig?',5,()=>{
+  const soll=Math.random()<.5;let z,n;
+  for(let t=0;t<300;t++){n=zuf(4,30);z=zuf(2,n-1);if((ggT(z,n)===1)===soll)break}
+  const fertig=ggT(z,n)===1,t=kleinsterTeiler(z,n);
+  const erkl=fertig?`${z} und ${n} haben keinen gemeinsamen Teiler außer 1.`:`${z} und ${n} sind beide durch ${t} teilbar: ${fr(z,n)} = ${fr(z/t,n/t)}${ggT(z/t,n/t)>1?' und danach geht es noch weiter.':'.'}`;
+  return{wahl:true,html:`<p class="gross">Ist ${fr(z,n)} vollständig gekürzt?</p><div class="wahlen"><button class="wahl" data-a="ja">👍 Ja</button><button class="wahl" data-a="nein">👎 Nein</button></div>`,
+    init:(r,aus)=>$$('.wahl',r).forEach(b=>b.onclick=()=>{b.classList.add('gew');const ja=b.dataset.a==='ja';aus(ja===fertig?{ok:1,msg:(fertig?'Ja! ':'Richtig, da geht noch was. ')+erkl}:{msg:(fertig?'Doch, der ist fertig. ':'Noch nicht ganz. ')+erkl})}),
+    loesung:''};
+});
+
+/* ---------- Station 5: Alltag ---------- */
+(function(){
+  const liste=[
+    ['In einer Lerngruppe sind 24 Kinder. 18 von ihnen kommen zu Fuß, mit dem Rad oder mit dem Bus zur Schule. Welcher Anteil der Kinder kommt ohne Auto?',18,24],
+    ['Im Schulgarten gibt es 30 Beete. Auf 12 Beeten wachsen Kartoffeln. Welcher Anteil der Beete ist das?',12,30],
+    ['Eine Familie kauft in einer Woche 20 Flaschen. 16 davon sind Mehrwegflaschen. Welcher Anteil der Flaschen ist Mehrweg?',16,20],
+    ['Eine Stunde hat 60 Minuten. Die Hofpause dauert 20 Minuten. Welcher Teil einer Stunde ist das?',20,60],
+    ['Auf dem Schuldach sind 36 Solarmodule. 24 davon liefern schon Strom. Welcher Anteil der Module liefert schon Strom?',24,36],
+    ['Beim Müllsammeln im Park findet eure Gruppe 50 Teile. 35 davon sind aus Plastik. Welcher Anteil des Mülls ist aus Plastik?',35,50],
+    ['Ein Brot wiegt 1000 g. Zum Frühstück werden 250 g gegessen. Welcher Teil des Brotes ist das?',250,1000]
+  ];
+  let reihe=mische(liste);
+  serie($('#u7'),'🌱 Anteile im Alltag',6,nr=>{
+    if(nr===0)reihe=mische(liste);
+    const [text,Z,N]=reihe[nr],g=ggT(Z,N),a=Z/g,b=N/g;
+    return{html:`<p class="sach">${text}</p><div class="gleichung"><span style="font-size:.65em">Anteil:</span> ${frIn('an')}</div><p class="klein" style="text-align:center">Gib den Anteil vollständig gekürzt an.</p>`,
+      pruefe:r=>{const [x,y]=lies(r,'an');if(isNaN(x)||isNaN(y))return{leer:1};if(y===0)return{msg:'Der Nenner darf nicht 0 sein.'};
+        if(x*N!==Z*y)return{msg:'Das passt noch nicht. Schreib zuerst den Anteil als Bruch: im Zähler der Teil, im Nenner das Ganze. Kürze dann.'};
+        const t=kleinsterTeiler(x,y);if(t>1)return{teil:1,msg:`Der Anteil stimmt! Kürze vollständig: ${x} und ${y} sind beide durch ${t} teilbar.`};
+        return{ok:1,msg:`${lob()} ${Z} von ${N} sind ${fr(a,b)}.`}},
+      loesung:kette(fr(Z,N),fr(a,b),':',g)};
+  });
+})();
+
+/* ---------- Station 6: Paare ---------- */
+(function(){
+  const el=$('#w6'),P=[[[5,10],[1,2,'streifen']],[[6,8],[3,4,'kreis']],[[10,15],[2,3,'']],[[4,10],[2,5,'streifen']],[[4,12],[1,3,'kreis']],[[15,18],[5,6,'']]];
+  let sel=null,tr=0,sperre=false,belohnt=false;
+  el.innerHTML=`<div class="paare"></div><div class="fb" id="w6f" aria-live="polite"></div><button class="btn" id="w6n">Neu mischen ↻</button>`;
+  function neu(){
+    const k=[];P.forEach(([[a,b],[c,d,art]],i)=>{k.push({p:i,h:fr(a,b)});k.push({p:i,h:art?bild(c,d,{art}):fr(c,d)})});
+    $('.paare',el).innerHTML=mische(k).map(x=>`<button class="pk" data-p="${x.p}">${x.h}</button>`).join('');
+    sel=null;tr=0;$('#w6f').className='fb';$('#w6f').innerHTML='';
+  }
+  $('.paare',el).addEventListener('click',e=>{
+    const k=e.target.closest('.pk');if(!k||sperre||k.classList.contains('treffer'))return;
+    if(!sel){sel=k;k.classList.add('sel');return}
+    if(sel===k){k.classList.remove('sel');sel=null;return}
+    if(sel.dataset.p===k.dataset.p){
+      [sel,k].forEach(x=>{x.classList.remove('sel');x.classList.add('treffer');x.disabled=true});sel=null;tr++;
+      if(tr===P.length){const f=$('#w6f');f.className='fb ok';f.innerHTML=belohnt?'🎉 Alle Paare gefunden!':'🎉 Alle Paare gefunden! Dafür gibt es 3 Sterne.';if(!belohnt){belohnt=true;stern(3)}}
+    }else{
+      sperre=true;const a=sel;sel=null;[a,k].forEach(x=>x.classList.add('falsch'));
+      setTimeout(()=>{[a,k].forEach(x=>x.classList.remove('falsch','sel'));sperre=false},700);
+    }
+  });
+  $('#w6n').onclick=neu;neu();
+})();
+
+/* Selbsteinschätzung */
+(function(){
+  const s=['Ich kann am Bild erklären, was beim Kürzen passiert.','Ich kann einen Bruch mit einer vorgegebenen Zahl kürzen.','Ich kann erklären, warum Kürzen der Rückweg vom Erweitern ist.','Ich kann einen Bruch vollständig kürzen.','Ich kann Anteile aus dem Alltag gekürzt angeben.'];
+  const el=$('#w6b');
+  el.innerHTML=s.map(t=>`<div class="ich"><span>${t}</span><span class="smileys"><button aria-label="kann ich sicher">😀</button><button aria-label="klappt meistens">🙂</button><button aria-label="übe ich noch">🤔</button></span></div>`).join('')+`<p class="klein">Bei 🤔 blättere noch einmal zurück zu Station 3 oder 4. Oben kannst du direkt auf die Nummer der Station klicken.</p>`;
+  el.addEventListener('click',e=>{const b=e.target.closest('.smileys button');if(!b)return;$$('button',b.parentNode).forEach(x=>x.classList.toggle('an',x===b))});
+})();
+
+/* Blättern */
+function blinkWeiter(){const v=$('#nvVor');if(!v||v.disabled)return;v.classList.remove('puls');void v.offsetWidth;v.classList.add('puls')}
+(function(){
+  const seiten=$$('.seite'),links=$$('.kopf nav a'),zur=$('#nvZur'),vor=$('#nvVor');
+  let akt=0;
+  function zeige(n,richtung){
+    n=Math.max(0,Math.min(seiten.length-1,n));
+    seiten[akt].classList.remove('aktiv');
+    const neu=seiten[n];neu.classList.toggle('zurueck',richtung<0);neu.classList.add('aktiv');akt=n;
+    window.scrollTo(0,0);
+    zur.disabled=n===0;vor.disabled=n===seiten.length-1;vor.classList.remove('puls');
+    $('#nvBalken').style.width=(n/(seiten.length-1)*100)+'%';
+    $('#nvText').textContent=n===0?'Start':`Seite ${n} von ${seiten.length-1}`;
+    const st=neu.dataset.st;links.forEach(l=>l.classList.toggle('aktiv',l.dataset.st===st));
+    try{history.replaceState(null,'','#seite-'+n)}catch(e){}
+  }
+  zur.onclick=()=>zeige(akt-1,-1);
+  vor.onclick=()=>zeige(akt+1,1);
+  links.forEach(l=>l.onclick=e=>{e.preventDefault();const i=seiten.findIndex(x=>x.dataset.st===l.dataset.st);zeige(i,i<akt?-1:1)});
+  $$('[data-geh]').forEach(b=>b.onclick=()=>zeige(+b.dataset.geh,1));
+  document.addEventListener('keydown',e=>{
+    if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+    if(e.key==='ArrowRight')zeige(akt+1,1);
+    if(e.key==='ArrowLeft')zeige(akt-1,-1);
+  });
+  const m=/^#seite-(\d+)$/.exec(location.hash);
+  seiten[0].classList.add('aktiv');zeige(m?+m[1]:0,1);
+})();
+</script>
+</body>
+</html>
