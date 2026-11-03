@@ -1,0 +1,171 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fit für den Start</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+<style>
+/* Layout: eine schmale Spalte wie ein Arbeitsblatt, oben drei Reiter, darunter eine Aufgabenkarte */
+:root{
+  --bg:#f3f5f8; --karte:#ffffff; --fg:#1e2633; --leise:#5b6678; --linie:#d5dbe4;
+  --akzent:#3c4b5f; --akzent-hell:#e3e8ef; --gut:#1f7a46; --gut-hell:#e2f3e8; --halb:#a86400; --halb-hell:#fbefdc; --falsch:#a3202a; --falsch-hell:#fbe4e5;
+  --schrift:"Andika","Trebuchet MS",Verdana,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161b22; --karte:#202733; --fg:#e8ecf2; --leise:#a5afbf; --linie:#384354;
+  --akzent:#b9c6d8; --akzent-hell:#2b3442; --gut:#6fd39a; --gut-hell:#1d3a2a; --halb:#f0b45a; --halb-hell:#3d2f17; --falsch:#ff8d94; --falsch-hell:#3f2125; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161b22; --karte:#202733; --fg:#e8ecf2; --leise:#a5afbf; --linie:#384354;
+  --akzent:#b9c6d8; --akzent-hell:#2b3442; --gut:#6fd39a; --gut-hell:#1d3a2a; --halb:#f0b45a; --halb-hell:#3d2f17; --falsch:#ff8d94; --falsch-hell:#3f2125; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--schrift);font-size:18px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+main{max-width:620px;margin:0 auto;display:grid;gap:18px}
+h1{font-size:1.7rem;margin:0;text-wrap:balance}
+.unter{color:var(--leise);margin:2px 0 0}
+.reiter{display:flex;flex-wrap:wrap;gap:8px}
+.reiter button{font:inherit;font-size:1rem;padding:8px 14px;border-radius:999px;border:1.5px solid var(--linie);background:var(--karte);color:var(--fg);cursor:pointer}
+.reiter button[aria-selected="true"]{background:var(--akzent);border-color:var(--akzent);color:var(--karte);font-weight:700}
+.karte{background:var(--karte);border:1px solid var(--linie);border-radius:14px;padding:20px;display:grid;gap:16px}
+.nr{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--leise)}
+.auftrag{font-size:1.15rem;margin:0}
+.bruch{display:inline-grid;text-align:center;vertical-align:middle;margin:0 4px;font-weight:700;font-variant-numeric:tabular-nums}
+.bruch span:first-child{border-bottom:2.5px solid currentColor;padding:0 6px}
+.gross{font-size:2rem}
+.eingabe{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.feldbruch{display:inline-grid;gap:4px;justify-items:center}
+.feldbruch hr{width:100%;border:0;border-top:2.5px solid var(--fg);margin:0}
+input{font:inherit;font-size:1.3rem;width:5.2em;padding:6px 8px;text-align:center;border:1.5px solid var(--linie);border-radius:8px;background:var(--bg);color:var(--fg)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--akzent);outline-offset:2px}
+label{font-size:1rem;color:var(--leise)}
+.feld{display:grid;gap:4px}
+.knoepfe{display:flex;flex-wrap:wrap;gap:10px}
+.knoepfe button{font:inherit;font-size:1rem;padding:9px 16px;border-radius:10px;cursor:pointer;border:1.5px solid var(--akzent)}
+.primaer{background:var(--akzent);color:var(--karte);font-weight:700}
+.zweit{background:transparent;color:var(--akzent)}
+.rueck{border-radius:10px;padding:12px 14px;margin:0}
+.rueck.gut{background:var(--gut-hell);color:var(--gut)}
+.rueck.halb{background:var(--halb-hell);color:var(--halb)}
+.rueck.falsch{background:var(--falsch-hell);color:var(--falsch)}
+.tipp{background:var(--akzent-hell);border-radius:10px;padding:12px 14px;margin:0}
+.stand{display:flex;gap:18px;color:var(--leise);font-size:.95rem;font-variant-numeric:tabular-nums}
+.stand b{color:var(--fg)}
+@media (prefers-reduced-motion:no-preference){.rueck{animation:auf .25s ease-out}@keyframes auf{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+
+<main>
+  <header>
+    <h1>Fit für den Start</h1>
+    <p class="unter">Wahrscheinlichkeit 1 · Brüche und Prozente üben</p>
+  </header>
+
+  <div class="reiter" role="tablist" aria-label="Übungsart">
+    <button role="tab" id="r-kuerzen" aria-selected="true" data-art="kuerzen">1 Kürzen</button>
+    <button role="tab" id="r-prozent" aria-selected="false" data-art="prozent">2 In Prozent</button>
+    <button role="tab" id="r-anteil" aria-selected="false" data-art="anteil">3 Anteil</button>
+  </div>
+
+  <section class="karte" aria-live="polite">
+    <div class="nr" id="nr">Aufgabe 1</div>
+    <p class="auftrag" id="auftrag"></p>
+    <div id="aufgabe"></div>
+    <form class="eingabe" id="form" autocomplete="off"></form>
+    <div class="knoepfe">
+      <button class="primaer" type="submit" form="form" id="pruefen">Prüfen</button>
+      <button class="zweit" type="button" id="tippKnopf">Tipp</button>
+      <button class="zweit" type="button" id="neu">Neue Aufgabe</button>
+    </div>
+    <p class="tipp" id="tipp" hidden></p>
+    <p class="rueck" id="rueck" hidden></p>
+  </section>
+
+  <div class="stand"><span>Richtig: <b id="richtig">0</b></span><span>Versuche: <b id="versuche">0</b></span><span>Serie: <b id="serie">0</b></span></div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const zufall=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const wahl=l=>l[Math.floor(Math.random()*l.length)];
+const ggT=(a,b)=>b?ggT(b,a%b):a;
+const zahl=s=>{s=String(s).trim().replace(/\s/g,'').replace('%','').replace(',','.');return s===''||isNaN(s)?null:Number(s)};
+const komma=x=>String(Math.round(x*1000)/1000).replace('.',',');
+const bruch=(z,n,gross)=>`<span class="bruch${gross?' gross':''}"><span>${z}</span><span>${n}</span></span>`;
+
+let art='kuerzen',aufgabe=null,nr=1,stand={richtig:0,versuche:0,serie:0};
+
+const kontexte=[
+  ['Lernenden','haben einen Hund'],['Würfen','zeigen eine 6'],['Losen','sind Gewinne'],
+  ['Kugeln in der Urne','sind rot'],['Personen','kommen mit dem Rad'],['Reißzwecken','liegen auf dem Rücken']];
+
+function neueAufgabe(){
+  $('rueck').hidden=true;$('tipp').hidden=true;$('nr').textContent='Aufgabe '+nr;
+  const f=$('form');
+  if(art==='kuerzen'){
+    let z,n;do{n=zufall(2,12);z=zufall(1,n-1)}while(ggT(z,n)!==1);
+    const k=zufall(2,6);aufgabe={z,n,az:z*k,an:n*k};
+    $('auftrag').textContent='Kürze so weit wie möglich.';
+    $('aufgabe').innerHTML=bruch(aufgabe.az,aufgabe.an,true);
+    f.innerHTML=`<span class="feldbruch"><input id="ez" inputmode="numeric" aria-label="Zähler"><hr><input id="en" inputmode="numeric" aria-label="Nenner"></span>`;
+    $('tipp').textContent=`Suche eine Zahl, durch die du Zähler und Nenner teilen kannst. Teile beide durch dieselbe Zahl. Wiederhole das, bis es nicht mehr geht.`;
+  } else if(art==='prozent'){
+    const n=wahl([2,4,5,10,20,25,50,8]);let z;do{z=zufall(1,n-1)}while(ggT(z,n)!==1);
+    aufgabe={z,n,wert:z/n};
+    $('auftrag').textContent='Schreibe als Dezimalzahl und in Prozent.';
+    $('aufgabe').innerHTML=bruch(z,n,true);
+    f.innerHTML=`<div class="feld"><label for="ed">Dezimalzahl</label><input id="ed" inputmode="decimal"></div><div class="feld"><label for="ep">Prozent</label><input id="ep" inputmode="decimal"></div><span style="align-self:end;padding-bottom:8px">%</span>`;
+    $('tipp').textContent=`Rechne Zähler : Nenner. Das ist die Dezimalzahl. Für Prozent multiplizierst du die Dezimalzahl mit 100.`;
+  } else {
+    const n=wahl([10,20,25,40,50,200]);const z=zufall(1,n-1);const [wer,was]=wahl(kontexte);
+    aufgabe={z,n,wert:z/n};
+    $('auftrag').textContent='Welcher Anteil ist das in Prozent? Runde, wenn nötig, auf eine Stelle nach dem Komma.';
+    $('aufgabe').innerHTML=`<p style="margin:0;font-size:1.2rem"><b>${z}</b> von <b>${n}</b> ${wer} ${was}.</p>`;
+    f.innerHTML=`<div class="feld"><label for="ep">Anteil</label><input id="ep" inputmode="decimal"></div><span style="align-self:end;padding-bottom:8px">%</span>`;
+    $('tipp').textContent=`Schreibe den Anteil als Bruch: ${z} von ${n} ist ${z}/${n}. Rechne ${z} : ${n} und multipliziere mit 100.`;
+  }
+  const erstes=f.querySelector('input');if(erstes)erstes.focus({preventScroll:true});
+}
+
+function melde(klasse,text){const r=$('rueck');r.className='rueck '+klasse;r.innerHTML=text;r.hidden=false}
+
+function pruefe(e){
+  e.preventDefault();
+  let ok=false,halb=false,text='';
+  if(art==='kuerzen'){
+    const z=zahl($('ez').value),n=zahl($('en').value);
+    if(z===null||n===null||n===0){melde('halb','Trage Zähler und Nenner ein.');return}
+    if(z*aufgabe.an===n*aufgabe.az){
+      if(z===aufgabe.z&&n===aufgabe.n){ok=true;text=`Richtig! ${bruch(aufgabe.az,aufgabe.an)} = ${bruch(z,n)}`}
+      else{halb=true;text=`Der Bruch hat den richtigen Wert. Du kannst aber noch weiter kürzen.`}
+    } else text=`Das stimmt noch nicht. Prüfe, ob du Zähler <b>und</b> Nenner durch dieselbe Zahl geteilt hast.`;
+  } else if(art==='prozent'){
+    const d=zahl($('ed').value),p=zahl($('ep').value);
+    if(d===null||p===null){melde('halb','Trage beide Felder aus.');return}
+    const dOk=Math.abs(d-aufgabe.wert)<1e-9,pOk=Math.abs(p-aufgabe.wert*100)<1e-9;
+    if(dOk&&pOk){ok=true;text=`Richtig! ${bruch(aufgabe.z,aufgabe.n)} = ${komma(aufgabe.wert)} = ${komma(aufgabe.wert*100)}&nbsp;%`}
+    else if(dOk){halb=true;text=`Die Dezimalzahl stimmt. Beim Prozentwert ist noch ein Fehler. Multipliziere mit 100.`}
+    else if(pOk){halb=true;text=`Der Prozentwert stimmt. Bei der Dezimalzahl ist noch ein Fehler. Teile den Prozentwert durch 100.`}
+    else text=`Das stimmt noch nicht. Rechne ${aufgabe.z} : ${aufgabe.n}.`;
+  } else {
+    const p=zahl($('ep').value);
+    if(p===null){melde('halb','Trage den Anteil ein.');return}
+    const genau=aufgabe.wert*100,gerundet=Math.round(genau*10)/10;
+    if(Math.abs(p-genau)<1e-9||Math.abs(p-gerundet)<1e-9){ok=true;text=`Richtig! ${aufgabe.z} : ${aufgabe.n} = ${komma(aufgabe.wert)} = ${komma(gerundet)}&nbsp;%`}
+    else if(Math.abs(p-aufgabe.wert)<1e-9){halb=true;text=`Das ist die Dezimalzahl. Für Prozent multiplizierst du noch mit 100.`}
+    else text=`Das stimmt noch nicht. Rechne ${aufgabe.z} : ${aufgabe.n} und multipliziere mit 100.`;
+  }
+  stand.versuche++;
+  if(ok){stand.richtig++;stand.serie++;nr++;melde('gut',text+(stand.serie>=5?' Fünf richtig in Folge, du bist fit!':''))}
+  else{stand.serie=0;melde(halb?'halb':'falsch',text)}
+  $('richtig').textContent=stand.richtig;$('versuche').textContent=stand.versuche;$('serie').textContent=stand.serie;
+}
+
+document.querySelectorAll('.reiter button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.reiter button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  art=b.dataset.art;nr=1;neueAufgabe();
+}));
+$('form').addEventListener('submit',pruefe);
+$('neu').addEventListener('click',()=>{nr++;neueAufgabe()});
+$('tippKnopf').addEventListener('click',()=>{$('tipp').hidden=!$('tipp').hidden});
+const start=location.hash.slice(1);
+if(['kuerzen','prozent','anteil'].includes(start)){document.querySelector(`[data-art="${start}"]`).click()}else neueAufgabe();
+</script>
+
+</body></html>
