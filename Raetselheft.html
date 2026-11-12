@@ -224,6 +224,28 @@ button:focus-visible,.cell:focus-visible{outline:3px solid var(--sea);outline-of
 .slot{width:42px;height:42px;border-radius:10px;border:2px dashed var(--line);background:none;color:var(--soft);font-weight:700;font-size:18px;padding:0}
 .slot.on{width:auto;padding:0 10px;border:2px solid var(--robo);color:var(--robo);font-size:14px;background:color-mix(in srgb,var(--robo) 8%,var(--cell))}
 .phint{font-size:13px;color:var(--soft);margin:8px 2px 0}
+/* Neue Rätseltypen */
+.board.aqua .cell{border-color:color-mix(in srgb,var(--line) 55%,transparent)}
+.board.aqua .cell.bt{border-top:2.5px solid var(--ink)}.board.aqua .cell.bl{border-left:2.5px solid var(--ink)}
+.board.aqua .cell.bb{border-bottom:2.5px solid var(--ink)}.board.aqua .cell.br{border-right:2.5px solid var(--ink)}
+.board.nono .cell.g5c{border-left:2px solid var(--ink)}.board.nono .cell.g5r{border-top:2px solid var(--ink)}
+.clue.nr{display:flex;justify-content:flex-end;align-items:center;gap:.4em;padding-right:.4em;font-size:max(10px,calc(var(--cs)*.44))}
+.clue.nc{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;line-height:1.2;padding-bottom:.25em;font-size:max(10px,calc(var(--cs)*.44))}
+.fillc{width:100%;height:100%;background:var(--ink);color:var(--cell);display:grid;place-items:center;font-weight:700;font-size:calc(var(--cs)*.46);font-variant-numeric:tabular-nums}
+.waterc{width:100%;height:100%;background:color-mix(in srgb,var(--water) 62%,var(--cell))}
+.numc{font-weight:700;font-size:calc(var(--cs)*.46);font-variant-numeric:tabular-nums;color:var(--ink);pointer-events:none}
+.numc.off{color:var(--soft);opacity:.45;text-decoration:line-through}
+.numc.pick{width:80%;height:80%;border-radius:50%;background:var(--bin);color:var(--paper);display:grid;place-items:center}
+.cell .dot.corner{position:absolute;right:9%;top:9%;width:15%;height:15%}
+.cell.akw{background:var(--ink)}.cell.akw .numc{color:var(--cell)}
+.cell.akw.done .numc{opacity:.5}.cell.akw.over .numc{color:var(--bad)}
+.cell.lit{background:color-mix(in srgb,var(--gold) 26%,var(--cell))}
+.cell.grd{background:color-mix(in srgb,var(--tent) 16%,var(--cell))}
+.cell.pond{background:color-mix(in srgb,var(--water) 26%,var(--cell))}
+.cell.numdone .numc{color:var(--soft);opacity:.6}.cell.numover .numc{color:var(--bad)}
+.arw{position:relative;width:100%;height:100%;display:grid;place-items:center;pointer-events:none}
+.cell .arw svg{position:absolute;left:5%;top:5%;width:90%;height:90%}
+.arw b{position:relative;font-size:calc(var(--cs)*.4);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -654,6 +676,192 @@ function genSlither(n,target,seed){
   }
 }
 
+// ===================== Neue Rätseltypen =====================
+const lineIdx=(n,k,row)=>[...Array(n)].map((_,j)=>row?k*n+j:j*n+k);
+function countsOf(sol,n,w){const rows=[],cols=[];for(let k=0;k<n;k++){let a=0,b=0;for(let j=0;j<n;j++){a+=sol[k*n+j]*(w?w[k*n+j]:1);b+=sol[j*n+k]*(w?w[j*n+k]:1)}rows.push(a);cols.push(b)}return{rows,cols}}
+function growRegions(n,G,R){const reg=new Int16Array(n*n).fill(-1);const seeds=shuffle([...Array(n*n).keys()],R).slice(0,G);seeds.forEach((i,g)=>reg[i]=g);
+  let left=n*n-G,guard=0;
+  while(left>0&&guard++<400000){const i=Math.floor(R()*n*n);if(reg[i]<0)continue;const[a,b]=pick(N4,R);const x=((i/n)|0)+a,y=i%n+b;
+    if(x>=0&&x<n&&y>=0&&y<n&&reg[x*n+y]<0){reg[x*n+y]=reg[i];left--}}
+  return left?null:Array.from(reg)}
+function randomPicture(n,R,dens){ // leicht zusammenhängende Zufallsbilder
+  const a=new Int8Array(n*n);for(let i=0;i<n*n;i++)a[i]=R()<dens?1:0;
+  const b=Int8Array.from(a);
+  for(let i=0;i<n*n;i++){const r=(i/n)|0,c=i%n;let s=0,t=0;for(const[x,y]of N8){const p=r+x,q=c+y;if(p>=0&&p<n&&q>=0&&q<n){t++;s+=a[p*n+q]}}
+    if(R()<.6){if(s>=t*0.7)b[i]=1;else if(s<=t*0.25)b[i]=0}}
+  return b}
+// Hinweise entfernen, solange die Technikstufe passt
+function thinOut(P,keys,get,unset,reset,model,target,R){let tier=0;
+  for(const k of shuffle(keys.slice(),R)){const old=get(k);unset(k);const{m,given}=model(P);const q=rate(m,given);
+    if(q.tier<1||q.tier>target)reset(k,old);else tier=q.tier}
+  const{m,given}=model(P);const q=rate(m,given);return q.tier}
+
+// ---------- Nonogramm ----------
+function runsOf(line){const o=[];let k=0;for(const v of line){if(v===1)k++;else if(k){o.push(k);k=0}}if(k)o.push(k);return o}
+const _lt=new Map();
+function lineTuples(n,clue){const key=n+'|'+clue.join(',');if(_lt.has(key))return _lt.get(key);const out=[];
+  const rec=(pos,ci,arr)=>{if(ci===clue.length){out.push(arr);return}
+    let rest=clue.length-ci-1;for(let j=ci;j<clue.length;j++)rest+=clue[j];
+    for(let s=pos;s+rest<=n;s++){const a=arr.slice();for(let j=0;j<clue[ci];j++)a[s+j]=1;rec(s+clue[ci]+1,ci+1,a)}};
+  rec(0,0,new Array(n).fill(0));_lt.set(key,out);return out}
+function modelNono(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  for(let k=0;k<n;k++){m.table(lineIdx(n,k,true),lineTuples(n,P.rc[k]));m.table(lineIdx(n,k,false),lineTuples(n,P.cc[k]))}
+  return{m,given}}
+function genNono(n,target,seed){const R=rng(seed);
+  const sol=randomPicture(n,R,target===1?0.5+R()*0.12:0.42+R()*0.14);
+  const rc=[],cc=[];for(let k=0;k<n;k++){rc.push(runsOf(lineIdx(n,k,true).map(i=>sol[i])));cc.push(runsOf(lineIdx(n,k,false).map(i=>sol[i])))}
+  if(rc.some(x=>!x.length)||cc.some(x=>!x.length))return null;
+  return{type:'nono',n,rc,cc,sol}}
+
+// ---------- Lichter (Akari) ----------
+function akGeom(P){const n=P.n,W=new Uint8Array(n*n);P.walls.forEach(i=>W[i]=1);
+  const vis=i=>{const r=(i/n)|0,c=i%n,o=[i];for(const[a,b]of N4){let x=r+a,y=c+b;while(x>=0&&x<n&&y>=0&&y<n&&!W[x*n+y]){o.push(x*n+y);x+=a;y+=b}}return o};
+  const adj=i=>{const r=(i/n)|0,c=i%n;return N4.map(([a,b])=>[r+a,c+b]).filter(([x,y])=>x>=0&&x<n&&y>=0&&y<n&&!W[x*n+y]).map(([x,y])=>x*n+y)};
+  return{W,vis,adj}}
+function modelAkari(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1),{W,vis,adj}=akGeom(P);
+  for(let i=0;i<n*n;i++)if(W[i])given[i]=0;
+  for(const row of[true,false])for(let k=0;k<n;k++){let run=[];const L=lineIdx(n,k,row);
+    for(let j=0;j<=n;j++){if(j<n&&!W[L[j]])run.push(L[j]);else{if(run.length>1)m.sum(run,0,1);run=[]}}}
+  for(let i=0;i<n*n;i++)if(!W[i])m.sum(vis(i),1,99);
+  P.walls.forEach(i=>{const k=P.num[i];if(k>=0){const a=adj(i);if(a.length)m.sum(a,k,k)}});
+  return{m,given}}
+function genAkari(n,target,seed){const R=rng(seed);
+  const walls=new Set();const cnt=Math.round(n*n*(0.17+R()*0.07));let g=0;
+  while(walls.size<cnt&&g++<999){const i=Math.floor(R()*n*n);walls.add(i);walls.add(n*n-1-i)}
+  const P={type:'akari',n,walls:[...walls].sort((a,b)=>a-b),num:{}};P.walls.forEach(i=>P.num[i]=-1);
+  let{m,given}=modelAkari(P);const s=solveCount(m,given,1,R,6000);if(!s||!s.length)return null;
+  const sol=s[0];P.sol=sol;const{adj}=akGeom(P);
+  P.walls.forEach(i=>P.num[i]=adj(i).reduce((a,j)=>a+sol[j],0));
+  ({m,given}=modelAkari(P));const q=rate(m,given);if(q.tier<1||q.tier>3)return null;
+  thinOut(P,P.walls,k=>P.num[k],k=>P.num[k]=-1,(k,o)=>P.num[k]=o,modelAkari,Math.max(target,q.tier),R);
+  return P}
+
+// ---------- Minensuche ----------
+function nb8(n,i){const r=(i/n)|0,c=i%n,o=[];for(const[a,b]of N8){const x=r+a,y=c+b;if(x>=0&&x<n&&y>=0&&y<n)o.push(x*n+y)}return o}
+function modelMines(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  for(let i=0;i<n*n;i++)if(P.clues[i]>=0)given[i]=0;
+  for(let i=0;i<n*n;i++)if(P.clues[i]>=0){const cs=nb8(n,i).filter(j=>P.clues[j]<0);if(cs.length)m.sum(cs,P.clues[i],P.clues[i]);else if(P.clues[i]>0)m.sum([i],1,1)}
+  return{m,given}}
+function genMines(n,target,seed){const R=rng(seed);const sol=new Int8Array(n*n);const d=0.18+R()*0.1;
+  for(let i=0;i<n*n;i++)sol[i]=R()<d?1:0;
+  const clues=Array.from(sol,(v,i)=>v?-1:nb8(n,i).reduce((a,j)=>a+sol[j],0));
+  const P={type:'mines',n,clues,sol};
+  const{m,given}=modelMines(P);const q=rate(m,given);if(q.tier<1||q.tier>3)return null;
+  const keys=[];clues.forEach((k,i)=>{if(k>=0)keys.push(i)});
+  thinOut(P,keys,k=>P.clues[k],k=>P.clues[k]=-1,(k,o)=>P.clues[k]=o,modelMines,Math.max(target,q.tier),R);
+  if(P.clues.filter(k=>k>=0).length<n)return null;
+  return P}
+
+// ---------- Mosaik ----------
+function modelMosaic(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  for(let i=0;i<n*n;i++)if(P.clues[i]>=0)m.sum([i,...nb8(n,i)],P.clues[i],P.clues[i]);
+  return{m,given}}
+function genMosaic(n,target,seed){const R=rng(seed);const sol=randomPicture(n,R,0.4+R()*0.2);
+  const clues=Array.from(sol,(v,i)=>v+nb8(n,i).reduce((a,j)=>a+sol[j],0));
+  const P={type:'mosaic',n,clues,sol};
+  const{m,given}=modelMosaic(P);const q=rate(m,given);if(q.tier<1||q.tier>3)return null;
+  thinOut(P,[...Array(n*n).keys()],k=>P.clues[k],k=>P.clues[k]=-1,(k,o)=>P.clues[k]=o,modelMosaic,Math.max(target,q.tier),R);
+  return P}
+
+// ---------- Aquarium ----------
+function aqBlocks(P){const n=P.n,rowsB=[];// je Zeile: Blöcke (Felder desselben Beckens)
+  for(let r=0;r<n;r++){const B={};for(let c=0;c<n;c++)(B[P.reg[r*n+c]]=B[P.reg[r*n+c]]||[]).push(r*n+c);rowsB.push(B)}
+  return rowsB}
+function modelAqua(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1),RB=aqBlocks(P);
+  for(let k=0;k<n;k++){m.sum(lineIdx(n,k,true),P.rows[k],P.rows[k]);m.sum(lineIdx(n,k,false),P.cols[k],P.cols[k])}
+  for(let r=0;r<n;r++)for(const g in RB[r]){const b=RB[r][g];
+    for(let j=0;j+1<b.length;j++)m.table([b[j],b[j+1]],[[0,0],[1,1]]);
+    if(r+1<n&&RB[r+1][g])m.table([b[0],RB[r+1][g][0]],[[0,0],[0,1],[1,1]])}
+  const scan=(vals,deep)=>{
+    for(let r=0;r<n;r++){let need=P.rows[r];const U=[];
+      for(const g in RB[r]){const b=RB[r][g];const v=vals[b[0]];if(v===1)need-=b.length;else if(v<0)U.push(b)}
+      if(!U.length)continue;const tot=U.reduce((a,b)=>a+b.length,0);if(need<0||need>tot)return -1;
+      for(let j=0;j<U.length;j++){const s=U[j].length;let canIn,canOut;
+        if(!deep){canIn=s<=need;canOut=tot-s>=need}
+        else{const reach=new Uint8Array(need+1);reach[0]=1;
+          for(let k=0;k<U.length;k++){if(k===j)continue;const w=U[k].length;for(let x=need;x>=w;x--)if(reach[x-w])reach[x]=1}
+          canIn=s<=need&&!!reach[need-s];canOut=!!reach[need]}
+        if(!canIn&&!canOut)return -1;
+        if(!canIn){U[j].forEach(i=>vals[i]=0);return 1}
+        if(!canOut){U[j].forEach(i=>vals[i]=1);return 1}}}
+    return 0};
+  m.h1=vals=>scan(vals,false);m.h2=vals=>scan(vals,true);
+  return{m,given}}
+function genAqua(n,target,seed){const R=rng(seed);
+  const reg=growRegions(n,Math.round(n*n/(4+R()*2.5)),R);if(!reg)return null;
+  const span={};reg.forEach((g,i)=>{const r=(i/n)|0;const s=span[g]=span[g]||[r,r];s[0]=Math.min(s[0],r);s[1]=Math.max(s[1],r)});
+  const lvl={};for(const g in span){const[a,b]=span[g];lvl[g]=a+Math.floor(R()*(b-a+2))}
+  const sol=Int8Array.from(reg,(g,i)=>((i/n)|0)>=lvl[g]?1:0);
+  const{rows,cols}=countsOf(sol,n);
+  return{type:'aqua',n,reg,rows,cols,sol}}
+
+// ---------- Summenjagd ----------
+const _st=new Map();
+function sumTuples(vals,target){const key=vals.join(',')+'='+target;if(_st.has(key))return _st.get(key);const n=vals.length,out=[];
+  for(let b=0;b<(1<<n);b++){let s=0;for(let j=0;j<n;j++)if(b>>j&1)s+=vals[j];if(s===target)out.push([...Array(n)].map((_,j)=>b>>j&1))}
+  _st.set(key,out);return out}
+function modelSums(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  for(let k=0;k<n;k++)for(const row of[true,false]){const L=lineIdx(n,k,row);m.table(L,sumTuples(L.map(i=>P.val[i]),row?P.rows[k]:P.cols[k]))}
+  if(P.hints)P.hints.forEach(([i,v])=>given[i]=v);
+  return{m,given}}
+function genSums(n,target,seed){const R=rng(seed);
+  const val=[...Array(n*n)].map(()=>1+Math.floor(R()*9));const sol=new Int8Array(n*n);const d=0.45+R()*0.2;
+  for(let i=0;i<n*n;i++)sol[i]=R()<d?1:0;
+  const{rows,cols}=countsOf(sol,n,val);if(rows.some(x=>!x)||cols.some(x=>!x))return null;
+  return{type:'sums',n,val,rows,cols,sol}}
+
+// ---------- Schatzkarte (eigene Erfindung) ----------
+function arrowCells(P,a){const n=P.n,[dr,dc]=DIR4[a.d],o=[];let r=((a.i/n)|0)+dr,c=a.i%n+dc;
+  while(r>=0&&r<n&&c>=0&&c<n){o.push(r*n+c);r+=dr;c+=dc}return o}
+const DIR4=[[-1,0],[0,1],[1,0],[0,-1]];
+function modelArrows(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  const A=new Uint8Array(n*n);P.arr.forEach(a=>{A[a.i]=1;given[a.i]=0});
+  P.arr.forEach(a=>{const cs=arrowCells(P,a).filter(i=>!A[i]);if(cs.length)m.sum(cs,a.k,a.k)});
+  for(let i=0;i<n*n;i++){if(A[i])continue;if(i%n<n-1&&!A[i+1])m.sum([i,i+1],0,1);if(i+n<n*n&&!A[i+n])m.sum([i,i+n],0,1)}
+  return{m,given}}
+function genArrows(n,target,seed){const R=rng(seed);const sol=new Int8Array(n*n);const d=0.3+R()*0.12;
+  for(const i of shuffle([...Array(n*n).keys()],R)){if(R()>d*1.6)continue;const r=(i/n)|0,c=i%n;
+    if(N4.every(([a,b])=>{const x=r+a,y=c+b;return x<0||x>=n||y<0||y>=n||!sol[x*n+y]}))sol[i]=1}
+  const P={type:'arrows',n,arr:[],sol};
+  for(let i=0;i<n*n;i++){if(sol[i])continue;
+    const ds=[0,1,2,3].filter(k=>arrowCells(P,{i,d:k}).length>0);
+    const w=ds.map(k=>arrowCells(P,{i,d:k}).length);let t=R()*w.reduce((a,b)=>a+b,0),dd=ds[0];
+    for(let j=0;j<ds.length;j++){t-=w[j];if(t<=0){dd=ds[j];break}}
+    P.arr.push({i,d:dd,k:0})}
+  P.arr.forEach(a=>a.k=arrowCells(P,a).reduce((s,j)=>s+sol[j],0));
+  let{m,given}=modelArrows(P);let q=rate(m,given);if(q.tier<1||q.tier>3)return null;
+  const tg=Math.max(target,q.tier);
+  for(const a of shuffle(P.arr.slice(),R)){const k=P.arr.indexOf(a);P.arr.splice(k,1);
+    ({m,given}=modelArrows(P));q=rate(m,given);if(q.tier<1||q.tier>tg)P.arr.splice(k,0,a)}
+  if(P.arr.length<2)return null;
+  return P}
+
+// ---------- Vogelscheuchen (eigene Erfindung) ----------
+function modelCrows(P){const n=P.n,m=new Model(n*n),given=new Int8Array(n*n).fill(-1);
+  const W=new Uint8Array(n*n);P.ponds.forEach(i=>{W[i]=1;given[i]=0});
+  for(let i=0;i<n*n;i++)if(!W[i])m.sum([i,...nb8(n,i)].filter(j=>!W[j]),1,1);
+  if(P.hints)P.hints.forEach(([i,v])=>given[i]=v);
+  return{m,given}}
+function genCrows(n,target,seed){const R=rng(seed);const sol=new Int8Array(n*n),cov=new Uint8Array(n*n);
+  // dichte Packung: erst zufällig, dann Lücken füllen
+  for(const i of shuffle([...Array(n*n).keys()],R)){const r=(i/n)|0,c=i%n;let ok=true;
+    for(let a=-2;a<=2&&ok;a++)for(let b=-2;b<=2;b++){const x=r+a,y=c+b;if(x>=0&&x<n&&y>=0&&y<n&&sol[x*n+y]){ok=false;break}}
+    if(ok){sol[i]=1;cov[i]=1;nb8(n,i).forEach(j=>cov[j]=1)}}
+  const ponds=[];for(let i=0;i<n*n;i++)if(!cov[i])ponds.push(i);
+  if(ponds.length>n*n*0.3)return null;
+  const P={type:'crows',n,ponds,hints:[],sol};
+  const hmap=new Map();const res=()=>{P.hints=[...hmap];const{m,given}=modelCrows(P);return rate(m,given)};
+  let r=res();
+  for(let g=0;g<40&&(r.tier<0||r.tier>Math.max(target,1));g++){
+    const unk=[];for(let i=0;i<n*n;i++)if(cov[i]&&!hmap.has(i)&&(!r.vals||r.vals[i]<0))unk.push(i);if(!unk.length)break;
+    const su=unk.filter(i=>sol[i]);const i=pick(su.length&&R()<.5?su:unk,R);hmap.set(i,sol[i]);r=res()}
+  if(r.tier<1||r.tier>3)return null;
+  for(const i of shuffle([...hmap.keys()],R)){const v=hmap.get(i);hmap.delete(i);const q=res();if(q.tier<1||q.tier>Math.max(target,r.tier))hmap.set(i,v)}
+  P.hints=[...hmap];return P}
+
+const GEN2={nono:genNono,akari:genAkari,mines:genMines,mosaic:genMosaic,aqua:genAqua,sums:genSums,arrows:genArrows,crows:genCrows};
+const MODEL2={nono:modelNono,akari:modelAkari,mines:modelMines,mosaic:modelMosaic,aqua:modelAqua,sums:modelSums,arrows:modelArrows,crows:modelCrows};
+
 // ---------- Stufenplan ----------
 const PLAN={
   tents:[[5,1],[6,1],[6,2],[7,1],[7,2],[8,2],[8,3],[9,2],[9,3],[10,2],[10,3],[11,3],[12,3]],
@@ -662,16 +870,25 @@ const PLAN={
   binairo:[[6,1],[6,2],[8,1],[8,2],[8,3],[10,2],[10,3],[12,2],[12,3]],
   hashi:[[7,1],[7,2],[8,2],[9,2],[9,3],[10,2],[10,3],[12,3]],
   slither:[[5,1],[5,2],[6,2],[6,3],[7,2],[7,3],[8,3],[10,3]],
+  nono:[[5,1],[6,1],[7,1],[8,1],[8,3],[10,1],[10,3],[12,1],[12,3]],
+  akari:[[5,1],[6,1],[6,2],[7,2],[7,3],[8,2],[8,3],[10,2],[10,3]],
+  mines:[[5,1],[6,1],[6,2],[7,2],[8,2],[8,3],[9,3],[10,2],[10,3]],
+  mosaic:[[5,1],[6,1],[6,2],[7,2],[8,2],[8,3],[10,2],[10,3],[12,3]],
+  aqua:[[5,1],[6,1],[6,2],[7,2],[7,3],[8,2],[8,3],[10,2],[10,3]],
+  sums:[[4,1],[5,1],[6,1],[7,1],[7,3],[8,1],[8,3]],
+  arrows:[[5,1],[6,1],[6,2],[7,2],[8,2],[8,3],[9,3],[10,3]],
+  crows:[[5,1],[6,1],[6,2],[7,2],[8,2],[9,2],[10,2],[12,2]],
 };
 function spec(type,level){const p=PLAN[type];const e=p[Math.min(level,p.length)-1];
   return type==='stars'?{n:e[0],k:e[1],tier:e[2]}:{n:e[0],tier:e[1]}}
-function modelFor(P){return({tents:modelTents,stars:modelStars,ships:modelShips,binairo:modelBinairo,hashi:modelHashi,slither:modelSlither})[P.type](P)}
+function modelFor(P){return({tents:modelTents,stars:modelStars,ships:modelShips,binairo:modelBinairo,hashi:modelHashi,slither:modelSlither,...MODEL2})[P.type](P)}
 function makePuzzle(type,level,variant=0,timeLimit=2500){
   const sp=spec(type,level);const t0=now();let best=null,bestD=99;
   let seed=(((type.charCodeAt(0)*131+type.length)*7919+level*104729+variant*15485863)>>>0);
   for(let att=0;att<400;att++){seed=(seed*1103515245+12345)>>>0;
     let P=null;
-    if(type==='tents')P=genTents(sp.n,seed);
+    if(GEN2[type])P=GEN2[type](sp.n,sp.tier,seed);
+    else if(type==='tents')P=genTents(sp.n,seed);
     else if(type==='stars')P=genStars(sp.n,sp.k,seed,t0+(best?timeLimit:timeLimit*3));
     else if(type==='ships')P=genShips(sp.n,sp.tier,seed);
     else if(type==='binairo')P=genBinairo(sp.n,sp.tier,seed);
@@ -788,6 +1005,22 @@ const TYPES={
     rules:['Verbinde die Inseln mit waagerechten oder senkrechten Brücken.','Die Zahl sagt, wie viele Brücken an der Insel enden.','Zwischen zwei Inseln liegen höchstens zwei Brücken.','Brücken kreuzen sich nicht.','Am Ende hängen alle Inseln zusammen.']},
   slither:{name:'Rundweg',c:'var(--loop)',obj:'Linie',
     rules:['Zeichne entlang der Gitterlinien einen einzigen geschlossenen Rundweg.','Der Weg verzweigt sich nicht und kreuzt sich nicht.','Eine Zahl sagt, wie viele Seiten ihres Feldes zum Weg gehören.','Felder ohne Zahl können beliebig viele Seiten haben.']},
+  nono:{name:'Nonogramm',c:'var(--ship)',obj:'ausgemalt',grid:true,grp:1,
+    rules:['Male Felder aus, bis ein Bild entsteht.','Die Zahlen links und oben nennen die Längen der ausgemalten Blöcke in dieser Zeile oder Spalte, in der richtigen Reihenfolge.','Zwischen zwei Blöcken bleibt mindestens ein Feld frei.']},
+  mosaic:{name:'Mosaik',c:'var(--star)',obj:'ausgemalt',grid:true,grp:1,
+    rules:['Male Felder aus.','Eine Zahl sagt, wie viele Felder im 3×3-Block um sie herum ausgemalt sind. Das Zahlenfeld selbst zählt mit.','Auch Zahlenfelder dürfen ausgemalt werden.']},
+  mines:{name:'Minensuche',c:'var(--bad)',obj:'Mine',fixn:'Zahl',grid:true,grp:1,
+    rules:['In manchen leeren Feldern liegt eine Mine.','Eine Zahl sagt, wie viele Minen in den bis zu acht Nachbarfeldern liegen, auch schräg.','Auf Zahlenfeldern liegt keine Mine.']},
+  akari:{name:'Lichter',c:'color-mix(in srgb,var(--gold) 70%,var(--ink))',obj:'Lampe',fixn:'Wand',grid:true,grp:1,
+    rules:['Stelle Lampen auf weiße Felder, bis jedes weiße Feld beleuchtet ist.','Eine Lampe leuchtet waagerecht und senkrecht, bis eine schwarze Wand das Licht stoppt.','Keine Lampe darf eine andere anleuchten.','Eine Zahl auf einer Wand sagt, wie viele Lampen direkt an ihren vier Seiten stehen.']},
+  aqua:{name:'Aquarium',c:'var(--water)',obj:'Wasser',grid:true,grp:1,
+    rules:['Fülle die dick umrandeten Becken mit Wasser.','In einem Becken steht das Wasser überall gleich hoch. Ist ein Feld gefüllt, dann sind es auch alle Felder desselben Beckens in derselben Zeile und in den Zeilen darunter.','Die Zahlen sagen, wie viele Felder in der Zeile oder Spalte gefüllt sind.','Ein Becken darf leer bleiben oder ganz voll sein.']},
+  sums:{name:'Summenjagd',c:'var(--bin)',obj:'eingekreist',grid:true,grp:1,
+    rules:['Kreise Zahlen ein und streiche die übrigen.','Die eingekreisten Zahlen einer Zeile ergeben zusammen die Zahl links.','Die eingekreisten Zahlen einer Spalte ergeben zusammen die Zahl oben.']},
+  arrows:{name:'Schatzkarte',c:'var(--hashi)',obj:'Schatz',fixn:'Pfeil',grid:true,grp:2,
+    rules:['In manchen leeren Feldern liegt ein Schatz.','Ein Pfeil mit Zahl sagt, wie viele Schätze in Pfeilrichtung bis zum Rand liegen.','Zwei Schätze liegen nie Seite an Seite. Über Eck dürfen sie sich berühren.','Auf Pfeilfeldern liegt kein Schatz.']},
+  crows:{name:'Vogelscheuchen',c:'var(--tent)',obj:'Vogelscheuche',fixn:'Teich',grid:true,grp:2,
+    rules:['Stelle Vogelscheuchen auf die Ackerfelder.','Eine Vogelscheuche bewacht ihr eigenes Feld und alle Nachbarfelder, auch schräg.','Jedes Ackerfeld wird von genau einer Vogelscheuche bewacht.','Teiche brauchen keine Bewachung, dort steht auch keine Vogelscheuche.']},
 };
 const ROBO={name:'Roboter',c:'var(--robo)'};
 const ICON={
@@ -803,6 +1036,14 @@ const ICON={
   bot:'<svg viewBox="0 0 40 40"><path d="M20 3 L33 33 L20 26 L7 33 Z" fill="var(--robo)" stroke="color-mix(in srgb,var(--robo) 60%,#000)" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="19" r="3.2" fill="var(--paper)"/></svg>',
   battery:'<svg viewBox="0 0 40 40"><rect x="10" y="9" width="20" height="26" rx="3" fill="#F2C230" stroke="#9A7400" stroke-width="2"/><rect x="16" y="5" width="8" height="5" rx="1" fill="#9A7400"/><path d="M22 14 L15 23 H20 L18 30 L25 21 H20 Z" fill="#5A4300"/></svg>',
   flag:'<svg viewBox="0 0 40 40"><rect x="10" y="5" width="3" height="31" rx="1.5" fill="var(--ink)"/><path d="M13 6 H32 L27 13 L32 20 H13 Z" fill="var(--bad)"/></svg>',
+  bulb:'<svg viewBox="0 0 40 40"><path d="M20 4a11 11 0 0 0-6.5 19.9V28h13v-4.1A11 11 0 0 0 20 4Z" fill="var(--gold)" stroke="color-mix(in srgb,var(--gold) 60%,#000)" stroke-width="1.5"/><rect x="14.5" y="29.5" width="11" height="3" rx="1.5" fill="var(--soft)"/><rect x="16" y="33.5" width="8" height="3" rx="1.5" fill="var(--soft)"/></svg>',
+  mine:'<svg viewBox="0 0 40 40"><g stroke="var(--ink)" stroke-width="3" stroke-linecap="round"><path d="M20 4v32M4 20h32M9 9l22 22M31 9 9 31"/></g><circle cx="20" cy="20" r="10.5" fill="var(--ink)"/><circle cx="16.5" cy="16.5" r="2.6" fill="var(--cell)"/></svg>',
+  gem:'<svg viewBox="0 0 40 40"><path d="M11 7h18l8 10-17 18L3 17Z" fill="var(--gold)" stroke="color-mix(in srgb,var(--gold) 55%,#000)" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 17h34M11 7l4 10 5 18 5-18 4-10M15 17l5-10 5 10" fill="none" stroke="color-mix(in srgb,var(--gold) 55%,#000)" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+  crow:'<svg viewBox="0 0 40 40"><rect x="18.5" y="15" width="3" height="22" rx="1" fill="#7A5230"/><rect x="4" y="20" width="32" height="3.4" rx="1.6" fill="#7A5230"/><path d="M11 19h18v10l-3-2-3 2-3-2-3 2-3-2-3 2Z" fill="#C2412D"/><circle cx="20" cy="13" r="6" fill="#F1C232" stroke="#9A7400" stroke-width="1.2"/><path d="M10.5 9h19l-4-7h-11Z" fill="#5A4300"/></svg>',
+  nono:'<svg viewBox="0 0 40 40"><g fill="var(--ship)"><rect x="5" y="5" width="9" height="9"/><rect x="15.5" y="5" width="9" height="9"/><rect x="26" y="15.5" width="9" height="9"/><rect x="5" y="26" width="9" height="9"/><rect x="15.5" y="15.5" width="9" height="9"/><rect x="26" y="26" width="9" height="9"/></g><g fill="none" stroke="var(--line)" stroke-width="1.5"><rect x="26" y="5" width="9" height="9"/><rect x="5" y="15.5" width="9" height="9"/><rect x="15.5" y="26" width="9" height="9"/></g></svg>',
+  mosaic:'<svg viewBox="0 0 40 40"><rect x="4" y="4" width="15" height="15" fill="var(--star)"/><rect x="21" y="21" width="15" height="15" fill="var(--star)"/><rect x="21" y="4" width="15" height="15" fill="none" stroke="var(--star)" stroke-width="2"/><rect x="4" y="21" width="15" height="15" fill="none" stroke="var(--star)" stroke-width="2"/><text x="28.5" y="16.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="sans-serif">3</text><text x="11.5" y="33.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="sans-serif">2</text></svg>',
+  aqua:'<svg viewBox="0 0 40 40"><path d="M7 20h26v13H7Z" fill="var(--water)"/><path d="M7 6v27h26V6" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 20v13" stroke="var(--ink)" stroke-width="1.5"/></svg>',
+  sums:'<svg viewBox="0 0 40 40"><circle cx="13" cy="20" r="9" fill="var(--bin)"/><text x="13" y="24.5" text-anchor="middle" font-size="13" font-weight="700" fill="var(--paper)" font-family="sans-serif">7</text><text x="30" y="24.5" text-anchor="middle" font-size="13" font-weight="700" fill="var(--soft)" font-family="sans-serif">4</text><path d="M24 20h12" stroke="var(--soft)" stroke-width="1.6"/></svg>',
   undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
@@ -810,7 +1051,8 @@ const ICON={
   play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>',
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v16"/><path d="M19 5 9 12l10 7z"/></svg>',
 };
-const typeIcon=t=>({tents:ICON.tent,ships:ICON.ship,stars:ICON.star,binairo:ICON.bin,hashi:ICON.hashi,slither:ICON.loop,robot:ICON.robot})[t];
+const typeIcon=t=>({tents:ICON.tent,ships:ICON.ship,stars:ICON.star,binairo:ICON.bin,hashi:ICON.hashi,slither:ICON.loop,robot:ICON.robot,nono:ICON.nono,mosaic:ICON.mosaic,mines:ICON.mine,akari:ICON.bulb,aqua:ICON.aqua,sums:ICON.sums,arrows:ICON.gem,crows:ICON.crow})[t];
+const arrowIcon=d=>`<svg viewBox="0 0 40 40" style="transform:rotate(${d*90}deg)"><path d="M20 2 37 20h-8v17H11V20H3Z" fill="color-mix(in srgb,var(--hashi) 34%,var(--cell))"/></svg>`;
 const stars3=k=>[1,2,3].map(i=>`<span class="pip${i<=k?' on':''}"></span>`).join('');
 
 // ---------- Speicher ----------
@@ -834,17 +1076,20 @@ function entry(t,name,c,meta){const s=store[t];
 function home(){closeSheet();
   stopTimer();G=null;
   const total=Object.values(store).reduce((a,s)=>a+Object.keys(s.solved).length,0);
-  const logic=Object.entries(TYPES).map(([t,T])=>{const sp=spec(t,store[t].current);
+  const group=g=>Object.entries(TYPES).filter(([t,T])=>(T.grp||0)===g).map(([t,T])=>{const sp=spec(t,store[t].current);
     return entry(t,T.name,T.c,`${sp.n}×${sp.n}${t==='stars'&&sp.k===2?', zwei Sterne':''}, ${TECH[sp.tier][0]}`)}).join('');
   const rs=roboSpec(store.robot.current);
   app.innerHTML=`<div class="wrap">
-    <header class="mast"><h1>Rätsel&shy;heft</h1><p>Sechs Logikrätsel mit eindeutiger Lösung und ein Roboter, der programmiert werden will. Jede gelöste Stufe schaltet die nächste frei.</p></header>
-    <h2 class="sec">Logikrätsel</h2><ul class="book">${logic}</ul>
+    <header class="mast"><h1>Rätsel&shy;heft</h1><p>Vierzehn Logikrätsel mit eindeutiger Lösung und ein Roboter, der programmiert werden will. Jede gelöste Stufe schaltet die nächste frei.</p></header>
+    <h2 class="sec">Logikrätsel</h2><ul class="book">${group(0)}</ul>
+    <h2 class="sec">Bilder, Zahlen, Licht und Wasser</h2><ul class="book">${group(1)}</ul>
+    <h2 class="sec">Eigene Erfindungen</h2><ul class="book">${group(2)}</ul>
     <h2 class="sec">Programmieren</h2><ul class="book">${entry('robot','Roboter',ROBO.c,rs.loops?'Mit Schleifen':'Befehlsfolgen')}</ul>
     <div class="foot"><span>${total} gelöst</span><button class="linkbtn" id="howto">So wird gespielt</button></div></div>`;
   app.querySelectorAll('.entry').forEach(b=>b.onclick=()=>{const t=b.dataset.t;t==='robot'?startRobot(store.robot.current):start(t,store[t].current)});
   $('#howto').onclick=()=>openSheet(`<h3>So wird gespielt</h3>
     <p><b>Tippen</b> wechselt ein Feld: leer, Symbol, Punkt. Der Punkt heißt »hier sicher nichts«. <b>Ziehen</b> überträgt denselben Zustand auf mehrere Felder. Eine <b>Randzahl antippen</b> füllt die leeren Felder ihrer Reihe mit Punkten.</p>
+    <p>Bei <b>Summenjagd</b> heißt das: frei, eingekreist, gestrichen. Bei <b>Mosaik</b> bleibt die Zahl in jedem Zustand sichtbar.</p>
     <p><b>Brückenbau</b>: von Insel zu Insel ziehen oder nacheinander antippen. <b>Rundweg</b>: Linien antippen oder entlang der Punkte ziehen.</p>
     <p><b>Technik</b> zeigt, welche Denkweise ein Rätsel mindestens braucht:</p>
     <ol class="tech">${[1,2,3].map(k=>`<li><b>${TECH[k][0]}</b>: ${TECH[k][1]}</li>`).join('')}</ol>
@@ -864,6 +1109,10 @@ function start(t,level){closeSheet();
     if(t==='tents')P.trees.forEach(i=>fixed[i]=9);
     if(t==='ships')P.hints.forEach(([i,v])=>fixed[i]=v?1:2);
     if(t==='binairo')P.givens.forEach(([i,v])=>fixed[i]=v?1:2);
+    if(t==='akari')P.walls.forEach(i=>fixed[i]=9);
+    if(t==='mines')P.clues.forEach((k,i)=>{if(k>=0)fixed[i]=9});
+    if(t==='arrows')P.arr.forEach(a=>fixed[a.i]=9);
+    if(t==='crows'){P.ponds.forEach(i=>fixed[i]=9);P.hints.forEach(([i,v])=>fixed[i]=v?1:2)}
     const sv=s.saves[level];let board=new Int8Array(len);
     if(sv&&sv.v===variant&&sv.b&&sv.b.length===len)board=Int8Array.from(sv.b);
     for(let i=0;i<len;i++)if(fixed[i]>=0)board[i]=fixed[i]===9?0:fixed[i];
@@ -910,15 +1159,24 @@ function renderGame(){
 
 // ---------- Gitter-Rätsel ----------
 function renderGrid(bw){
-  const{t,P,n}=G;const clues=t==='tents'||t==='ships';
-  const maxW=Math.min(window.innerWidth-32,568);const cs=Math.floor(Math.min(54,maxW/(n+(clues?1:0))));
-  bw.innerHTML=`<div class="board ${t}" id="board" style="--cs:${cs}px;grid-template-columns:${clues?`${cs}px `:''}repeat(${n},${cs}px)"></div>`;
+  const{t,P,n}=G;const nono=t==='nono';const clues=nono||(!!P.rows&&!!P.cols);
+  if(t==='arrows'){G.amap={};P.arr.forEach(a=>G.amap[a.i]=a)}
+  if(t==='akari')G.ak=akGeom(P);
+  const maxW=Math.min(window.innerWidth-32,568);
+  const mr=nono?Math.max(...P.rc.map(x=>x.length)):1,mc=nono?Math.max(...P.cc.map(x=>x.length)):1;
+  const lf=nono?mr*0.62+0.25:1,tf=nono?mc*0.57+0.2:1;
+  const cs=Math.floor(Math.min(54,maxW/(n+(clues?lf:0))));const lw=Math.ceil(cs*lf),th=Math.ceil(cs*tf);
+  bw.innerHTML=`<div class="board ${t}" id="board" style="--cs:${cs}px;grid-template-columns:${clues?`${lw}px `:''}repeat(${n},${cs}px)"></div>`;
   const B=$('#board');let h='';
-  if(clues){h+='<span></span>';for(let c=0;c<n;c++)h+=`<button class="clue" data-col="${c}" style="height:${cs}px" aria-label="Spalte ${c+1}: ${P.cols[c]}">${P.cols[c]}</button>`}
+  const colTxt=c=>nono?P.cc[c].map(x=>`<span>${x}</span>`).join(''):P.cols[c],rowTxt=r=>nono?P.rc[r].map(x=>`<span>${x}</span>`).join(''):P.rows[r];
+  const colLab=c=>nono?P.cc[c].join(' '):P.cols[c],rowLab=r=>nono?P.rc[r].join(' '):P.rows[r];
+  if(clues){h+='<span></span>';for(let c=0;c<n;c++)h+=`<button class="clue${nono?' nc':''}" data-col="${c}" style="height:${th}px" aria-label="Spalte ${c+1}: ${colLab(c)}">${colTxt(c)}</button>`}
   for(let r=0;r<n;r++){
-    if(clues)h+=`<button class="clue" data-row="${r}" aria-label="Zeile ${r+1}: ${P.rows[r]}">${P.rows[r]}</button>`;
+    if(clues)h+=`<button class="clue${nono?' nr':''}" data-row="${r}" aria-label="Zeile ${r+1}: ${rowLab(r)}">${rowTxt(r)}</button>`;
     for(let c=0;c<n;c++){const i=r*n+c;let cls=`cell${r===0?' r0':''}${c===0?' c0':''}${r===n-1?' rl':''}${c===n-1?' cl':''}`,style=`--d:${r+c}`;
-      if(t==='stars'){const g=P.reg[i];style+=`;background:var(--p${g%10})`;
+      if(nono){if(c&&c%5===0)cls+=' g5c';if(r&&r%5===0)cls+=' g5r'}
+      if(G.fixed[i]===9&&t==='akari')cls+=' akw';if(G.fixed[i]===9&&t==='crows')cls+=' pond';
+      if(P.reg){const g=P.reg[i];if(t==='stars')style+=`;background:var(--p${g%10})`;
         if(r===0||P.reg[i-n]!==g)cls+=' bt';if(c===0||P.reg[i-1]!==g)cls+=' bl';if(r===n-1||P.reg[i+n]!==g)cls+=' bb';if(c===n-1||P.reg[i+1]!==g)cls+=' br'}
       if(G.fixed[i]>=0)cls+=' fixedcell';
       h+=`<div class="${cls}" data-i="${i}" style="${style}"></div>`}}
@@ -937,21 +1195,41 @@ function segClass(i){const{n,board}=G,r=(i/n)|0,c=i%n,s=(x,y)=>x>=0&&x<n&&y>=0&&
   const U=s(r-1,c),D=s(r+1,c),L=s(r,c-1),R=s(r,c+1);
   if((L||R)&&!(U||D)){if(L&&R)return'mh';return L?'r':'l'}if((U||D)&&!(L||R)){if(U&&D)return'mv';return U?'d':'u'}
   if(!U&&!D&&!L&&!R)return(w(r-1,c)&&w(r+1,c)&&w(r,c-1)&&w(r,c+1))?'single':'lone';return'lone'}
+function cellHTML(i){const{t,P,board,n}=G;const f=G.fixed[i],b=board[i];
+  if(f===9){if(t==='tents')return ICON.tree;
+    if(t==='akari')return P.num[i]>=0?`<span class="numc">${P.num[i]}</span>`:'';
+    if(t==='mines')return `<span class="numc">${P.clues[i]}</span>`;
+    if(t==='arrows'){const a=G.amap[i];return `<span class="arw">${arrowIcon(a.d)}<b>${a.k}</b></span>`}
+    if(t==='crows')return ICON.wave;return''}
+  if(t==='ships'&&f===1){const sh=shipShape(P.sol,n,i);return `<span class="seg fixed ${sh==='mid'?'mid':sh}"></span>`}
+  if(t==='ships'&&f===2)return ICON.wave;
+  if(t==='binairo')return b?`<span class="bin ${b===1?'dark':'light'}"></span>`:'';
+  if(t==='mosaic'){const k=P.clues[i];
+    if(b===1)return `<span class="fillc">${k>=0?k:''}</span>`;
+    if(b===2)return k>=0?`<span class="numc">${k}</span><span class="dot corner"></span>`:'<span class="dot"></span>';
+    return k>=0?`<span class="numc">${k}</span>`:''}
+  if(t==='sums')return `<span class="numc${b===1?' pick':b===2?' off':''}">${P.val[i]}</span>`;
+  if(b===1)return t==='tents'?ICON.tent:t==='stars'?ICON.star:t==='nono'?'<span class="fillc"></span>':t==='akari'?ICON.bulb:t==='mines'?ICON.mine:t==='aqua'?'<span class="waterc"></span>':t==='arrows'?ICON.gem:t==='crows'?ICON.crow:`<span class="seg ${segClass(i)}"></span>`;
+  if(b===2)return'<span class="dot"></span>';return''}
 function drawGrid(){
-  const{t,n,P,board}=G;const conf=gridConflicts();
-  document.querySelectorAll('#board .cell').forEach(el=>{const i=+el.dataset.i;let h='';
-    if(t==='tents'&&G.fixed[i]===9)h=ICON.tree;
-    else if(t==='ships'&&G.fixed[i]===1){const sh=shipShape(P.sol,n,i);h=`<span class="seg fixed ${sh==='mid'?'mid':sh}"></span>`}
-    else if(t==='ships'&&G.fixed[i]===2)h=ICON.wave;
-    else if(t==='binairo'&&board[i])h=`<span class="bin ${board[i]===1?'dark':'light'}"></span>`;
-    else if(board[i]===1)h=t==='tents'?ICON.tent:t==='stars'?ICON.star:`<span class="seg ${segClass(i)}"></span>`;
-    else if(board[i]===2)h='<span class="dot"></span>';
+  const{t,n,P,board}=G;const conf=gridConflicts();const T=TYPES[t];
+  let mark=null,mcls='';
+  if(t==='akari'){mark=new Uint8Array(n*n);mcls='lit';for(let i=0;i<n*n;i++)if(board[i]===1)G.ak.vis(i).forEach(j=>mark[j]=1)}
+  if(t==='crows'){mark=new Uint8Array(n*n);mcls='grd';for(let i=0;i<n*n;i++)if(board[i]===1){mark[i]=1;nb8(n,i).forEach(j=>{if(G.fixed[j]!==9)mark[j]=1})}}
+  document.querySelectorAll('#board .cell').forEach(el=>{const i=+el.dataset.i;const h=cellHTML(i);
     if(el._h!==h){el.innerHTML=h;el._h=h}el.classList.toggle('conf',conf.has(i));
-    const lab=t==='binairo'?(board[i]===1?'dunkel':board[i]===2?'hell':'leer'):(board[i]===1?TYPES[t].obj:board[i]===2?'Punkt':G.fixed[i]===9?'Baum':'leer');
-    el.setAttribute('aria-label',`Zeile ${((i/n)|0)+1}, Spalte ${i%n+1}: ${lab}`)});
-  if(t==='tents'||t==='ships')document.querySelectorAll('#board .clue').forEach(b=>{let cnt=0;
-    for(let k=0;k<n;k++){const i=b.dataset.row!==undefined?(+b.dataset.row)*n+k:k*n+(+b.dataset.col);if(board[i]===1)cnt++}
-    const tgt=b.dataset.row!==undefined?P.rows[+b.dataset.row]:P.cols[+b.dataset.col];b.classList.toggle('done',cnt===tgt);b.classList.toggle('over',cnt>tgt)});
+    if(mark)el.classList.toggle(mcls,!!mark[i]&&G.fixed[i]!==9);
+    if(t==='akari'&&G.fixed[i]===9&&P.num[i]>=0){const c=G.ak.adj(i).reduce((a,j)=>a+(board[j]===1?1:0),0);el.classList.toggle('done',c===P.num[i]);el.classList.toggle('over',c>P.num[i])}
+    if((t==='mines'&&G.fixed[i]===9)||(t==='mosaic'&&P.clues[i]>=0)){const cells=t==='mosaic'?[i,...nb8(n,i)]:nb8(n,i);const c=cells.reduce((a,j)=>a+(board[j]===1?1:0),0);
+      el.classList.toggle('numdone',c===P.clues[i]&&board[i]!==1);el.classList.toggle('numover',c>P.clues[i]&&board[i]!==1)}
+    const lab=t==='binairo'?(board[i]===1?'dunkel':board[i]===2?'hell':'leer'):(G.fixed[i]===9?(T.fixn||'Baum'):board[i]===1?T.obj:board[i]===2?'Punkt':'leer');
+    const extra=t==='sums'?`, Zahl ${P.val[i]}`:t==='mosaic'&&P.clues[i]>=0?`, Zahl ${P.clues[i]}`:t==='mines'&&G.fixed[i]===9?` ${P.clues[i]}`:t==='arrows'&&G.fixed[i]===9?` ${['nach oben','nach rechts','nach unten','nach links'][G.amap[i].d]}, ${G.amap[i].k}`:t==='akari'&&G.fixed[i]===9&&P.num[i]>=0?` ${P.num[i]}`:'';
+    el.setAttribute('aria-label',`Zeile ${((i/n)|0)+1}, Spalte ${i%n+1}: ${lab}${extra}`)});
+  document.querySelectorAll('#board .clue').forEach(b=>{const row=b.dataset.row!==undefined,k=row?+b.dataset.row:+b.dataset.col;const L=lineIdx(n,k,row);
+    if(t==='nono'){const got=runsOf(L.map(i=>board[i])),want=row?P.rc[k]:P.cc[k];const sum=a=>a.reduce((x,y)=>x+y,0);
+      b.classList.toggle('done',got.join()===want.join());b.classList.toggle('over',sum(got)>sum(want));return}
+    let cnt=0;for(const i of L)if(board[i]===1)cnt+=t==='sums'?P.val[i]:1;
+    const tgt=row?P.rows[k]:P.cols[k];b.classList.toggle('done',cnt===tgt);b.classList.toggle('over',cnt>tgt)});
   if(t==='ships')drawFleet();
 }
 function gridConflicts(){const{t,n,board,P}=G;const S=new Set();
@@ -963,6 +1241,10 @@ function gridConflicts(){const{t,n,board,P}=G;const S=new Set();
   if(t==='binairo'){const lines=[];for(let r=0;r<n;r++)lines.push([...Array(n)].map((_,c)=>r*n+c));for(let c=0;c<n;c++)lines.push([...Array(n)].map((_,r)=>r*n+c));
     for(const L of lines){for(const v of[1,2]){const cs=L.filter(i=>board[i]===v);if(cs.length>n/2)cs.forEach(i=>S.add(i))}
       for(let k=0;k+2<n;k++){const a=board[L[k]];if(a&&a===board[L[k+1]]&&a===board[L[k+2]]){S.add(L[k]);S.add(L[k+1]);S.add(L[k+2])}}}}
+  if(t==='akari'){for(let i=0;i<n*n;i++){if(board[i]!==1)continue;for(const j of G.ak.vis(i))if(j!==i&&board[j]===1){S.add(i);S.add(j)}}}
+  if(t==='arrows'){for(let i=0;i<n*n;i++){if(board[i]!==1)continue;if(i%n<n-1&&board[i+1]===1){S.add(i);S.add(i+1)}if(i+n<n*n&&board[i+n]===1){S.add(i);S.add(i+n)}}}
+  if(t==='crows'){for(let i=0;i<n*n;i++){if(board[i]!==1)continue;const r=(i/n)|0,c=i%n;
+      for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const x=r+a,y=c+b;if((a||b)&&x>=0&&x<n&&y>=0&&y<n&&board[x*n+y]===1){S.add(i);S.add(x*n+y)}}}}
   return S}
 function drawFleet(){const{n,P,board}=G;const seen=new Uint8Array(n*n),found={};const water=(x,y)=>x<0||x>=n||y<0||y>=n||board[x*n+y]===2;
   for(let i=0;i<n*n;i++){if(board[i]!==1||seen[i])continue;const comp=[],st=[i];seen[i]=1;
