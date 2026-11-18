@@ -1,0 +1,1422 @@
+<title>Grundfertigkeiten Klasse 10</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+<style>
+/* Layout: Startseite mit Themenkacheln, danach eine Karte pro Frage (Weiterklicken statt Scrollen) */
+:root {
+  --bg: #f4f6f9;
+  --paper: #ffffff;
+  --fg: #1d2633;
+  --muted: #5b6676;
+  --line: #d5dce6;
+  --zahlen: #2c6cb0;
+  --zahlen-soft: #e3edf8;
+  --funktionen: #2b8a57;
+  --funktionen-soft: #e1f2e8;
+  --daten: #9a7300;
+  --daten-soft: #fbf1cf;
+  --ok: #24864f;
+  --ok-soft: #dff3e7;
+  --bad: #c0392b;
+  --bad-soft: #fbe3e0;
+  --grid: #e3e8ef;
+  --axis: #3a4554;
+  --plot-a: #2c6cb0;
+  --plot-b: #c0392b;
+  --shade: #2c6cb0;
+  --font: "Andika", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --topic: var(--zahlen);
+  --topic-soft: var(--zahlen-soft);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141a22; --paper: #1d2530; --fg: #e8edf3; --muted: #a2adbb; --line: #34404f;
+    --zahlen: #6ea8e6; --zahlen-soft: #1f3247; --funktionen: #5cc28c; --funktionen-soft: #1d3a2b;
+    --daten: #e6bb3c; --daten-soft: #3a321a; --ok: #5cc28c; --ok-soft: #1d3a2b;
+    --bad: #f07a6c; --bad-soft: #43231f; --grid: #2c3644; --axis: #c6cfdb;
+    --plot-a: #6ea8e6; --plot-b: #f07a6c; --shade: #6ea8e6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141a22; --paper: #1d2530; --fg: #e8edf3; --muted: #a2adbb; --line: #34404f;
+  --zahlen: #6ea8e6; --zahlen-soft: #1f3247; --funktionen: #5cc28c; --funktionen-soft: #1d3a2b;
+  --daten: #e6bb3c; --daten-soft: #3a321a; --ok: #5cc28c; --ok-soft: #1d3a2b;
+  --bad: #f07a6c; --bad-soft: #43231f; --grid: #2c3644; --axis: #c6cfdb;
+  --plot-a: #6ea8e6; --plot-b: #f07a6c; --shade: #6ea8e6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font);
+  font-size: 18px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.35rem; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--topic); outline-offset: 2px; }
+
+/* Kopf */
+.kopf { display: flex; flex-direction: column; gap: 6px; }
+.kopf .unter { color: var(--muted); max-width: 62ch; }
+
+/* Startseite */
+.bereich { display: flex; flex-direction: column; gap: 10px; }
+.bereich-name { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.kachel {
+  text-align: left; background: var(--paper); border: 1px solid var(--line);
+  border-left: 6px solid var(--k); border-radius: 10px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+}
+.kachel:hover { border-color: var(--k); }
+.kachel .t { font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; }
+.kachel .info { color: var(--muted); font-size: .9rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chip { font-size: .8rem; padding: 2px 8px; border-radius: 999px; background: var(--k-soft); color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Test */
+.leiste { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.zurueck { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: .95rem; }
+.thema { font-weight: 700; color: var(--topic); }
+.punkte { display: flex; gap: 6px; flex-wrap: wrap; }
+.punkte span { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+.punkte span.jetzt { background: var(--topic); }
+.punkte span.r { background: var(--ok); }
+.punkte span.f { background: var(--bad); }
+
+.karte {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+  padding: 22px clamp(16px, 4vw, 28px); display: flex; flex-direction: column; gap: 18px;
+}
+.nr { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .95rem; }
+.nr b { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--topic); color: var(--paper); font-size: 1rem; }
+.frage { font-size: 1.15rem; max-width: 62ch; }
+.hinweis { color: var(--muted); font-size: .9rem; }
+.sys { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.sys td { padding: 2px 14px 2px 0; }
+.sys td:first-child { color: var(--muted); }
+.fig { overflow-x: auto; }
+.fig svg { display: block; max-width: 100%; height: auto; }
+
+.optionen { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.opt {
+  display: flex; align-items: center; gap: 12px; text-align: left; min-width: 0;
+  background: var(--paper); border: 2px solid var(--line); border-radius: 10px; padding: 10px 12px;
+}
+.opt .bu {
+  flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px;
+  border: 2px solid var(--topic); border-radius: 6px; color: var(--topic); font-weight: 700;
+}
+.opt .tx { min-width: 0; }
+.opt[aria-pressed="true"] { border-color: var(--topic); background: var(--topic-soft); }
+.opt[aria-pressed="true"] .bu { background: var(--topic); color: var(--paper); }
+.opt.ist-r { border-color: var(--ok); background: var(--ok-soft); }
+.opt.ist-r .bu { border-color: var(--ok); background: var(--ok); color: var(--paper); }
+.opt.ist-f { border-color: var(--bad); background: var(--bad-soft); }
+.opt.ist-f .bu { border-color: var(--bad); background: var(--bad); color: var(--paper); }
+.opt.fehlt { border-color: var(--ok); border-style: dashed; }
+.opt .marke { margin-left: auto; font-size: .85rem; font-weight: 700; flex: none; }
+.opt:disabled { cursor: default; }
+
+.rueck { border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.rueck.r { background: var(--ok-soft); }
+.rueck.f { background: var(--bad-soft); }
+.rueck strong { font-size: 1.05rem; }
+
+.knoepfe { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.knopf { border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; background: var(--topic); color: var(--paper); }
+.knopf:disabled { opacity: .4; cursor: not-allowed; }
+.knopf.leise { background: none; border: 2px solid var(--topic); color: var(--topic); }
+
+/* Ergebnis */
+.ergebnis-kopf { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.zahl { font-size: 3rem; font-weight: 700; color: var(--topic); font-variant-numeric: tabular-nums; line-height: 1; }
+.stufe { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 700; }
+.stufe.s1 { background: var(--ok-soft); color: var(--ok); }
+.stufe.s2 { background: var(--daten-soft); color: var(--fg); }
+.stufe.s3 { background: var(--bad-soft); color: var(--bad); }
+.fehlerliste { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.fehlerliste li { border-left: 4px solid var(--bad); padding: 4px 0 4px 12px; display: flex; flex-direction: column; gap: 4px; }
+.fehlerliste .q { font-weight: 700; }
+.fehlerliste .rl { color: var(--muted); font-size: .95rem; }
+
+.ueben { gap: 14px; padding-top: 8px; border-top: 1px solid var(--line); }
+.tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+.tab { padding: 8px 16px; border-radius: 8px 8px 0 0; color: var(--muted); text-decoration: none; font-weight: 700; margin-bottom: -2px; border-bottom: 3px solid transparent; }
+.tab:hover { color: var(--fg); }
+.tab.aktiv { color: var(--fg); border-bottom-color: var(--zahlen); background: var(--paper); }
+.tab:focus-visible { outline: 3px solid var(--zahlen); outline-offset: 2px; }
+.tabelle { overflow-x: auto; }
+.stand { border-collapse: collapse; width: 100%; min-width: 620px; background: var(--paper); font-size: .95rem; }
+.stand th, .stand td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.stand thead th { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.stand tbody th { border-left: 5px solid var(--topic); }
+.stufe.klein { font-size: .8rem; padding: 1px 8px; margin-top: 4px; }
+.sicherung { display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
+.sicherung textarea { font: .9rem/1.4 ui-monospace, Menlo, Consolas, monospace; color: var(--fg); background: var(--paper); border: 2px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; resize: vertical; word-break: break-all; }
+.feldblock { font-weight: 700; }
+.erledigt { color: var(--ok); font-weight: 700; }
+.teile { display: flex; flex-direction: column; }
+.teil { display: grid; grid-template-columns: 2em minmax(0, 1fr) 3em; gap: 0 12px; }
+.teil > .tm { display: flex; flex-direction: column; gap: 10px; padding-bottom: 22px; min-width: 0; }
+.teil > .tl { font-weight: 700; }
+.teil > .tb { border-left: 2px solid var(--axis); text-align: center; font-variant-numeric: tabular-nums; }
+.teil.kopfzeile > .tb { padding-bottom: 6px; }
+.knoepfe.links { justify-content: flex-start; }
+.rueck.muster { background: var(--topic-soft); }
+.tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--topic-soft); color: var(--fg); text-transform: none; letter-spacing: 0; }
+.tag.emp { background: var(--ok-soft); color: var(--ok); }
+.pruefkarte h2 { font-size: 1.4rem; }
+.ueben-kopf { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.knopf.klein { padding: 6px 14px; font-size: .9rem; }
+.ueben .knopf.leise { --topic: var(--fg); }
+.ueb-gruppe { display: flex; flex-direction: column; gap: 8px; }
+.bausteine { display: flex; flex-wrap: wrap; gap: 8px; }
+.baustein { display: inline-flex; align-items: center; gap: 8px; background: var(--paper); border: 2px solid var(--topic); color: var(--fg); border-radius: 999px; padding: 6px 14px; font-size: .95rem; text-align: left; }
+.baustein:hover { background: var(--topic-soft); }
+.haken { font-size: .8rem; font-weight: 700; color: var(--ok); }
+.felder { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.felder .optionen { flex: 1 1 100%; }
+.feld { display: inline-flex; align-items: center; gap: 8px; }
+.feld .fl { font-weight: 700; }
+.feld input { font: inherit; color: var(--fg); background: var(--paper); border: 2px solid var(--line); border-radius: 8px; padding: 6px 10px; width: 9em; max-width: 60vw; }
+.feld input:focus { outline: none; border-color: var(--topic); }
+.feld.falsch input { border-color: var(--bad); background: var(--bad-soft); }
+.feld input:disabled { opacity: .8; }
+.tipp summary { cursor: pointer; color: var(--topic); font-weight: 700; }
+.tipp p { margin-top: 6px; }
+.geschafft { border: 2px solid var(--ok); }
+h3 { font-size: 1.1rem; margin: 0; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .82em; line-height: 1.1; margin: 0 .1em; }
+.frac > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 .2em; }
+.fuss { color: var(--muted); font-size: .85rem; }
+
+@media (max-width: 520px) {
+  body { font-size: 17px; }
+  h1 { font-size: 1.55rem; }
+  .optionen { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .karte { animation: rein .18s ease-out; }
+  @keyframes rein { from { transform: translateY(4px); } to { transform: none; } }
+}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Abbildungen ---------- */
+function felder(n, k, spalten) {
+  const s = 24, g = 3, zeilen = Math.ceil(n / spalten);
+  const w = spalten * (s + g) + g, h = zeilen * (s + g) + g;
+  let r = '';
+  for (let i = 0; i < n; i++) {
+    const x = g + (i % spalten) * (s + g), y = g + Math.floor(i / spalten) * (s + g);
+    r += `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="2" style="fill:${i < k ? 'var(--shade)' : 'var(--paper)'};stroke:var(--axis);stroke-width:1.2"/>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${k} von ${n} Feldern gefärbt">${r}</svg>`;
+}
+
+function plot(o) {
+  const u = o.u || 36, [x0, x1] = o.x, [y0, y1] = o.y, pad = 22;
+  const W = (x1 - x0) * u + 2 * pad, H = (y1 - y0) * u + 2 * pad;
+  const X = x => pad + (x - x0) * u, Y = y => pad + (y1 - y) * u;
+  let s = '';
+  if (o.zahlen !== false) {
+    for (let x = x0; x <= x1; x++) s += `<line x1="${X(x)}" y1="${Y(y0)}" x2="${X(x)}" y2="${Y(y1)}" style="stroke:var(--grid)"/>`;
+    for (let y = y0; y <= y1; y++) s += `<line x1="${X(x0)}" y1="${Y(y)}" x2="${X(x1)}" y2="${Y(y)}" style="stroke:var(--grid)"/>`;
+  }
+  s += `<line x1="${X(x0)}" y1="${Y(0)}" x2="${X(x1) + 10}" y2="${Y(0)}" style="stroke:var(--axis);stroke-width:1.5"/>`;
+  s += `<polygon points="${X(x1) + 14},${Y(0)} ${X(x1) + 6},${Y(0) - 4} ${X(x1) + 6},${Y(0) + 4}" style="fill:var(--axis)"/>`;
+  s += `<line x1="${X(0)}" y1="${Y(y0)}" x2="${X(0)}" y2="${Y(y1) - 10}" style="stroke:var(--axis);stroke-width:1.5"/>`;
+  s += `<polygon points="${X(0)},${Y(y1) - 14} ${X(0) - 4},${Y(y1) - 6} ${X(0) + 4},${Y(y1) - 6}" style="fill:var(--axis)"/>`;
+  s += `<text x="${X(x1) + 6}" y="${Y(0) + 18}" style="fill:var(--fg);font-size:13px">x</text>`;
+  s += `<text x="${X(0) + 8}" y="${Y(y1) - 4}" style="fill:var(--fg);font-size:13px">y</text>`;
+  if (o.zahlen !== false) {
+    for (let x = x0; x < x1; x++) if (x !== 0) s += `<text x="${X(x)}" y="${Y(0) + 15}" text-anchor="middle" style="fill:var(--muted);font-size:11px">${String(x).replace('-', '−')}</text>`;
+    for (let y = y0; y < y1; y++) if (y !== 0) s += `<text x="${X(0) - 6}" y="${Y(y) + 4}" text-anchor="end" style="fill:var(--muted);font-size:11px">${String(y).replace('-', '−')}</text>`;
+    s += `<text x="${X(0) - 6}" y="${Y(0) + 15}" text-anchor="end" style="fill:var(--muted);font-size:11px">0</text>`;
+  }
+  const id = 'c' + Math.random().toString(36).slice(2, 8);
+  s += `<clipPath id="${id}"><rect x="${X(x0)}" y="${Y(y1)}" width="${(x1 - x0) * u}" height="${(y1 - y0) * u}"/></clipPath>`;
+  (o.geraden || []).forEach((g, i) => {
+    const farbe = i === 0 ? 'var(--plot-a)' : 'var(--plot-b)';
+    s += `<line clip-path="url(#${id})" x1="${X(x0)}" y1="${Y(g.m * x0 + g.n)}" x2="${X(x1)}" y2="${Y(g.m * x1 + g.n)}" style="stroke:${farbe};stroke-width:2.5"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Koordinatensystem mit Geraden">${s}</svg>`;
+}
+
+/* ---------- Inhalte ---------- */
+const STUFEN_TEXT = {
+  s1: 'Deine Grundfertigkeiten sind sicher. Du kannst gleich mit den schwierigeren Aufgaben zum Trainieren im Heft beginnen.',
+  s2: 'Deine Grundfertigkeiten sind teilweise sicher. Lies die Erklärungen zu deinen Fehlern und bearbeite dann die Aufgaben zum Trainieren im Heft.',
+  s3: 'Deine Grundfertigkeiten sind noch unsicher. Wiederhole zuerst die Regeln in deinem Merkheft oder frag nach. Beginne danach mit den ersten Aufgaben zum Trainieren.'
+};
+const STUFEN_NAME = { s1: 'sicher', s2: 'teilweise sicher', s3: 'noch unsicher' };
+
+const THEMEN = [
+{ id: 'prozent', titel: 'Prozentrechnung', bereich: 'zahlen', grenzen: [5, 3], fragen: [
+ { q: 'Welche Gleichungen sind richtig? (W: Prozentwert, G: Grundwert, p: Prozentzahl, zum Beispiel p = 15 bei 15 %)', o: ['W = G · p : 100', 'G = W · p : 100', 'p = W : G · 100', 'G = W : p · 100'], r: [0, 2, 3],
+   e: 'Die Grundgleichung lautet W = G · p : 100. Nach p umgestellt gilt p = W : G · 100, nach G umgestellt G = W : p · 100.' },
+ { q: 'Wie viel Prozent sind 45 kg von 300 kg?', o: ['15 %', '6,7 %', '1,5 %', '45 %'], r: [0],
+   e: 'p = W : G · 100 = 45 : 300 · 100 = 15. Es sind 15 %.' },
+ { q: '60 m sind …', o: ['20 % von 300 m', '12 % von 500 m', '{1/4} von 200 m', '150 % von 40 m'], r: [0, 1, 3],
+   e: 'W = G · p : 100: 300 m · 20 : 100 = 60 m, 500 m · 12 : 100 = 60 m und 40 m · 150 : 100 = 60 m. Ein Viertel von 200 m sind nur 50 m.' },
+ { q: '30 % der Lernenden einer Schule sind 120 Lernende. Wie viele Lernende hat die Schule insgesamt?', o: ['36', '400', '360', '4000'], r: [1],
+   e: 'G = W : p · 100 = 120 : 30 · 100 = 400.' },
+ { q: 'In welchen Zeilen passen Prozentwert, Grundwert und Prozentsatz zusammen?', o: ['W = 18, G = 120, p = 15 %', 'W = 7, G = 35, p = 25 %', 'W = 54, G = 60, p = 90 %', 'W = 12, G = 8, p = 150 %'], r: [0, 2, 3],
+   e: 'Rechne jeweils p = W : G · 100. 18 : 120 · 100 = 15, 54 : 60 · 100 = 90 und 12 : 8 · 100 = 150. Bei 7 : 35 · 100 = 20 ergeben sich 20 %.' }
+]},
+{ id: 'terme', titel: 'Terme', bereich: 'zahlen', grenzen: [5, 3], fragen: [
+ { q: 'Berechne den Wert des Terms 3x² − 2x für x = −2.', o: ['16', '8', '−8', '32'], r: [0],
+   e: '3 · (−2)² − 2 · (−2) = 3 · 4 + 4 = 16. Setze negative Zahlen immer in Klammern ein.' },
+ { q: 'Welcher Term passt zu: „Das Dreifache einer Zahl, vermindert um 4“?', o: ['3(x − 4)', '3x − 4', 'x³ − 4', '4 − 3x'], r: [1],
+   e: 'Zuerst wird die Zahl verdreifacht (3x), dann wird 4 abgezogen. Bei 3(x − 4) würde zuerst 4 abgezogen.' },
+ { q: 'Welche Vereinfachungen sind richtig?', o: ['5a − (2a − 3) = 3a + 3', '4x · 3x = 12x', '2y + 3y² = 5y³', '−2(3 − x) = −6 + 2x'], r: [0, 3],
+   e: 'Ein Minus vor der Klammer ändert alle Vorzeichen in der Klammer. 4x · 3x = 12x². 2y und 3y² sind keine gleichartigen Glieder und lassen sich nicht zusammenfassen.' },
+ { q: 'Welche Umformungen sind richtig?', o: ['(x + 3)² = x² + 9', '(a − 4)² = a² − 8a + 16', '(2 + y)(2 − y) = 4 − y²', '2(x + 5)² = 2x² + 20x + 50'], r: [1, 2, 3],
+   e: 'Bei (x + 3)² fehlt das gemischte Glied: (x + 3)² = x² + 6x + 9. Bei 2(x + 5)² wendest du zuerst die binomische Formel an und multiplizierst dann mit 2.' },
+ { q: 'Klammere den größtmöglichen Faktor aus: 12ab − 18a', o: ['6a(2b − 3)', '6(2ab − 3a)', '3a(4b − 6)', '6a(2b − 18)'], r: [0],
+   e: 'Der größte gemeinsame Teiler von 12 und 18 ist 6, außerdem enthalten beide Glieder a. B und C sind richtig gerechnet, aber nicht vollständig ausgeklammert.' }
+]},
+{ id: 'gleichungen', titel: 'Lineare Gleichungen', bereich: 'zahlen', grenzen: [5, 3], fragen: [
+ { q: 'Wie viele Lösungen kann eine lineare Gleichung haben?', o: ['keine', 'genau eine', 'genau zwei', 'unendlich viele'], r: [0, 1, 3],
+   e: 'Meist gibt es genau eine Lösung. Entsteht beim Umformen eine falsche Aussage wie 3 = 5, gibt es keine Lösung. Bei einer wahren Aussage wie 0 = 0 ist jede Zahl eine Lösung.' },
+ { q: 'Welche Zahlen sind Lösung der Gleichung 4x + 2 = 0?', o: ['−0,5', '0,5', '−{1/2}', '−2'], r: [0, 2],
+   e: '4x = −2, also x = −2 : 4 = −0,5. Das ist dieselbe Zahl wie −{1/2}.' },
+ { q: 'Welche Umformungen führen zur Lösung der Gleichung 5x + 15 = 40?', o: ['− 15, dann : 5', ': 5, dann − 3', ': 5, dann − 15', '− 40, dann : 5'], r: [0, 1],
+   e: 'Dividiert man zuerst durch 5, wird jeder Summand dividiert: x + 3 = 8. Deshalb muss danach 3 subtrahiert werden. Beide Wege führen zu x = 5.' },
+ { q: 'Eine Mutter ist dreimal so alt wie ihre Tochter. Zusammen sind sie 52 Jahre alt. Welche Gleichungen passen? (x: Alter der Tochter)', o: ['x + 3x = 52', '3x = 52', 'x + 3 = 52', '4x = 52'], r: [0, 3],
+   e: 'Die Tochter ist x Jahre alt, die Mutter 3x. Zusammen x + 3x = 4x = 52. Die Tochter ist 13 Jahre alt.' },
+ { q: 'Stelle die Formel V = a · b · c nach b um.', o: ['b = {V/a · c}', 'b = V − a − c', 'b = {a · c/V}', 'b = V · a · c'], r: [0],
+   e: 'b wird mit a und mit c multipliziert. Dividiere deshalb beide Seiten durch a · c: b = V : (a · c).' }
+]},
+{ id: 'lgs', titel: 'Lineare Gleichungssysteme', bereich: 'funktionen', grenzen: [7, 5], fragen: [
+ { q: 'Gib die Lösungsmenge des Gleichungssystems an.', sys: [['I', 'x + y = 7'], ['II', 'x − y = 3']], o: ['L = {(5; 2)}', 'L = {(2; 5)}', 'L = {5}', 'L = {(4; 3)}'], r: [0],
+   e: 'Addiert man beide Gleichungen, erhält man 2x = 10, also x = 5. Aus I folgt y = 2. Die Lösung ist ein Zahlenpaar (x; y).' },
+ { q: 'Welche zweite Gleichung bildet mit y = 2x − 1 ein Gleichungssystem mit unendlich vielen Lösungen?', o: ['y = 2x + 1', '2y = 4x − 2', 'y = −2x − 1', '4x − 2y = 2'], r: [1, 3],
+   e: 'Unendlich viele Lösungen gibt es, wenn beide Gleichungen dieselbe Gerade beschreiben. Stellt man B und D nach y um, erhält man jeweils y = 2x − 1.' },
+ { q: 'Welche zweite Gleichung bildet mit y = −x + 2 ein Gleichungssystem ohne Lösung?', o: ['y = −x + 5', 'y = x + 2', '2y = −2x + 4', 'x + y = −1'], r: [0, 3],
+   e: 'Keine Lösung gibt es bei parallelen Geraden: gleicher Anstieg, aber ein anderer Schnittpunkt mit der y-Achse. D umgestellt ergibt y = −x − 1. C beschreibt dieselbe Gerade.' },
+ { q: 'Welches Gleichungssystem wurde hier grafisch gelöst?', fig: () => plot({ x: [-2, 5], y: [-2, 4], geraden: [{ m: 1, n: -1 }, { m: -0.5, n: 2 }] }),
+   o: ['I  y = x − 1\nII  y = −0,5x + 2', 'I  y = x + 1\nII  y = −0,5x + 2', 'I  y = x − 1\nII  y = 0,5x + 2', 'I  y = −x + 3\nII  y = −0,5x + 2'], r: [0],
+   e: 'Die steigende Gerade schneidet die y-Achse bei −1 und steigt pro Kästchen nach rechts um 1. Die fallende Gerade schneidet die y-Achse bei 2 und fällt um 0,5. Der Schnittpunkt ist S(2 | 1), also L = {(2; 1)}.' },
+ { q: 'Wie viele Lösungen kann ein lineares Gleichungssystem mit zwei Gleichungen und zwei Variablen haben?', o: ['keine', 'genau eine', 'genau zwei', 'unendlich viele'], r: [0, 1, 3],
+   e: 'Zwei Geraden schneiden sich in einem Punkt, sind parallel oder liegen aufeinander. Zwei Schnittpunkte sind nicht möglich.' },
+ { q: 'Paul ist dreimal so alt wie Lea. Zusammen sind sie 32 Jahre alt. Welcher Term gibt in diesem Gleichungssystem Pauls Alter an?', sys: [['I', '3x = y'], ['II', 'x + y = 32']], o: ['x', 'y', '3y', 'kein Term'], r: [1],
+   e: 'Aus I folgt: y ist das Dreifache von x. Also steht x für Leas Alter und y für Pauls Alter.' },
+ { q: 'Welche Gleichung entsteht, wenn man Gleichung I in Gleichung II einsetzt?', sys: [['I', 'y = 2x'], ['II', '3x + y = 15']], o: ['3x + 2x = 15', '3 · 2x + y = 15', '3x + y = 2x', '3x + 2 = 15'], r: [0],
+   e: 'Beim Einsetzungsverfahren ersetzt man y in Gleichung II durch 2x. Man erhält x = 3 und y = 6.' },
+ { q: 'Anna kauft 3 Roggenbrötchen und 2 Körnerbrötchen für 2,90 €. Ben kauft 4 Roggenbrötchen und 5 Körnerbrötchen für 5,50 €. Welche Gleichungssysteme passen? (r: Preis eines Roggenbrötchens, k: Preis eines Körnerbrötchens)',
+   o: ['I  3r + 2k = 2,90\nII  4r + 5k = 5,50', 'I  3k + 2r = 2,90\nII  4k + 5r = 5,50', 'I  3r + 2k = 5,50\nII  4r + 5k = 2,90', 'I  2k + 3r = 2,90\nII  5k + 4r = 5,50'], r: [0, 3],
+   e: 'Die Anzahl muss zur richtigen Sorte gehören. Bei D sind nur die Summanden vertauscht. Ein Roggenbrötchen kostet 0,50 €, ein Körnerbrötchen 0,70 €.' }
+]},
+{ id: 'funktionen', titel: 'Lineare Funktionen', bereich: 'funktionen', grenzen: [10, 7], fragen: [
+ { q: 'Für welche Funktionen gilt f(2) = −1?', o: ['f(x) = 3x − 7', 'f(x) = −x + 1', 'f(x) = 2x + 1', 'f(x) = −0,5x'], r: [0, 1, 3],
+   e: 'Setze x = 2 ein: 6 − 7 = −1, −2 + 1 = −1 und −0,5 · 2 = −1. Bei C ergibt sich 5.' },
+ { q: 'In der Gleichung y = mx + n gibt n …', o: ['… den Schnittpunkt des Graphen mit der y-Achse an.', '… die Nullstelle an.', '… den Anstieg an.', '… an, wie steil der Graph ist.'], r: [0],
+   e: 'Der Graph schneidet die y-Achse im Punkt (0 | n). Der Anstieg m gibt an, wie steil der Graph ist.' },
+ { q: 'Die Abbildung zeigt den Graphen einer linearen Funktion y = mx + n. Welche Aussage ist richtig?', fig: () => plot({ x: [-2, 3], y: [-2, 3], zahlen: false, geraden: [{ m: -1.5, n: 1.5 }] }),
+   o: ['m > 0 und n > 0', 'm < 0 und n > 0', 'm < 0 und n < 0', 'm > 0 und n < 0'], r: [1],
+   e: 'Der Graph fällt, also ist m negativ. Er schneidet die y-Achse oberhalb der x-Achse, also ist n positiv.' },
+ { q: 'Forme die Gleichung 6x − 2y = 8 so um, dass du m und n ablesen kannst.', o: ['m = 6 und n = 8', 'm = 3 und n = 4', 'm = 3 und n = −4', 'm = −3 und n = 4'], r: [2],
+   e: '−2y = −6x + 8. Dividiert durch −2 ergibt sich y = 3x − 4.' },
+ { q: 'Welche Geraden verlaufen durch den Punkt P(2 | 3) und haben den Anstieg m = −1?', o: ['y = −x + 5', 'y = −x + 3', 'y = x + 1', 'x + y = 5'], r: [0, 3],
+   e: 'Setze P ein: 3 = −1 · 2 + n, also n = 5. Die Gleichung x + y = 5 ist nach y umgestellt dieselbe Gerade.' },
+ { q: 'Welche Gleichung hat die Gerade, die parallel zur x-Achse durch den Punkt P(4 | −2) verläuft?', o: ['y = −2', 'y = 4', 'x = 4', 'y = −2x'], r: [0],
+   e: 'Eine Parallele zur x-Achse hat den Anstieg 0. Jeder ihrer Punkte hat dieselbe y-Koordinate wie P.' },
+ { q: 'Was trifft auf alle Graphen linearer Funktionen zu?', o: ['Sie sind Geraden.', 'Sie verlaufen durch den Koordinatenursprung.', 'Sie schneiden die y-Achse.', 'Sie schneiden die x-Achse.'], r: [0, 2],
+   e: 'Jeder Graph schneidet die y-Achse bei n. Durch den Ursprung gehen nur Graphen mit n = 0. Parallelen zur x-Achse wie y = 3 haben keine Nullstelle.' },
+ { q: 'Welchen Anstieg hat die Gerade durch die Punkte P(1 | 4) und Q(3 | −2)?', o: ['m = −3', 'm = 3', 'm = −2', 'm = −{1/3}'], r: [0],
+   e: 'm = (−2 − 4) : (3 − 1) = −6 : 2 = −3.' },
+ { q: 'Welche Zuordnungen sind linear?', o: ['Anzahl der Hefte → Preis', 'gefahrene Kilometer → Preis einer Taxifahrt (Grundgebühr und Preis pro Kilometer)', 'Seitenlänge eines Quadrats → Flächeninhalt', 'Fahrzeit bei 50 km/h → zurückgelegter Weg'], r: [0, 1, 3],
+   e: 'Bei A, B und D kommt pro Einheit immer derselbe Betrag dazu. Der Flächeninhalt eines Quadrats wächst mit a², das ist nicht linear.' },
+ { q: 'Welche Nullstelle hat die Funktion f(x) = 2x − 5?', o: ['x = 2,5', 'x = −2,5', 'x = 5', 'x = −5'], r: [0],
+   e: '2x − 5 = 0, also 2x = 5 und x = 2,5.' },
+ { q: 'Welche Gleichung gehört zum abgebildeten Graphen?', fig: () => plot({ x: [-4, 4], y: [-2, 4], geraden: [{ m: 0.5, n: 1 }] }),
+   o: ['y = 0,5x + 1', 'y = 2x + 1', 'y = 0,5x − 1', 'y = x + 0,5'], r: [0],
+   e: 'Der Graph schneidet die y-Achse bei 1. Geht man 2 Kästchen nach rechts, steigt er um 1 Kästchen. Der Anstieg ist also 1 : 2 = 0,5.' }
+]},
+{ id: 'wahrscheinlichkeit', titel: 'Wahrscheinlichkeits­rechnung', bereich: 'daten', grenzen: [11, 8], fragen: [
+ { q: 'Bei welchen Zufallsversuchen sind alle Ergebnisse gleich wahrscheinlich?', o: ['Werfen eines Spielwürfels', 'Werfen einer Reißzwecke (Rücken oder Seite)', 'Werfen einer Münze', 'Drehen eines Glücksrads mit den Feldern 180°, 90° und 90°'], r: [0, 2],
+   e: 'Beim Würfel und bei der Münze ist jedes Ergebnis gleich wahrscheinlich. Bei der Reißzwecke und beim Glücksrad mit unterschiedlich großen Feldern ist das nicht so.' },
+ { q: 'Eine Münze wird einmal geworfen. Mit welcher Wahrscheinlichkeit liegt „Zahl“ oben?', o: ['{1/2}', '0,2', '2', '0,5'], r: [0, 3],
+   e: 'Es gibt zwei gleich wahrscheinliche Ergebnisse. {1/2} und 0,5 sind dieselbe Zahl. Wahrscheinlichkeiten liegen immer zwischen 0 und 1.' },
+ { q: 'Ein Ereignis E kann nicht eintreten. Dann gilt …', o: ['P(E) = 0', 'P(E) = 0,5', 'P(E) = 1', 'P(E) = 100 %'], r: [0],
+   e: 'Ein unmögliches Ereignis hat die Wahrscheinlichkeit 0.' },
+ { q: 'Ein Ereignis E tritt mit Sicherheit ein. Dann gilt …', o: ['P(E) = 0', 'P(E) = 0,5', 'P(E) = 1', 'P(E) = 100 %'], r: [2, 3],
+   e: 'Ein sicheres Ereignis hat die Wahrscheinlichkeit 1. Das sind 100 %.' },
+ { q: 'Ein Ereignis A tritt mit einer Wahrscheinlichkeit von 35 % ein. Wie groß ist die Wahrscheinlichkeit für das Gegenereignis A̅?', o: ['35 %', '65 %', '0', '{13/20}'], r: [1, 3],
+   e: 'P(A) + P(A̅) = 1. Also gilt P(A̅) = 100 % − 35 % = 65 %. Außerdem ist {13/20} = 0,65.' },
+ { q: 'Ein Würfel wird einmal geworfen. Mit welcher Wahrscheinlichkeit fällt eine Augenzahl größer als 4?', o: ['{1/3}', '{2/6}', '{1/2}', '{4/6}'], r: [0, 1],
+   e: 'Günstig sind 5 und 6, also 2 von 6 möglichen Ergebnissen. {2/6} = {1/3}.' },
+ { q: 'Ein Würfel wird einmal geworfen. Für welche Ereignisse ist die Wahrscheinlichkeit {1/2}?', o: ['Die Augenzahl ist gerade.', 'Die Augenzahl ist eine Primzahl.', 'Die Augenzahl ist kleiner als 3.', 'Die Augenzahl ist größer als 3.'], r: [0, 1, 3],
+   e: 'Gerade: 2, 4, 6. Primzahl: 2, 3, 5. Größer als 3: 4, 5, 6. Das sind jeweils 3 von 6 Ergebnissen. Kleiner als 3 sind nur 1 und 2.' },
+ { q: 'In einem Korb liegen 40 Äpfel, 8 davon sind faul. Mit welcher Wahrscheinlichkeit nimmt man zufällig einen guten Apfel?', o: ['{4/5}', '{8/40}', '80 %', '{32/40}'], r: [0, 2, 3],
+   e: '32 von 40 Äpfeln sind gut. {32/40} = {4/5} = 80 %. {8/40} ist die Wahrscheinlichkeit für einen faulen Apfel.' },
+ { q: 'In einer Urne liegen 4 rote und 6 blaue Kugeln. Es werden nacheinander zwei Kugeln gezogen. Die erste Kugel wird zurückgelegt. Mit welcher Wahrscheinlichkeit sind beide Kugeln rot?', o: ['16 %', '13,3 %', '40 %', '1,6 %'], r: [0],
+   e: 'Mit Zurücklegen bleibt die Wahrscheinlichkeit beim zweiten Zug gleich: {4/10} · {4/10} = {16/100} = 16 %.' },
+ { q: 'In einer Urne liegen 4 rote und 6 blaue Kugeln. Es werden nacheinander zwei Kugeln gezogen. Die erste Kugel wird nicht zurückgelegt. Mit welcher Wahrscheinlichkeit sind beide Kugeln rot?', o: ['{2/15}', '{16/100}', '{12/90}', '{4/10}'], r: [0, 2],
+   e: 'Beim zweiten Zug liegen nur noch 3 rote unter 9 Kugeln: {4/10} · {3/9} = {12/90} = {2/15}.' },
+ { q: 'Zwei Würfel werden gleichzeitig geworfen. Mit welcher Wahrscheinlichkeit beträgt die Augensumme 4?', o: ['{3/36}', '{1/12}', '{4/36}', '{2/36}'], r: [0, 1],
+   e: 'Günstig sind (1, 3), (2, 2) und (3, 1). Das sind 3 von 36 möglichen Ergebnissen. {3/36} = {1/12}.' },
+ { q: 'Eine Münze wird zweimal geworfen. Mit welcher Wahrscheinlichkeit liegt beide Male „Zahl“ oben?', o: ['{1/4}', '{2/4}', '{3/4}', '{1/2}'], r: [0],
+   e: '{1/2} · {1/2} = {1/4}. Möglich sind (Z, Z), (Z, W), (W, Z) und (W, W).' }
+]}
+];
+
+const BEREICHE = {
+  zahlen: { name: 'Zahlen und Größen', farbe: '--zahlen' },
+  funktionen: { name: 'Zuordnungen und Funktionen', farbe: '--funktionen' },
+  daten: { name: 'Daten und Zufall', farbe: '--daten' }
+};
+
+/* ---------- Hilfen ---------- */
+const BU = ['A', 'B', 'C', 'D'];
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function mathe(s) {
+  return esc(s)
+    .replace(/\{([^{}\/]+)\/([^{}]+)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>')
+    .replace(/\n/g, '<br>');
+}
+function lade() { try { return JSON.parse(localStorage.getItem('gf10-ergebnisse') || '{}'); } catch (e) { return {}; } }
+function speichere(id, wert) { try { const a = lade(); a[id] = wert; localStorage.setItem('gf10-ergebnisse', JSON.stringify(a)); } catch (e) {} }
+function stufe(t, n) { return n >= t.grenzen[0] ? 's1' : n >= t.grenzen[1] ? 's2' : 's3'; }
+function setzeFarbe(t) {
+  const r = document.documentElement.style;
+  if (!t) { r.removeProperty('--topic'); r.removeProperty('--topic-soft'); return; }
+  const f = BEREICHE[t.bereich].farbe;
+  r.setProperty('--topic', `var(${f})`);
+  r.setProperty('--topic-soft', `var(${f}-soft)`);
+}
+
+/* ---------- Übungsbausteine ---------- */
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const nz = (a, b) => { let v; do { v = R(a, b); } while (v === 0); return v; };
+function fz(x) { const r = Math.round(x * 10000) / 10000; return String(r).replace('.', ',').replace('-', '−'); }
+function fe(x) { return x.toFixed(2).replace('.', ',') + ' €'; }
+function par(x) { return x < 0 ? `(${fz(x)})` : fz(x); }
+function koef(c, v) { if (v === '') return fz(Math.abs(c)); const a = Math.abs(c); return (a === 1 ? '' : fz(a)) + v; }
+function poly(teile) {
+  let s = '';
+  for (const [c, v] of teile) {
+    if (c === 0) continue;
+    if (s === '') s = (c < 0 ? '−' : '') + koef(c, v);
+    else s += (c < 0 ? ' − ' : ' + ') + koef(c, v);
+  }
+  return s === '' ? '0' : s;
+}
+const lin = (m, n) => poly([[m, 'x'], [n, '']]);
+function ggt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; }
+function bruch(a, b) { const g = ggt(a, b); return `{${a / g}/${b / g}}`; }
+function prozent(v) { return fz(Math.round(v * 1000) / 10) + ' %'; }
+const FACH = { 2: 'Doppelte', 3: 'Dreifache', 4: 'Vierfache', 5: 'Fünffache', 6: 'Sechsfache', 7: 'Siebenfache' };
+const FACHD = { 2: 'Doppelten', 3: 'Dreifachen', 4: 'Vierfachen', 5: 'Fünffachen', 6: 'Sechsfachen', 7: 'Siebenfachen' };
+
+const BAUSTEINE = {
+ p1: { thema: 'prozent', titel: 'Prozentsatz berechnen', tipp: 'p = W : G · 100', gen() {
+   let G, p, W;
+   do { G = pick([40, 80, 120, 150, 200, 240, 250, 300, 400, 500, 600, 800]); p = pick([5, 10, 12, 15, 20, 25, 30, 35, 40, 45, 60, 75, 80]); W = G * p / 100; } while (!Number.isInteger(W));
+   const text = pick([
+     `Von ${G} Lernenden einer Schule kommen ${W} zu Fuß. Wie viel Prozent sind das?`,
+     `Bei einer Umfrage antworten ${W} von ${G} Befragten mit „ja“. Wie viel Prozent sind das?`,
+     `Ein Wald hat ${G} Bäume. ${W} davon sind Eichen. Wie viel Prozent der Bäume sind Eichen?`]);
+   return { text, felder: [{ label: 'p =', einheit: '%', typ: 'zahl', wert: p }],
+     loesung: `p = W : G · 100 = ${W} : ${G} · 100 = ${p}. Es sind ${p} %.` }; } },
+ p2: { thema: 'prozent', titel: 'Prozentwert berechnen', tipp: 'W = G · p : 100', gen() {
+   if (Math.random() < .5) {
+     let G, p, W;
+     do { G = pick([60, 120, 160, 240, 300, 450, 500, 800, 1200, 2400]); p = pick([5, 8, 10, 12, 15, 20, 25, 30, 40]); W = G * p / 100; } while (!Number.isInteger(W * 100));
+     const text = pick([`Eine Klassenfahrt kostet ${fe(G)}. Der Förderverein übernimmt ${p} % der Kosten. Wie viel Euro übernimmt der Förderverein?`,
+       `Ein Laptop kostet ${fe(G)}. Im Angebot gibt es ${p} % Rabatt. Wie viel Euro spart man?`]);
+     return { text, felder: [{ label: 'W =', einheit: '€', typ: 'zahl', wert: W }], loesung: `W = G · p : 100 = ${fz(G)} · ${p} : 100 = ${fz(W)}. Das sind ${fe(W)}.` };
+   }
+   let G, p, W;
+   do { G = pick([80, 120, 200, 240, 300, 400, 450, 600, 750]); p = pick([5, 10, 15, 20, 25, 30, 40, 60]); W = G * p / 100; } while (!Number.isInteger(W));
+   const text = pick([`In einem Wald stehen ${G} Bäume. ${p} % davon sind Buchen. Wie viele Buchen sind das?`,
+     `An einer Schule lernen ${G} Lernende. ${p} % davon kommen mit dem Bus. Wie viele Lernende sind das?`]);
+   return { text, felder: [{ label: 'W =', typ: 'zahl', wert: W }], loesung: `W = G · p : 100 = ${G} · ${p} : 100 = ${W}.` }; } },
+ p3: { thema: 'prozent', titel: 'Grundwert berechnen', tipp: 'G = W : p · 100', gen() {
+   let G, p, W;
+   do { G = pick([80, 120, 160, 200, 240, 300, 400, 500, 600, 800, 1200]); p = pick([5, 10, 15, 20, 25, 30, 40, 60, 75]); W = G * p / 100; } while (!Number.isInteger(W));
+   if (Math.random() < .5) return { text: `${W} Lernende sind ${p} % aller Lernenden einer Schule. Wie viele Lernende hat die Schule?`,
+     felder: [{ label: 'G =', typ: 'zahl', wert: G }], loesung: `G = W : p · 100 = ${W} : ${p} · 100 = ${G}.` };
+   return { text: `Eine Anzahlung von ${fe(W)} sind ${p} % des Kaufpreises. Wie hoch ist der Kaufpreis?`,
+     felder: [{ label: 'G =', einheit: '€', typ: 'zahl', wert: G }], loesung: `G = W : p · 100 = ${W} : ${p} · 100 = ${G}. Der Kaufpreis beträgt ${fe(G)}.` }; } },
+
+ t1: { thema: 'terme', titel: 'Termwerte berechnen', tipp: 'Setze negative Zahlen in Klammern ein. Beachte: (−3)² = 9.', gen() {
+   const a = pick([2, 3, -2, 4, -1]), b = nz(-5, 5), c = R(-6, 6), x = R(-4, -1), v = a * x * x + b * x + c;
+   return { text: `Berechne den Wert des Terms ${poly([[a, 'x²'], [b, 'x'], [c, '']])} für x = ${fz(x)}.`,
+     felder: [{ label: 'Wert:', typ: 'zahl', wert: v }],
+     loesung: `${fz(a)} · (${fz(x)})² ${b < 0 ? '−' : '+'} ${fz(Math.abs(b))} · (${fz(x)})${c ? (c < 0 ? ' − ' : ' + ') + fz(Math.abs(c)) : ''} = ${fz(a * x * x)} ${b * x < 0 ? '−' : '+'} ${fz(Math.abs(b * x))}${c ? (c < 0 ? ' − ' : ' + ') + fz(Math.abs(c)) : ''} = ${fz(v)}` }; } },
+ t2: { thema: 'terme', titel: 'Klammern auflösen und zusammenfassen', tipp: 'Ein Minus vor der Klammer ändert alle Vorzeichen in der Klammer. Fasse danach gleichartige Glieder zusammen.', gen() {
+   let a, b, c, d, e, A, B;
+   do { a = R(2, 5); b = R(1, 4); c = nz(-6, 6); d = R(1, 5); e = nz(-6, 6); A = a * b - d; B = a * c - e; } while (A === 0 || (a === 3 && b === 2 && c === -4 && d === 1 && e === -5));
+   return { text: `Vereinfache den Term so weit wie möglich: ${a}(${poly([[b, 'x'], [c, '']])}) − (${poly([[d, 'x'], [e, '']])})`,
+     felder: [{ label: 'Ergebnis:', typ: 'term', term: `${A}*x+(${B})`, vars: ['x'], ohneKlammer: true }],
+     loesung: `${poly([[a * b, 'x'], [a * c, ''], [-d, 'x'], [-e, '']])} = ${poly([[A, 'x'], [B, '']])}` }; } },
+ t3: { thema: 'terme', titel: 'Binomische Formeln', tipp: '(a + b)² = a² + 2ab + b², (a − b)² = a² − 2ab + b², (a + b)(a − b) = a² − b²', gen() {
+   const a = R(1, 3), b = R(1, 6), f = R(0, 2), ax = koef(a, 'x');
+   const d = [`(${ax} + ${b})²`, `(${ax} − ${b})²`, `(${ax} + ${b})(${ax} − ${b})`][f];
+   const t = [[a * a, 2 * a * b, b * b], [a * a, -2 * a * b, b * b], [a * a, 0, -b * b]][f];
+   return { text: `Löse die Klammern auf: ${d}`,
+     felder: [{ label: 'Ergebnis:', typ: 'term', term: `${t[0]}*x^2+(${t[1]})*x+(${t[2]})`, vars: ['x'], ohneKlammer: true }],
+     loesung: `${d} = ${poly([[t[0], 'x²'], [t[1], 'x'], [t[2], '']])}` }; } },
+ t4: { thema: 'terme', titel: 'Ausklammern', tipp: 'Suche den größten gemeinsamen Teiler der Zahlen und die Variablen, die in allen Gliedern vorkommen.', gen() {
+   const g = pick([2, 3, 4, 5, 6]);
+   let p, q; do { p = R(2, 7); q = R(1, 7); } while (p === q || ggt(p, q) !== 1);
+   const s = pick([1, -1]);
+   if (Math.random() < .5) {
+     return { text: `Klammere den größtmöglichen Faktor aus: ${poly([[g * p, 'ab'], [s * g * q, 'a']])}`,
+       felder: [{ label: 'Ergebnis:', typ: 'term', term: `${g}*a*(${p}*b+(${s * q}))`, vars: ['a', 'b'], faktor: `${g}*a` }],
+       loesung: `${poly([[g * p, 'ab'], [s * g * q, 'a']])} = ${g}a(${poly([[p, 'b'], [s * q, '']])})` };
+   }
+   return { text: `Klammere den größtmöglichen Faktor aus: ${poly([[g * p, 'x²'], [s * g * q, 'x']])}`,
+     felder: [{ label: 'Ergebnis:', typ: 'term', term: `${g}*x*(${p}*x+(${s * q}))`, vars: ['x'], faktor: `${g}*x` }],
+     loesung: `${poly([[g * p, 'x²'], [s * g * q, 'x']])} = ${g}x(${poly([[p, 'x'], [s * q, '']])})` }; } },
+ t5: { thema: 'terme', titel: 'Terme aus Texten aufstellen', tipp: 'Achte auf die Reihenfolge: Was wird zuerst gerechnet? Eine Summe oder Differenz, die danach multipliziert wird, braucht Klammern.', gen() {
+   const k = R(2, 6), m = R(2, 9);
+   const v = pick([
+     [`das ${FACH[k]} einer Zahl x, vermindert um ${m}`, `${k}*x-${m}`, `${k}x − ${m}`],
+     [`die Summe aus einer Zahl x und ${m}, multipliziert mit ${k}`, `${k}*(x+${m})`, `${k}(x + ${m})`],
+     [`die Hälfte einer Zahl x, vermehrt um ${m}`, `x/2+${m}`, `x : 2 + ${m}`],
+     [`das Quadrat einer Zahl x, vermindert um ${m}`, `x^2-${m}`, `x² − ${m}`],
+     [`das ${FACH[k]} der Differenz aus einer Zahl x und ${m}`, `${k}*(x-${m})`, `${k}(x − ${m})`]]);
+   return { text: `Schreibe als Term: ${v[0]}.`, felder: [{ label: 'Term:', typ: 'term', term: v[1], vars: ['x'] }], loesung: v[2] }; } },
+
+ g1: { thema: 'gleichungen', titel: 'Lineare Gleichungen lösen', tipp: 'Löse zuerst Klammern auf. Bringe dann alle Glieder mit x auf eine Seite und alle Zahlen auf die andere.', gen() {
+   const x = R(-6, 9), f = R(0, 2);
+   if (f === 0) { const a = R(2, 9), b = nz(-12, 12), c = a * x + b;
+     return { text: `Löse die Gleichung: ${lin(a, b)} = ${fz(c)}`, felder: [{ label: 'x =', typ: 'zahl', wert: x }], loesung: `${a}x = ${fz(c - b)}, also x = ${fz(x)}` }; }
+   let a, c; do { a = R(2, 9); c = R(1, 9); } while (a === c);
+   if (f === 1) { const b = nz(-10, 10), d = a * x + b - c * x;
+     return { text: `Löse die Gleichung: ${lin(a, b)} = ${lin(c, d)}`, felder: [{ label: 'x =', typ: 'zahl', wert: x }], loesung: `${fz(a - c)}x = ${fz(d - b)}, also x = ${fz(x)}` }; }
+   const a2 = R(2, 5); let c2; do { c2 = R(1, 6); } while (c2 === a2);
+   let b = nz(-5, 5); if (a2 === 4 && b === -2 && c2 === 2) b = -3;
+   const d = a2 * (x + b) - c2 * x;
+   return { text: `Löse die Gleichung: ${a2}(${lin(1, b)}) = ${lin(c2, d)}`, felder: [{ label: 'x =', typ: 'zahl', wert: x }],
+     loesung: `${lin(a2, a2 * b)} = ${lin(c2, d)}, also ${fz(a2 - c2)}x = ${fz(d - a2 * b)} und x = ${fz(x)}` }; } },
+ g2: { thema: 'gleichungen', titel: 'Gleichungen zu Sachaufgaben', tipp: 'Lege fest, wofür x steht. Schreibe dann den Text als Gleichung und löse sie.', gen() {
+   const f = R(0, 3);
+   if (f === 0) { const k = R(3, 4), t = R(8, 14), s = t * (k + 1);
+     return { text: `Eine Mutter ist ${k}-mal so alt wie ihre Tochter. Zusammen sind sie ${s} Jahre alt. Wie alt ist die Tochter?`,
+       felder: [{ label: 'Alter der Tochter:', einheit: 'Jahre', typ: 'zahl', wert: t }], loesung: `x + ${k}x = ${s}, also ${k + 1}x = ${s} und x = ${t}` }; }
+   if (f === 1) { const a = R(5, 30), b = R(3, 25), u = 2 * (a + b);
+     return { text: `Ein Rechteck hat einen Umfang von ${u} cm. Eine Seite ist ${a} cm lang. Wie lang ist die andere Seite?`,
+       felder: [{ label: 'andere Seite:', einheit: 'cm', typ: 'zahl', wert: b }], loesung: `2 · (${a} + x) = ${u}, also ${a} + x = ${u / 2} und x = ${b}` }; }
+   if (f === 2) { const k = R(2, 7), m = R(3, 15), x = R(2, 12), r = k * x + m;
+     return { text: `Addiert man zum ${FACHD[k]} einer Zahl ${m}, erhält man ${r}. Wie heißt die Zahl?`,
+       felder: [{ label: 'Zahl:', typ: 'zahl', wert: x }], loesung: `${k}x + ${m} = ${r}, also ${k}x = ${r - m} und x = ${x}` }; }
+   const g = pick([2.5, 3, 3.5, 4]), p = pick([1.5, 2, 2.5]), km = R(3, 15), s = g + p * km;
+   return { text: `Eine Taxifahrt kostet ${fe(g)} Grundgebühr und ${fe(p)} pro Kilometer. Eine Fahrt kostet ${fe(s)}. Wie viele Kilometer wurden gefahren?`,
+     felder: [{ label: 'Strecke:', einheit: 'km', typ: 'zahl', wert: km }], loesung: `${fz(g)} + ${fz(p)}x = ${fz(s)}, also ${fz(p)}x = ${fz(s - g)} und x = ${km}` }; } },
+ g3: { thema: 'gleichungen', titel: 'Formeln umstellen', tipp: 'Gehe die Rechenschritte rückwärts: Was mit der gesuchten Variable gerechnet wird, machst du in umgekehrter Reihenfolge rückgängig.', gen() {
+   const f = pick([
+     ['u = 2a + 2b', 'a', '(u-2*b)/2', ['u', 'b'], '{u − 2b/2}'],
+     ['V = a · b · c', 'c', 'V/(a*b)', ['V', 'a', 'b'], '{V/a · b}'],
+     ['A = {a + c/2} · h', 'h', '2*A/(a+c)', ['A', 'a', 'c'], '{2A/a + c}'],
+     ['W = G · p : 100', 'p', '100*W/G', ['W', 'G'], '{100 · W/G}'],
+     ['W = G · p : 100', 'G', '100*W/p', ['W', 'p'], '{100 · W/p}'],
+     ['s = v · t', 't', 's/v', ['s', 'v'], '{s/v}'],
+     ['y = m · x + n', 'm', '(y-n)/x', ['y', 'n', 'x'], '{y − n/x}'],
+     ['A = a · b', 'b', 'A/a', ['A', 'a'], '{A/a}']]);
+   return { text: `Stelle die Formel ${f[0]} nach ${f[1]} um. Achte auf Groß- und Kleinbuchstaben.`,
+     felder: [{ label: `${f[1]} =`, typ: 'term', term: f[2], vars: f[3], gesucht: f[1] }], loesung: `${f[1]} = ${f[4]}` }; } },
+ g4: { thema: 'gleichungen', titel: 'Anzahl der Lösungen erkennen', tipp: 'Forme so weit wie möglich um. Bleibt eine wahre Aussage wie 6 = 6, gibt es unendlich viele Lösungen. Bei einer falschen Aussage wie 6 = 4 gibt es keine Lösung.', gen() {
+   const t = R(0, 2), a = R(2, 5), b = nz(-5, 5);
+   const opts = ['keine Lösung', 'genau eine Lösung', 'unendlich viele Lösungen'];
+   if (t === 0) { const c = a * b + nz(-4, 4);
+     return { text: `Wie viele Lösungen hat die Gleichung ${a}(${lin(1, b)}) = ${lin(a, c)}?`, felder: [{ typ: 'wahl', opts, richtig: 0 }],
+       loesung: `${lin(a, a * b)} = ${lin(a, c)}. Subtrahiert man ${a}x, bleibt ${fz(a * b)} = ${fz(c)}. Das ist falsch, also keine Lösung.` }; }
+   if (t === 2) return { text: `Wie viele Lösungen hat die Gleichung ${a}(${lin(1, b)}) = ${lin(a, a * b)}?`, felder: [{ typ: 'wahl', opts, richtig: 2 }],
+     loesung: `${lin(a, a * b)} = ${lin(a, a * b)}. Subtrahiert man ${a}x, bleibt ${fz(a * b)} = ${fz(a * b)}. Das ist immer wahr, also unendlich viele Lösungen.` };
+   let c; do { c = R(1, 6); } while (c === a);
+   const x = R(-4, 6), d = a * (x + b) - c * x;
+   return { text: `Wie viele Lösungen hat die Gleichung ${a}(${lin(1, b)}) = ${lin(c, d)}?`, felder: [{ typ: 'wahl', opts, richtig: 1 }],
+     loesung: `Die Anzahl der x ist auf beiden Seiten verschieden. Es gibt genau eine Lösung: x = ${fz(x)}.` }; } },
+
+ l1: { thema: 'lgs', titel: 'Gleichungssysteme rechnerisch lösen', tipp: 'Einsetzungsverfahren: Ist eine Gleichung nach y umgestellt, setze sie in die andere ein. Additionsverfahren: Multipliziere so, dass beim Addieren eine Variable wegfällt.', gen() {
+   const x = R(-4, 6), y = R(-4, 6);
+   if (Math.random() < .5) {
+     let m, a, b; do { m = nz(-3, 3); a = nz(-4, 5); b = nz(-3, 4); } while (a + b * m === 0 || (m === 2 && y - m * x === -7));
+     const n = y - m * x, c = a * x + b * y;
+     return { text: 'Löse das Gleichungssystem.', sys: [['I', `y = ${lin(m, n)}`], ['II', `${poly([[a, 'x'], [b, 'y']])} = ${fz(c)}`]],
+       felder: [{ label: 'x =', typ: 'zahl', wert: x }, { label: 'y =', typ: 'zahl', wert: y }],
+       loesung: `I in II einsetzen: ${poly([[a, 'x']])} ${b < 0 ? '−' : '+'} ${Math.abs(b) === 1 ? '' : fz(Math.abs(b))}(${lin(m, n)}) = ${fz(c)}. Daraus folgt x = ${fz(x)} und y = ${fz(y)}, also L = {(${fz(x)}; ${fz(y)})}.` };
+   }
+   let a1, b1, a2, b2; do { a1 = R(1, 4); b1 = nz(-3, 3); a2 = R(1, 4); b2 = nz(-3, 3); } while (a1 * b2 - a2 * b1 === 0);
+   return { text: 'Löse das Gleichungssystem.', sys: [['I', `${poly([[a1, 'x'], [b1, 'y']])} = ${fz(a1 * x + b1 * y)}`], ['II', `${poly([[a2, 'x'], [b2, 'y']])} = ${fz(a2 * x + b2 * y)}`]],
+     felder: [{ label: 'x =', typ: 'zahl', wert: x }, { label: 'y =', typ: 'zahl', wert: y }],
+     loesung: `x = ${fz(x)} und y = ${fz(y)}, also L = {(${fz(x)}; ${fz(y)})}. Probe in I: ${fz(a1)} · ${par(x)} ${b1 < 0 ? '−' : '+'} ${fz(Math.abs(b1))} · ${par(y)} = ${fz(a1 * x + b1 * y)}.` }; } },
+ l2: { thema: 'lgs', titel: 'Anzahl der Lösungen bei Gleichungssystemen', tipp: 'Stelle beide Gleichungen nach y um. Gleicher Anstieg und gleicher y-Achsenabschnitt: unendlich viele Lösungen. Gleicher Anstieg, anderer Abschnitt: keine Lösung. Verschiedener Anstieg: genau eine Lösung.', gen() {
+   const m = pick([-3, -2, -1, -0.5, 0.5, 1, 2, 3]), n = nz(-4, 4), t = R(0, 2);
+   let m2 = m, n2 = n;
+   if (t === 0) n2 = n + nz(-3, 3);
+   if (t === 1) m2 = m + pick([1, -1, 2]);
+   const k = Number.isInteger(m2) ? pick([1, 2, -1, 3]) : pick([2, -2, 4]);
+   const opts = ['keine Lösung', 'genau eine Lösung', 'unendlich viele Lösungen'];
+   const richtig = t === 0 ? 0 : t === 1 ? 1 : 2;
+   return { text: 'Wie viele Lösungen hat das Gleichungssystem?', sys: [['I', `y = ${lin(m, n)}`], ['II', `${poly([[-k * m2, 'x'], [k, 'y']])} = ${fz(k * n2)}`]],
+     felder: [{ typ: 'wahl', opts, richtig }],
+     loesung: `II nach y umgestellt: y = ${lin(m2, n2)}. ${t === 0 ? 'Gleicher Anstieg, anderer y-Achsenabschnitt: Die Geraden sind parallel.' : t === 1 ? 'Die Anstiege sind verschieden: Die Geraden schneiden sich in einem Punkt.' : 'Beide Gleichungen beschreiben dieselbe Gerade.'}` }; } },
+ l3: { thema: 'lgs', titel: 'Gleichungssysteme zu Sachaufgaben', tipp: 'Lege zwei Variablen fest. Jede Information im Text ergibt eine Gleichung.', gen() {
+   const f = R(0, 2);
+   if (f === 0) { const h = R(5, 30), k = R(3, 20);
+     return { text: `Auf einem Hof leben Hühner und Kaninchen. Zusammen haben sie ${h + k} Köpfe und ${2 * h + 4 * k} Beine. Wie viele Hühner und wie viele Kaninchen sind es?`,
+       felder: [{ label: 'Hühner:', typ: 'zahl', wert: h }, { label: 'Kaninchen:', typ: 'zahl', wert: k }],
+       loesung: `I h + k = ${h + k}, II 2h + 4k = ${2 * h + 4 * k}. Lösung: ${h} Hühner und ${k} Kaninchen.` }; }
+   if (f === 1) { const pe = pick([6, 7, 8, 9, 10, 12]), pk = pick([3, 4, 5]), e = R(2, 12), k = R(3, 20), s = e * pe + k * pk;
+     return { text: `Eine Gruppe aus ${e + k} Personen zahlt für einen Zoobesuch insgesamt ${fe(s)}. Ein Erwachsener zahlt ${fe(pe)}, ein Kind ${fe(pk)}. Wie viele Erwachsene und wie viele Kinder sind in der Gruppe?`,
+       felder: [{ label: 'Erwachsene:', typ: 'zahl', wert: e }, { label: 'Kinder:', typ: 'zahl', wert: k }],
+       loesung: `I e + k = ${e + k}, II ${pe}e + ${pk}k = ${s}. Lösung: ${e} Erwachsene und ${k} Kinder.` }; }
+   const r = pick([0.35, 0.4, 0.45, 0.5, 0.55]), k = pick([0.6, 0.65, 0.7, 0.75, 0.8]);
+   let a1, b1, a2, b2; do { a1 = R(2, 5); b1 = R(1, 4); a2 = R(1, 5); b2 = R(2, 6); } while (a1 * b2 === a2 * b1);
+   const s1 = Math.round((a1 * r + b1 * k) * 100) / 100, s2 = Math.round((a2 * r + b2 * k) * 100) / 100;
+   return { text: `Anna kauft ${a1} Roggenbrötchen und ${b1} Körnerbrötchen für ${fe(s1)}. Ben kauft ${a2} Roggenbrötchen und ${b2} Körnerbrötchen für ${fe(s2)}. Wie viel kostet ein Roggenbrötchen, wie viel ein Körnerbrötchen?`,
+     felder: [{ label: 'Roggenbrötchen:', einheit: '€', typ: 'zahl', wert: r }, { label: 'Körnerbrötchen:', einheit: '€', typ: 'zahl', wert: k }],
+     loesung: `I ${a1}r + ${b1}k = ${fz(s1)}, II ${a2}r + ${b2}k = ${fz(s2)}. Ein Roggenbrötchen kostet ${fe(r)}, ein Körnerbrötchen ${fe(k)}.` }; } },
+ l4: { thema: 'lgs', titel: 'Gleichungssysteme grafisch lösen', tipp: 'Die Lösung ist der Schnittpunkt der beiden Geraden. Lies zuerst den x-Wert, dann den y-Wert ab.', gen() {
+   let sx, sy, m1, m2, n1, n2;
+   do { sx = R(-2, 3); sy = R(-2, 3); m1 = pick([-2, -1, -0.5, 0.5, 1, 2]); m2 = pick([-2, -1, -0.5, 0.5, 1, 2]); n1 = sy - m1 * sx; n2 = sy - m2 * sx; }
+   while (m1 === m2 || !Number.isInteger(n1) || !Number.isInteger(n2) || Math.abs(n1) > 4 || Math.abs(n2) > 4);
+   return { text: 'Lies die Lösung des Gleichungssystems am Schnittpunkt der beiden Geraden ab.',
+     fig: plot({ x: [-4, 5], y: [-3, 5], geraden: [{ m: m1, n: n1 }, { m: m2, n: n2 }] }),
+     felder: [{ label: 'x =', typ: 'zahl', wert: sx }, { label: 'y =', typ: 'zahl', wert: sy }],
+     loesung: `S(${fz(sx)} | ${fz(sy)}), also L = {(${fz(sx)}; ${fz(sy)})}. Die Geraden haben die Gleichungen y = ${lin(m1, n1)} und y = ${lin(m2, n2)}.` }; } },
+
+ f1: { thema: 'funktionen', titel: 'Funktionswerte berechnen', tipp: 'Setze den x-Wert für x ein. Negative Zahlen in Klammern.', gen() {
+   const m = pick([-3, -2, -1, -0.5, 0.5, 1, 1.5, 2, 3, 4]), n = R(-5, 5), x = R(-4, 5), v = m * x + n;
+   return { text: `Gegeben ist die Funktion f(x) = ${lin(m, n)}. Berechne f(${fz(x)}).`, felder: [{ label: `f(${fz(x)}) =`, typ: 'zahl', wert: v }],
+     loesung: `f(${fz(x)}) = ${fz(m)} · ${par(x)}${n ? (n < 0 ? ' − ' : ' + ') + fz(Math.abs(n)) : ''} = ${fz(v)}` }; } },
+ f2: { thema: 'funktionen', titel: 'Anstieg und y-Achsenabschnitt ablesen', tipp: 'n ist die Stelle, an der der Graph die y-Achse schneidet. Für m zeichnest du ein Steigungsdreieck: m = Änderung von y : Änderung von x.', gen() {
+   const m = pick([-2, -1, -0.5, 0.5, 1, 2]), n = R(-2, 3);
+   return { text: 'Lies den Anstieg m und den y-Achsenabschnitt n des Graphen ab.', fig: plot({ x: [-4, 4], y: [-3, 4], geraden: [{ m, n }] }),
+     felder: [{ label: 'm =', typ: 'zahl', wert: m }, { label: 'n =', typ: 'zahl', wert: n }],
+     loesung: `Der Graph schneidet die y-Achse bei ${fz(n)}. ${Number.isInteger(m) ? `Geht man 1 nach rechts, ändert sich y um ${fz(m)}.` : `Geht man 2 nach rechts, ändert sich y um ${fz(2 * m)}.`} Also y = ${lin(m, n)}.` }; } },
+ f3: { thema: 'funktionen', titel: 'Gleichung aus zwei Punkten', tipp: 'm = (y₂ − y₁) : (x₂ − x₁). Setze dann einen Punkt in y = mx + n ein und berechne n.', gen() {
+   const m = pick([-3, -2, -1, -0.5, 0, 0.5, 1, 2, 3]), n = R(-4, 5), x1 = 2 * R(-2, 1), x2 = x1 + pick([2, 4]), y1 = m * x1 + n, y2 = m * x2 + n;
+   return { text: `Eine Gerade verläuft durch die Punkte P(${fz(x1)} | ${fz(y1)}) und Q(${fz(x2)} | ${fz(y2)}). Bestimme ihre Gleichung y = mx + n.`,
+     felder: [{ label: 'm =', typ: 'zahl', wert: m }, { label: 'n =', typ: 'zahl', wert: n }],
+     loesung: `m = (${fz(y2)} − ${par(y1)}) : (${fz(x2)} − ${par(x1)}) = ${fz(y2 - y1)} : ${fz(x2 - x1)} = ${fz(m)}. Aus ${fz(y1)} = ${fz(m)} · ${par(x1)} + n folgt n = ${fz(n)}. Also y = ${lin(m, n)}.` }; } },
+ f4: { thema: 'funktionen', titel: 'Nullstellen berechnen', tipp: 'Setze f(x) = 0 und löse die Gleichung nach x auf.', gen() {
+   let r, m, n;
+   do { r = pick([-4, -3, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 2.5, 3, 4]); m = Number.isInteger(r) ? pick([-3, -2, -1, 1, 2, 3, 4, 5]) : pick([-4, -2, 2, 4]); n = -m * r; } while (n === 0);
+   return { text: `Berechne die Nullstelle der Funktion f(x) = ${lin(m, n)}.`, felder: [{ label: 'x₀ =', typ: 'zahl', wert: r }],
+     loesung: `${lin(m, n)} = 0, also ${koef(m, 'x').replace(/^/, m < 0 ? '−' : '')} = ${fz(-n)} und x₀ = ${fz(r)}` }; } },
+ f5: { thema: 'funktionen', titel: 'Gleichungen nach y umstellen', tipp: 'Bringe alles außer y auf die rechte Seite. Dividiere dann durch die Zahl vor y.', gen() {
+   const m = pick([-3, -2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2, 3]), n = nz(-5, 5), b = Number.isInteger(m) ? pick([2, -2, 4, 3, -1]) : pick([2, -2, 4]);
+   const a = -m * b, c = n * b;
+   return { text: 'Forme die Gleichung so um, dass du den Anstieg m und den y-Achsenabschnitt n ablesen kannst.', sys: [['', `${poly([[a, 'x'], [b, 'y']])} = ${fz(c)}`]],
+     felder: [{ label: 'm =', typ: 'zahl', wert: m }, { label: 'n =', typ: 'zahl', wert: n }],
+     loesung: `${poly([[b, 'y']])} = ${poly([[-a, 'x'], [c, '']])}. Dividiert durch ${par(b)}: y = ${lin(m, n)}.` }; } },
+
+ w1: { thema: 'wahrscheinlichkeit', titel: 'Wahrscheinlichkeiten bei einstufigen Zufallsversuchen', tipp: 'P = Anzahl der günstigen Ergebnisse : Anzahl der möglichen Ergebnisse. Du kannst als Bruch, Dezimalzahl oder in Prozent antworten.', gen() {
+   const f = R(0, 2);
+   if (f === 0) { const e = pick([['eine gerade Augenzahl', 3], ['eine Augenzahl größer als 4', 2], ['eine Primzahl', 3], ['eine Augenzahl kleiner als 3', 2], ['eine 6', 1], ['eine Augenzahl größer als 1', 5]]);
+     return { text: `Ein Würfel wird einmal geworfen. Wie groß ist die Wahrscheinlichkeit für ${e[0]}?`, felder: [{ label: 'P =', typ: 'wkt', wert: e[1] / 6 }],
+       loesung: `${e[1]} günstige von 6 möglichen Ergebnissen: P = ${bruch(e[1], 6)} ≈ ${prozent(e[1] / 6)}` }; }
+   if (f === 1) { const r = R(1, 6), b = R(1, 6), g = R(1, 5), n = r + b + g;
+     const e = pick([['rot', r], ['blau', b], ['nicht blau', r + g], ['rot oder grün', r + g], ['nicht rot', b + g]]);
+     return { text: `In einer Urne liegen ${r} rote, ${b} blaue und ${g} grüne Kugeln. Eine Kugel wird zufällig gezogen. Wie groß ist die Wahrscheinlichkeit für das Ereignis „Die Kugel ist ${e[0]}.“?`,
+       felder: [{ label: 'P =', typ: 'wkt', wert: e[1] / n }], loesung: `${e[1]} günstige von ${n} Kugeln: P = ${bruch(e[1], n)} ≈ ${prozent(e[1] / n)}` }; }
+   const n = pick([5, 6, 8, 10, 12]), k = R(1, n - 1);
+   return { text: `Ein Glücksrad hat ${n} gleich große Felder. ${k} davon sind Gewinnfelder. Mit welcher Wahrscheinlichkeit bleibt der Zeiger auf einem Gewinnfeld stehen?`,
+     felder: [{ label: 'P =', typ: 'wkt', wert: k / n }], loesung: `P = ${bruch(k, n)} ≈ ${prozent(k / n)}` }; } },
+ w2: { thema: 'wahrscheinlichkeit', titel: 'Gegenereignis', tipp: 'P(A) + P(A̅) = 1, also P(A̅) = 1 − P(A).', gen() {
+   if (Math.random() < .5) { let p; do { p = R(5, 95); } while (p === 50);
+     return { text: pick([`Die Wahrscheinlichkeit, dass ein Zug pünktlich ankommt, beträgt ${p} %. Wie groß ist die Wahrscheinlichkeit, dass er nicht pünktlich ankommt?`,
+       `Ein Saatkorn keimt mit einer Wahrscheinlichkeit von ${p} %. Wie groß ist die Wahrscheinlichkeit, dass es nicht keimt?`]),
+       felder: [{ label: 'P =', typ: 'wkt', wert: (100 - p) / 100 }], loesung: `P(A̅) = 100 % − ${p} % = ${100 - p} %` }; }
+   let a, b; do { b = pick([5, 6, 7, 8, 9, 10, 12]); a = R(1, b - 1); } while (ggt(a, b) !== 1);
+   return { text: `Bei einem Spiel gewinnt man mit der Wahrscheinlichkeit {${a}/${b}}. Wie groß ist die Wahrscheinlichkeit, nicht zu gewinnen?`,
+     felder: [{ label: 'P =', typ: 'wkt', wert: (b - a) / b }], loesung: `P(A̅) = 1 − {${a}/${b}} = {${b - a}/${b}}` }; } },
+ w3: { thema: 'wahrscheinlichkeit', titel: 'Zweistufig mit Zurücklegen', tipp: 'Zeichne ein Baumdiagramm. Mit Zurücklegen bleiben die Wahrscheinlichkeiten beim zweiten Zug gleich. Entlang eines Pfades multiplizieren, mehrere Pfade addieren.', gen() {
+   let r = R(2, 6), b = R(2, 8); if (r === 3 && b === 7) b = 6; const n = r + b, f = R(0, 3);
+   const frage = ['beide Kugeln rot', 'beide Kugeln blau', 'beide Kugeln gleichfarbig', 'genau eine Kugel rot'][f];
+   const z = [r * r, b * b, r * r + b * b, 2 * r * b][f], N = n * n;
+   const weg = [`{${r}/${n}} · {${r}/${n}}`, `{${b}/${n}} · {${b}/${n}}`, `{${r}/${n}} · {${r}/${n}} + {${b}/${n}} · {${b}/${n}}`, `{${r}/${n}} · {${b}/${n}} + {${b}/${n}} · {${r}/${n}}`][f];
+   return { text: `In einer Urne liegen ${r} rote und ${b} blaue Kugeln. Es werden nacheinander zwei Kugeln gezogen. Die erste Kugel wird zurückgelegt. Wie groß ist die Wahrscheinlichkeit, dass ${frage} sind?`,
+     felder: [{ label: 'P =', typ: 'wkt', wert: z / N }], loesung: `${weg} = {${z}/${N}} ≈ ${prozent(z / N)}` }; } },
+ w4: { thema: 'wahrscheinlichkeit', titel: 'Zweistufig ohne Zurücklegen', tipp: 'Zeichne ein Baumdiagramm. Ohne Zurücklegen ist beim zweiten Zug eine Kugel weniger in der Urne. Entlang eines Pfades multiplizieren, mehrere Pfade addieren.', gen() {
+   let r = R(2, 6), b = R(2, 8); if (r === 3 && b === 7) b = 6; const n = r + b, f = R(0, 3);
+   const frage = ['beide Kugeln rot', 'beide Kugeln blau', 'beide Kugeln gleichfarbig', 'genau eine Kugel rot'][f];
+   const z = [r * (r - 1), b * (b - 1), r * (r - 1) + b * (b - 1), 2 * r * b][f], N = n * (n - 1);
+   const weg = [`{${r}/${n}} · {${r - 1}/${n - 1}}`, `{${b}/${n}} · {${b - 1}/${n - 1}}`, `{${r}/${n}} · {${r - 1}/${n - 1}} + {${b}/${n}} · {${b - 1}/${n - 1}}`, `{${r}/${n}} · {${b}/${n - 1}} + {${b}/${n}} · {${r}/${n - 1}}`][f];
+   return { text: `In einer Urne liegen ${r} rote und ${b} blaue Kugeln. Es werden nacheinander zwei Kugeln gezogen. Die erste Kugel wird nicht zurückgelegt. Wie groß ist die Wahrscheinlichkeit, dass ${frage} sind?`,
+     felder: [{ label: 'P =', typ: 'wkt', wert: z / N }], loesung: `${weg} = {${z}/${N}} ≈ ${prozent(z / N)}` }; } },
+ w5: { thema: 'wahrscheinlichkeit', titel: 'Würfel und Münzen mehrfach werfen', tipp: 'Zähle die günstigen Ergebnisse systematisch. Zwei Würfel haben 36 mögliche Ergebnisse, drei Münzwürfe 8.', gen() {
+   const f = R(0, 3);
+   if (f === 0) { const s = R(3, 11), k = 6 - Math.abs(s - 7);
+     return { text: `Zwei Würfel werden gleichzeitig geworfen. Wie groß ist die Wahrscheinlichkeit, dass die Augensumme ${s} beträgt?`,
+       felder: [{ label: 'P =', typ: 'wkt', wert: k / 36 }], loesung: `${k} günstige von 36 Ergebnissen: P = ${bruch(k, 36)} ≈ ${prozent(k / 36)}` }; }
+   if (f === 1) return { text: 'Zwei Würfel werden gleichzeitig geworfen. Wie groß ist die Wahrscheinlichkeit, dass mindestens eine 6 fällt?',
+     felder: [{ label: 'P =', typ: 'wkt', wert: 11 / 36 }], loesung: `Gegenereignis „keine 6“: {25/36}. P = 1 − {25/36} = {11/36} ≈ ${prozent(11 / 36)}` };
+   if (f === 2) return { text: 'Eine Münze wird dreimal geworfen. Wie groß ist die Wahrscheinlichkeit, dass dreimal „Zahl“ oben liegt?',
+     felder: [{ label: 'P =', typ: 'wkt', wert: 1 / 8 }], loesung: '{1/2} · {1/2} · {1/2} = {1/8} = 12,5 %' };
+   return { text: 'Zwei Würfel werden gleichzeitig geworfen. Wie groß ist die Wahrscheinlichkeit für einen Pasch (zwei gleiche Augenzahlen)?',
+     felder: [{ label: 'P =', typ: 'wkt', wert: 6 / 36 }], loesung: 'Günstig sind (1, 1), (2, 2), …, (6, 6). P = {6/36} = {1/6} ≈ 16,7 %' }; } }
+};
+
+const ZUORDNUNG = {
+  prozent: [['p1', 'p2', 'p3'], ['p1'], ['p2'], ['p3'], ['p1']],
+  terme: [['t1'], ['t5'], ['t2'], ['t3'], ['t4']],
+  gleichungen: [['g4'], ['g1'], ['g1'], ['g2'], ['g3']],
+  lgs: [['l1'], ['l2'], ['l2'], ['l4'], ['l2'], ['l3'], ['l1'], ['l3']],
+  funktionen: [['f1'], ['f2'], ['f2'], ['f5'], ['f3'], ['f3'], ['f2'], ['f3'], ['f1'], ['f4'], ['f2']],
+  wahrscheinlichkeit: [['w1'], ['w1'], ['w1'], ['w1'], ['w2'], ['w1'], ['w1'], ['w1'], ['w3'], ['w4'], ['w5'], ['w3']]
+};
+
+/* ---------- Eingaben prüfen ---------- */
+function zahlLesen(s) {
+  const t = String(s).replace(/−/g, '-').replace(/\s/g, '').replace(/[€%a-zA-Z]+$/g, '').replace(',', '.');
+  if (!/^-?\d+(\.\d+)?$/.test(t)) return NaN;
+  return parseFloat(t);
+}
+function wktLesen(s) {
+  const t = String(s).replace(/−/g, '-').replace(/\s/g, '').replace(/,/g, '.');
+  if (/^\d+\/\d+$/.test(t)) { const [a, b] = t.split('/').map(Number); return b ? a / b : NaN; }
+  if (/^\d+(\.\d+)?%$/.test(t)) return parseFloat(t) / 100;
+  if (/^\d+(\.\d+)?$/.test(t)) { const v = parseFloat(t); return v > 1 ? -1 : v; }
+  return NaN;
+}
+function termParse(str) {
+  const s = String(str).replace(/−/g, '-').replace(/[·×]/g, '*').replace(/:/g, '/').replace(/²/g, '^2').replace(/³/g, '^3').replace(/,/g, '.').replace(/\s+/g, '');
+  const tok = s.match(/\d+(\.\d+)?|[A-Za-z]|[-+*/^()]/g);
+  if (!tok || tok.join('') !== s) throw new Error('Zeichen');
+  let i = 0; const vars = new Set();
+  const peek = () => tok[i], next = () => tok[i++];
+  function expr() { let a = term(); while (peek() === '+' || peek() === '-') { const op = next(), b = term(), x = a; a = op === '+' ? e => x(e) + b(e) : e => x(e) - b(e); } return a; }
+  function term() {
+    let a = unary();
+    for (;;) {
+      const p = peek();
+      if (p === '*' || p === '/') { next(); const b = unary(), x = a; a = p === '*' ? e => x(e) * b(e) : e => x(e) / b(e); }
+      else if (p !== undefined && (/^[\d(]/.test(p) || /^[A-Za-z]$/.test(p))) { const b = unary(), x = a; a = e => x(e) * b(e); }
+      else return a;
+    }
+  }
+  function unary() { if (peek() === '-') { next(); const a = unary(); return e => -a(e); } if (peek() === '+') { next(); return unary(); } return power(); }
+  function power() { const a = primary(); if (peek() === '^') { next(); const b = unary(); return e => Math.pow(a(e), b(e)); } return a; }
+  function primary() {
+    const t = next();
+    if (t === undefined) throw new Error('Ende');
+    if (t === '(') { const a = expr(); if (next() !== ')') throw new Error('Klammer'); return a; }
+    if (/^\d/.test(t)) { const v = parseFloat(t); return () => v; }
+    if (/^[A-Za-z]$/.test(t)) { vars.add(t); return e => e[t]; }
+    throw new Error('Zeichen');
+  }
+  const f = expr();
+  if (i !== tok.length) throw new Error('Rest');
+  return { f, vars };
+}
+function gleichwertig(f1, f2, vars) {
+  for (let k = 0; k < 6; k++) {
+    const env = {}; vars.forEach(v => { env[v] = 1.1 + Math.random() * 3.7; });
+    const a = f1(env), b = f2(env);
+    if (!isFinite(a) || !isFinite(b) || Math.abs(a - b) > 1e-6 * Math.max(1, Math.abs(b))) return false;
+  }
+  return true;
+}
+function pruefeFeld(fd, roh) {
+  if (fd.typ === 'wahl') return roh === undefined ? { leer: 'Wähle eine Antwort aus.' } : { ok: roh === fd.richtig };
+  const s = String(roh || '').trim();
+  if (!s) return { leer: 'Fülle alle Felder aus.' };
+  if (fd.typ === 'zahl') {
+    const v = zahlLesen(s);
+    if (isNaN(v)) return { leer: 'Gib eine Zahl ein, zum Beispiel 12,5 oder −3.' };
+    return { ok: Math.abs(v - fd.wert) <= Math.max(0.006, 0.0005 * Math.abs(fd.wert)) };
+  }
+  if (fd.typ === 'wkt') {
+    const v = wktLesen(s);
+    if (v === -1) return { leer: 'Eine Wahrscheinlichkeit liegt zwischen 0 und 1. Für Prozent schreibe das %-Zeichen dazu.' };
+    if (isNaN(v)) return { leer: 'Schreibe als Bruch (3/8), Dezimalzahl (0,375) oder in Prozent (37,5 %).' };
+    return { ok: Math.abs(v - fd.wert) <= 0.0015 };
+  }
+  let eingabe = s.replace(/^[A-Za-z]\s*=\s*/, '');
+  if (fd.gesucht && new RegExp(fd.gesucht).test(eingabe)) return { ok: false, msg: `Auf der rechten Seite darf ${fd.gesucht} nicht mehr vorkommen.` };
+  let p; try { p = termParse(eingabe); } catch (e) { return { leer: 'Der Term ist nicht lesbar. Schreibe zum Beispiel 3x − 4, 2(x + 5) oder x² + 1.' }; }
+  const fremd = [...p.vars].filter(v => !fd.vars.includes(v));
+  if (fremd.length) return { ok: false, msg: `Verwende nur ${fd.vars.join(', ')}.` };
+  if (fd.ohneKlammer && /\(/.test(eingabe)) return { leer: 'Löse alle Klammern auf.' };
+  const soll = termParse(fd.term).f;
+  if (!gleichwertig(p.f, soll, fd.vars)) return { ok: false };
+  if (fd.faktor) {
+    const k = eingabe.indexOf('(');
+    if (k <= 0) return { ok: false, msg: 'Schreibe das Ergebnis als Produkt mit Klammer, zum Beispiel 3x(2x + 1).' };
+    let fak; try { fak = termParse(eingabe.slice(0, k).replace(/[*·\s]+$/, '')).f; } catch (e) { return { ok: false }; }
+    if (!gleichwertig(fak, termParse(fd.faktor).f, fd.vars)) return { ok: false, msg: 'Richtig umgeformt, aber vor der Klammer steht nicht der größtmögliche Faktor.' };
+  }
+  return { ok: true };
+}
+
+/* ---------- Prüfungsaufgaben ---------- */
+const OPERATOR = {
+  'Berechnen': 'Berechnen: Ergebnis aus den gegebenen Größen mit einem nachvollziehbaren Rechenweg bestimmen.',
+  'Ermitteln': 'Ermitteln: Ergebnis auf einem Weg deiner Wahl bestimmen, rechnerisch oder zeichnerisch. Der Weg muss nachvollziehbar sein.',
+  'Angeben': 'Geben Sie an: Ergebnis ohne Rechenweg und ohne Begründung nennen.',
+  'Begründen': 'Begründen: Eine Aussage mit Argumenten oder einer Rechnung stützen.',
+  'Beurteilen': 'Beurteilen: Eine Aussage prüfen und zu einem begründeten Urteil kommen.',
+  'Zeichnen': 'Zeichnen: Eine genaue Darstellung mit Zeichengeräten anfertigen.',
+  'Aufstellen': 'Stellen Sie auf: Aus dem Sachverhalt eine Gleichung, einen Term oder ein Gleichungssystem bilden.',
+  'Nachweisen': 'Weisen Sie nach: Mit einer Rechnung zeigen, dass eine Aussage stimmt.',
+  'Umstellen': 'Stellen Sie um: Die Formel so umformen, dass die gesuchte Größe allein auf einer Seite steht.'
+};
+
+function rad(n, w) {
+  const r = 70, c = 80; let s = '';
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + i * 2 * Math.PI / n, a1 = a0 + 2 * Math.PI / n;
+    const x0 = c + r * Math.cos(a0), y0 = c + r * Math.sin(a0), x1 = c + r * Math.cos(a1), y1 = c + r * Math.sin(a1);
+    s += `<path d="M${c},${c} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z" style="fill:${i < w ? '#ffffff' : '#262626'};stroke:var(--axis);stroke-width:1.5"/>`;
+  }
+  s += `<polygon points="${c},${c - r - 2} ${c - 7},${c - r - 16} ${c + 7},${c - r - 16}" style="fill:var(--bad)"/>`;
+  return `<svg viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Glücksrad mit ${w} weißen und ${n - w} schwarzen Feldern">${s}</svg>`;
+}
+function tFigur(a, b) {
+  const u = 26, ox = 30, oy = 20, W = a * u, sx = ox + (W - u) / 2;
+  const st = 'fill:var(--topic-soft);stroke:var(--axis);stroke-width:1.5';
+  const tx = 'fill:var(--fg);font-size:13px';
+  return `<svg viewBox="0 0 ${W + 70} ${(b + 1) * u + 50}" width="${W + 70}" height="${(b + 1) * u + 50}" role="img" aria-label="Figur aus zwei Rechtecken">
+    <path d="M${ox},${oy} h${W} v${u} h${-(W - u) / 2} v${b * u} h${-u} v${-b * u} h${-(W - u) / 2} Z" style="${st}"/>
+    <text x="${ox + W / 2}" y="${oy - 6}" text-anchor="middle" style="${tx}">${a}x</text>
+    <text x="${ox + W + 6}" y="${oy + u / 2 + 4}" style="${tx}">x</text>
+    <text x="${sx + u + 6}" y="${oy + u + b * u / 2 + 4}" style="${tx}">${b}x</text>
+    <text x="${sx + u / 2}" y="${oy + (b + 1) * u + 16}" text-anchor="middle" style="${tx}">x</text></svg>`;
+}
+function quader(k2, k3) {
+  const s = 'fill:var(--topic-soft);stroke:var(--axis);stroke-width:1.5', t = 'fill:var(--fg);font-size:13px';
+  const L = 40 * k3, H = 30 * k2, D = 22;
+  return `<svg viewBox="0 0 ${L + D + 60} ${H + D + 40}" width="${L + D + 60}" height="${H + D + 40}" role="img" aria-label="Quader">
+    <path d="M20,${D + 10} h${L} v${H} h${-L} Z" style="${s}"/>
+    <path d="M20,${D + 10} l${D},${-D} h${L} l${-D},${D} Z" style="${s}"/>
+    <path d="M${20 + L},${D + 10} l${D},${-D} v${H} l${-D},${D} Z" style="${s}"/>
+    <text x="${20 + L / 2}" y="${D + H + 28}" text-anchor="middle" style="${t}">${k3 === 1 ? '' : k3}a</text>
+    <text x="8" y="${D + 10 + H / 2 + 4}" text-anchor="middle" style="${t}">${k2 === 1 ? '' : k2}a</text>
+    <text x="${20 + L + D / 2 + 10}" y="${D + H + 14}" style="${t}">a</text></svg>`;
+}
+function uhr(min) { const h = Math.floor(min / 60) % 24, m = Math.round(min % 60); return `${h}:${String(m).padStart(2, '0')} Uhr`; }
+
+const PRUEFUNG = {
+ pa: { thema: 'prozent', titel: 'Ausbildungsgehalt', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const B = pick([850, 900, 950, 1000, 1050, 1100, 1150, 1200]), K = pick([7.5, 8, 8.5]);
+   const rv = B * .1, kv = B * K / 100, pv = B * .02, av = B * .015, net = B - rv - kv - pv - av, rest = 100 - 10 - K - 2 - 1.5;
+   const viertel = Math.random() < .5;
+   return { kontext: `Mila erhält als Auszubildende ein Bruttogehalt von ${fe(B)} im Monat. Davon werden Sozialabgaben abgezogen. Die Prozentsätze sind gerundete Beispielwerte.`,
+     sys: [['Rentenversicherung', '10 %'], ['Krankenversicherung', `${fe(kv)}`], ['Pflegeversicherung', '2 %'], ['Arbeitslosenversicherung', '1,5 %']],
+     teile: [
+       { op: 'Berechnen', text: 'Berechnen Sie den Beitrag zur Rentenversicherung.', be: 1, felder: [{ label: 'Beitrag:', einheit: '€', typ: 'zahl', wert: rv }], loesung: `W = ${fz(B)} · 10 : 100 = ${fz(rv)}. Der Beitrag beträgt ${fe(rv)}.` },
+       { op: 'Berechnen', text: 'Berechnen Sie, wie viel Prozent des Bruttogehalts der Beitrag zur Krankenversicherung ist.', be: 1, felder: [{ label: 'p =', einheit: '%', typ: 'zahl', wert: K }], loesung: `p = ${fz(kv)} : ${fz(B)} · 100 = ${fz(K)}. Es sind ${fz(K)} %.` },
+       { op: 'Berechnen', text: 'Berechnen Sie Milas monatliches Nettogehalt.', be: 2, felder: [{ label: 'Nettogehalt:', einheit: '€', typ: 'zahl', wert: net }], loesung: `Abzüge: ${fe(rv)} + ${fe(kv)} + ${fe(pv)} + ${fe(av)} = ${fe(rv + kv + pv + av)}. Nettogehalt: ${fe(B)} − ${fe(rv + kv + pv + av)} = ${fe(net)}.` },
+       { op: 'Beurteilen', text: `Mila sagt: „Mir bleibt mehr als ${viertel ? 'drei Viertel' : 'vier Fünftel'} meines Bruttogehalts.“ Beurteilen Sie diese Aussage.`, be: 2, offen: true,
+         muster: `Mila behält ${fz(net)} : ${fz(B)} · 100 = ${fz(rest)} % ihres Bruttogehalts. ${viertel ? 'Drei Viertel sind 75 %.' : 'Vier Fünftel sind 80 %.'} Die Aussage ist ${(viertel ? rest > 75 : rest > 80) ? 'richtig' : 'falsch'}. (1 BE Rechnung, 1 BE begründete Entscheidung)` }
+     ] }; } },
+ pb: { thema: 'prozent', titel: 'Preissenkungen', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const G = pick([800, 1000, 1200, 1500, 2000]), p1 = pick([5, 8, 10, 12]), p2 = pick([4, 5, 6, 10]);
+   const A1 = G * (100 - p1) / 100, A2 = A1 * (100 - p2) / 100, B1 = G * (100 - p1 - p2) / 100;
+   const X = pick([900, 1240, 1250, 1600]), p3 = pick([15, 20, 25, 30]), Y = X * (100 - p3) / 100;
+   return { kontext: `Zwei Reisebüros bieten dieselbe Reise zunächst für ${fe(G)} an. Das Reisebüro „Sonnenweg“ senkt den Preis zuerst um ${p1} % und später noch einmal um ${p2} %. Das Reisebüro „Fernblick“ senkt den Preis einmal um ${p1 + p2} %.`,
+     teile: [
+       { op: 'Berechnen', text: 'Berechnen Sie den Preis bei „Sonnenweg“ nach der ersten Senkung.', be: 1, felder: [{ label: 'Preis:', einheit: '€', typ: 'zahl', wert: A1 }], loesung: `${fz(G)} · ${100 - p1} : 100 = ${fz(A1)}. Der Preis beträgt ${fe(A1)}.` },
+       { op: 'Berechnen', text: 'Berechnen Sie den Endpreis bei „Sonnenweg“.', be: 1, felder: [{ label: 'Endpreis:', einheit: '€', typ: 'zahl', wert: A2 }], loesung: `${fz(A1)} · ${100 - p2} : 100 = ${fz(A2)}. Der Endpreis beträgt ${fe(A2)}.` },
+       { op: 'Berechnen', text: 'Berechnen Sie den Endpreis bei „Fernblick“.', be: 1, felder: [{ label: 'Endpreis:', einheit: '€', typ: 'zahl', wert: B1 }], loesung: `${fz(G)} · ${100 - p1 - p2} : 100 = ${fz(B1)}. Der Endpreis beträgt ${fe(B1)}.` },
+       { op: 'Begründen', text: 'Begründen Sie, warum die beiden Endpreise verschieden sind.', be: 2, offen: true,
+         muster: `Bei „Sonnenweg“ bezieht sich die zweite Senkung um ${p2} % auf den bereits gesenkten Preis von ${fe(A1)}. Der Grundwert ist also kleiner als ${fe(G)}, deshalb wird weniger abgezogen. Darum ist „Fernblick“ günstiger. (1 BE Grundwert ändert sich, 1 BE Folgerung)` },
+       { op: 'Berechnen', text: `Ein drittes Reisebüro senkt den Preis einer anderen Reise von ${fe(X)} auf ${fe(Y)}. Berechnen Sie, um wie viel Prozent der Preis gesenkt wurde.`, be: 2, felder: [{ label: 'p =', einheit: '%', typ: 'zahl', wert: p3 }],
+         loesung: `Senkung: ${fe(X)} − ${fe(Y)} = ${fe(X - Y)}. p = ${fz(X - Y)} : ${fz(X)} · 100 = ${p3}. Der Preis wurde um ${p3} % gesenkt.` }
+     ] }; } },
+ ta: { thema: 'terme', titel: 'Figur aus Rechtecken', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const a = pick([3, 5]), b = pick([2, 3]), k = pick([1.5, 2, 2.5, 3]), x2 = R(2, 6), cu = 2 * a + 2 * b + 2, U = cu * x2;
+   return { kontext: 'Die Abbildung zeigt eine Figur aus zwei Rechtecken. Alle Längen sind in Zentimetern angegeben.', fig: tFigur(a, b),
+     teile: [
+       { op: 'Angeben', text: 'Geben Sie einen Term für den Flächeninhalt A der Figur an. Vereinfachen Sie den Term so weit wie möglich.', be: 2, felder: [{ label: 'A =', typ: 'term', term: `${a + b}*x^2`, vars: ['x'], ohneKlammer: true }], loesung: `A = ${a}x · x + x · ${b}x = ${a}x² + ${b}x² = ${a + b}x²` },
+       { op: 'Angeben', text: 'Geben Sie einen Term für den Umfang u der Figur an. Vereinfachen Sie den Term so weit wie möglich.', be: 2, felder: [{ label: 'u =', typ: 'term', term: `${cu}*x`, vars: ['x'], ohneKlammer: true }], loesung: `Alle Randstücke addieren: ${a}x + x + ${fz((a - 1) / 2)}x + ${b}x + x + ${b}x + ${fz((a - 1) / 2)}x + x = ${cu}x` },
+       { op: 'Berechnen', text: `Berechnen Sie den Flächeninhalt und den Umfang der Figur für x = ${fz(k)} cm.`, be: 2, felder: [{ label: 'A =', einheit: 'cm²', typ: 'zahl', wert: (a + b) * k * k }, { label: 'u =', einheit: 'cm', typ: 'zahl', wert: cu * k }],
+         loesung: `A = ${a + b} · ${fz(k)}² = ${fz((a + b) * k * k)} cm², u = ${cu} · ${fz(k)} = ${fz(cu * k)} cm` },
+       { op: 'Ermitteln', text: `Der Umfang der Figur soll ${U} cm betragen. Ermitteln Sie x.`, be: 1, felder: [{ label: 'x =', einheit: 'cm', typ: 'zahl', wert: x2 }], loesung: `${cu}x = ${U}, also x = ${x2} cm` }
+     ] }; } },
+ tb: { thema: 'terme', titel: 'Quaderförmige Bausteine', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const k2 = pick([2, 3]), k3 = pick([2, 3, 4]), v = pick([2, 3, 4, 5]);
+   return { kontext: 'Ein quaderförmiger Baustein hat die abgebildeten Kantenlängen.', fig: quader(k2, k3),
+     teile: [
+       { op: 'Angeben', text: 'Geben Sie einen Term für die Summe aller Kantenlängen an.', be: 1, felder: [{ label: 'Summe =', typ: 'term', term: `4*(1+${k2}+${k3})*a`, vars: ['a'] }], loesung: `4 · (a + ${k2}a + ${k3}a) = ${4 * (1 + k2 + k3)}a` },
+       { op: 'Angeben', text: 'Geben Sie einen Term für den Oberflächeninhalt an. Vereinfachen Sie so weit wie möglich.', be: 2, felder: [{ label: 'A_O =', typ: 'term', term: `2*(${k2}+${k3}+${k2 * k3})*a^2`, vars: ['a'] }],
+         loesung: `A_O = 2 · (a · ${k2}a + a · ${k3}a + ${k2}a · ${k3}a) = 2 · (${k2}a² + ${k3}a² + ${k2 * k3}a²) = ${2 * (k2 + k3 + k2 * k3)}a²` },
+       { op: 'Angeben', text: 'Geben Sie einen Term für das Volumen an.', be: 1, felder: [{ label: 'V =', typ: 'term', term: `${k2 * k3}*a^3`, vars: ['a'] }], loesung: `V = a · ${k2}a · ${k3}a = ${k2 * k3}a³` },
+       { op: 'Berechnen', text: `Berechnen Sie das Volumen für a = ${v} cm.`, be: 1, felder: [{ label: 'V =', einheit: 'cm³', typ: 'zahl', wert: k2 * k3 * v ** 3 }], loesung: `V = ${k2 * k3} · ${v}³ = ${k2 * k3 * v ** 3} cm³` },
+       { op: 'Beurteilen', text: 'Jonas behauptet: „Verdoppelt man a, verdoppelt sich auch das Volumen.“ Beurteilen Sie diese Aussage.', be: 2, offen: true,
+         muster: `Mit 2a statt a gilt V = ${k2 * k3} · (2a)³ = ${k2 * k3} · 8a³. Das Volumen wird achtmal so groß. Die Aussage ist falsch. (1 BE Rechnung oder Beispiel, 1 BE Entscheidung)` }
+     ] }; } },
+ ga: { thema: 'gleichungen', titel: 'Die vergessene Trinkflasche', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const [v1, v2, t0] = pick([[15, 20, 20], [12, 18, 30], [16, 24, 15], [10, 15, 30], [18, 24, 20]]);
+   const t = v2 * t0 / 60 / (v2 - v1), min = Math.round(t * 60), d = v1 * t;
+   const hh = pick([7, 8, 9, 10]), mm = pick([0, 15, 30]), start = hh * 60 + mm;
+   return { kontext: `Lea fährt um ${uhr(start)} mit dem Fahrrad los. Sie fährt mit einer Geschwindigkeit von ${v1} km/h. ${t0} Minuten später bemerkt ihr Vater, dass Lea ihre Trinkflasche vergessen hat. Er fährt ihr auf derselben Strecke mit dem E-Bike mit ${v2} km/h hinterher.`,
+     teile: [
+       { op: 'Aufstellen', text: 'Stellen Sie eine Gleichung auf, mit der man Leas Fahrzeit t (in Stunden) bis zum Einholen berechnen kann.', be: 2, offen: true,
+         muster: `Beide haben beim Einholen dieselbe Strecke zurückgelegt. Der Vater fährt ${t0} Minuten = {${t0}/60} Stunden kürzer: ${v1} · t = ${v2} · (t − {${t0}/60}). (1 BE gleiche Strecke, 1 BE verkürzte Fahrzeit)` },
+       { op: 'Ermitteln', text: 'Ermitteln Sie, wie viele Minuten nach Leas Start ihr Vater sie einholt.', be: 2, felder: [{ label: 'Zeit:', einheit: 'min', typ: 'zahl', wert: min }],
+         loesung: `${v1}t = ${v2}t − ${fz(v2 * t0 / 60)}, also ${v2 - v1}t = ${fz(v2 * t0 / 60)} und t = ${fz(t)} h = ${min} min` },
+       { op: 'Angeben', text: 'Geben Sie die Uhrzeit an, zu der der Vater Lea einholt.', be: 1, felder: [{ label: 'Uhrzeit:', einheit: 'Uhr', typ: 'zeit', wert: start + min }], loesung: `${uhr(start)} + ${min} min = ${uhr(start + min)}` },
+       { op: 'Berechnen', text: 'Berechnen Sie, wie viele Kilometer Lea bis dahin gefahren ist.', be: 1, felder: [{ label: 'Strecke:', einheit: 'km', typ: 'zahl', wert: d }], loesung: `s = ${v1} km/h · ${fz(t)} h = ${fz(d)} km` }
+     ] }; } },
+ gb: { thema: 'gleichungen', titel: 'Formeln an Figuren und Körpern', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   let a = R(6, 14), c = R(2, a - 2), h = R(3, 9);
+   const A = (a + c) * h / 2;
+   const a2 = R(6, 14), c2 = R(2, a2 - 2), h2 = R(3, 9), A2 = (a2 + c2) * h2 / 2;
+   const pa = R(3, 8), ha = R(4, 12), AO = pa * pa + 2 * pa * ha;
+   return { kontext: 'Für den Flächeninhalt eines Trapezes gilt A = {a + c/2} · h. Für den Oberflächeninhalt einer quadratischen Pyramide gilt A_O = a² + 2 · a · h_a. Alle Längen sind in Zentimetern angegeben.',
+     teile: [
+       { op: 'Umstellen', text: 'Stellen Sie die Trapezformel nach h um.', be: 1, felder: [{ label: 'h =', typ: 'term', term: '2*A/(a+c)', vars: ['A', 'a', 'c'], gesucht: 'h' }], loesung: 'h = {2A/a + c}' },
+       { op: 'Berechnen', text: `Ein Trapez hat den Flächeninhalt A = ${fz(A)} cm² und die Seiten a = ${a} cm und c = ${c} cm. Berechnen Sie die Höhe h.`, be: 1, felder: [{ label: 'h =', einheit: 'cm', typ: 'zahl', wert: h }], loesung: `h = 2 · ${fz(A)} : (${a} + ${c}) = ${h} cm` },
+       { op: 'Berechnen', text: `Ein anderes Trapez hat A = ${fz(A2)} cm², c = ${c2} cm und h = ${h2} cm. Berechnen Sie die Seite a.`, be: 2, felder: [{ label: 'a =', einheit: 'cm', typ: 'zahl', wert: a2 }],
+         loesung: `${fz(A2)} = {a + ${c2}/2} · ${h2}, also a + ${c2} = 2 · ${fz(A2)} : ${h2} = ${a2 + c2} und a = ${a2} cm` },
+       { op: 'Berechnen', text: `Eine quadratische Pyramide hat die Grundkante a = ${pa} cm und den Oberflächeninhalt A_O = ${AO} cm². Berechnen Sie die Höhe h_a der Seitenfläche.`, be: 2, felder: [{ label: 'h_a =', einheit: 'cm', typ: 'zahl', wert: ha }],
+         loesung: `${AO} = ${pa}² + 2 · ${pa} · h_a, also ${AO - pa * pa} = ${2 * pa} · h_a und h_a = ${ha} cm` }
+     ] }; } },
+ la: { thema: 'lgs', titel: 'Gleichungssystem und Parallele', quelle: 'Originalaufgabe: Schriftliche Abschlussprüfung Realschulabschluss 2023, Mathematik, Wahlpflichtaufgabe 1 a) und b). Bildungsserver Sachsen-Anhalt, Lizenz CC BY-NC-SA. Die BE-Verteilung ist hier selbst festgelegt.', original: true, gen() {
+   return { kontext: 'Gegeben ist das folgende lineare Gleichungssystem.', sys: [['(I)', 'x − y = −9'], ['(II)', '3x + 6y = 18']],
+     teile: [
+       { op: 'Nachweisen', text: 'Weisen Sie rechnerisch nach, dass L = {(−4; 5)} die Lösungsmenge dieses Gleichungssystems ist.', be: 2, offen: true,
+         muster: 'Lösen, zum Beispiel aus (I): x = y − 9. In (II): 3(y − 9) + 6y = 18, also 9y = 45 und y = 5, x = −4. Damit ist (−4; 5) die einzige Lösung. Nur einsetzen zeigt, dass (−4; 5) eine Lösung ist. Für die volle BE muss man zusätzlich begründen, dass es keine weitere gibt (die Geraden haben verschiedene Anstiege).' },
+       { op: 'Aufstellen', text: 'Betrachtet wird eine Gerade h durch den Punkt P(0 | 6), die parallel zur Geraden mit der Gleichung x − y = −9 verläuft. Stellen Sie eine Gleichung für die Gerade h auf.', be: 2,
+         felder: [{ label: 'y =', typ: 'term', term: 'x+6', vars: ['x'] }], loesung: 'x − y = −9 ergibt y = x + 9, also Anstieg 1. Durch P(0 | 6): y = x + 6' }
+     ] }; } },
+ lb: { thema: 'lgs', titel: 'Stromrechnung', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const ap = pick([0.28, 0.3, 0.32, 0.35, 0.36, 0.38, 0.4]), g = pick([8, 9, 10, 12, 13, 15]);
+   let k1, k2; do { k1 = 10 * R(15, 45); k2 = 10 * R(15, 45); } while (Math.abs(k1 - k2) < 40);
+   const C1 = Math.round((g + ap * k1) * 100) / 100, C2 = Math.round((g + ap * k2) * 100) / 100, k3 = 10 * R(20, 50), dg = R(4, 10), ap2 = Math.round((ap - 0.04) * 100) / 100, gr = dg / 0.04;
+   return { kontext: `Die monatliche Stromrechnung von Familie Meyer setzt sich aus einer Grundgebühr und einem Arbeitspreis pro Kilowattstunde (kWh) zusammen. Im Juni hat die Familie ${k1} kWh verbraucht und ${fe(C1)} bezahlt. Im Juli waren es ${k2} kWh für ${fe(C2)}.`,
+     teile: [
+       { op: 'Aufstellen', text: 'Stellen Sie ein lineares Gleichungssystem auf, mit dem sich die Grundgebühr g und der Arbeitspreis p ermitteln lassen.', be: 2, offen: true,
+         muster: `(I) g + ${k1} · p = ${fz(C1)}, (II) g + ${k2} · p = ${fz(C2)}. (1 BE je Gleichung, die Variablen müssen erklärt sein)` },
+       { op: 'Ermitteln', text: 'Ermitteln Sie den Arbeitspreis pro kWh und die monatliche Grundgebühr.', be: 2, felder: [{ label: 'Arbeitspreis:', einheit: '€/kWh', typ: 'zahl', wert: ap }, { label: 'Grundgebühr:', einheit: '€', typ: 'zahl', wert: g }],
+         loesung: `(I) − (II): ${k1 - k2}p = ${fz(Math.round((C1 - C2) * 100) / 100)}, also p = ${fz(ap)} €/kWh. Eingesetzt: g = ${fz(C1)} − ${k1} · ${fz(ap)} = ${fz(g)} €` },
+       { op: 'Berechnen', text: `Berechnen Sie die Kosten für einen Monat mit ${k3} kWh.`, be: 1, felder: [{ label: 'Kosten:', einheit: '€', typ: 'zahl', wert: g + ap * k3 }], loesung: `${fz(g)} + ${k3} · ${fz(ap)} = ${fz(g + ap * k3)}, also ${fe(g + ap * k3)}` },
+       { op: 'Ermitteln', text: `Ein anderer Anbieter verlangt eine Grundgebühr von ${fe(g + dg)} und ${fz(ap2)} € pro kWh. Ermitteln Sie, ab welchem monatlichen Verbrauch der andere Anbieter günstiger ist.`, be: 2,
+         felder: [{ label: 'ab mehr als', einheit: 'kWh', typ: 'zahl', wert: gr }], loesung: `${fz(g)} + ${fz(ap)}x = ${fz(g + dg)} + ${fz(ap2)}x, also 0,04x = ${dg} und x = ${fz(gr)}. Ab mehr als ${fz(gr)} kWh ist der andere Anbieter günstiger.` }
+     ] }; } },
+ fa: { thema: 'funktionen', titel: 'Stromtarife vergleichen', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   let d, D, xs; do { d = pick([2, 3, 4, 5]); D = pick([30, 36, 40, 45, 48, 60]); xs = 100 * D / d; } while (!Number.isInteger(xs) || xs < 800 || xs > 3000);
+   const pA = R(32, 40), pB = pA - d, GA = 6 * R(10, 20), GB = GA + D, V1 = pick([1500, 2000, 2500]), V2 = pick([xs - 500, xs + 500, xs + 1000].filter(v => v > 0));
+   return { kontext: `Ein Stromanbieter hat zwei Tarife. Tarif A: Jahresgrundgebühr ${GA} € und ${pA} ct pro kWh. Tarif B: Jahresgrundgebühr ${GB} € und ${pB} ct pro kWh.`,
+     teile: [
+       { op: 'Berechnen', text: `Berechnen Sie für beide Tarife die Jahreskosten bei einem Verbrauch von ${V1} kWh.`, be: 2, felder: [{ label: 'Tarif A:', einheit: '€', typ: 'zahl', wert: GA + pA * V1 / 100 }, { label: 'Tarif B:', einheit: '€', typ: 'zahl', wert: GB + pB * V1 / 100 }],
+         loesung: `A: ${GA} + ${V1} · ${fz(pA / 100)} = ${fz(GA + pA * V1 / 100)} €, B: ${GB} + ${V1} · ${fz(pB / 100)} = ${fz(GB + pB * V1 / 100)} €` },
+       { op: 'Angeben', text: 'Geben Sie für beide Tarife eine Funktionsgleichung an, die dem Verbrauch x (in kWh) die Jahreskosten y (in €) zuordnet.', be: 2,
+         felder: [{ label: 'A: y =', typ: 'term', term: `${pA / 100}*x+${GA}`, vars: ['x'] }, { label: 'B: y =', typ: 'term', term: `${pB / 100}*x+${GB}`, vars: ['x'] }], loesung: `A: y = ${fz(pA / 100)}x + ${GA}, B: y = ${fz(pB / 100)}x + ${GB}. Der Preis pro kWh muss in Euro umgerechnet werden.` },
+       { op: 'Ermitteln', text: 'Ermitteln Sie den Verbrauch, bei dem beide Tarife gleich viel kosten.', be: 2, felder: [{ label: 'x =', einheit: 'kWh', typ: 'zahl', wert: xs }],
+         loesung: `${fz(pA / 100)}x + ${GA} = ${fz(pB / 100)}x + ${GB}, also ${fz(d / 100)}x = ${D} und x = ${xs} kWh` },
+       { op: 'Angeben', text: `Familie Schulz verbraucht ${V2} kWh im Jahr. Geben Sie an, welcher Tarif für sie günstiger ist.`, be: 1, felder: [{ typ: 'wahl', opts: ['Tarif A', 'Tarif B'], richtig: V2 > xs ? 1 : 0 }],
+         loesung: `Bis ${xs} kWh ist Tarif A günstiger, darüber Tarif B. Bei ${V2} kWh ist also Tarif ${V2 > xs ? 'B' : 'A'} günstiger.` }
+     ] }; } },
+ fb: { thema: 'funktionen', titel: 'Zwei Geraden und ein Dreieck', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   let sx, sy, d1, d2, m1, m2;
+   do { sx = R(0, 2); sy = pick([2, 3, 4]); d1 = pick([1, 2, 4]); d2 = pick([1, 2, 4]); m1 = sy / d1; m2 = -sy / d2; }
+   while (!Number.isInteger(2 * m1) || !Number.isInteger(2 * m2) || sx - d1 < -4 || sx + d2 > 6 || m1 > 4 || m2 < -4);
+   const r1 = sx - d1, r2 = sx + d2, n1 = -m1 * r1, n2 = -m2 * r2;
+   return { kontext: `Gegeben sind die linearen Funktionen f(x) = ${lin(m1, n1)} und g(x) = ${lin(m2, n2)}.`,
+     teile: [
+       { op: 'Zeichnen', text: 'Zeichnen Sie die Graphen der Funktionen f und g in ein Koordinatensystem.', be: 2, offen: true,
+         muster: 'f: blau, g: rot. Achsen beschriften und jeden Graphen benennen. (1 BE je Graph)', musterFig: plot({ x: [-5, 7], y: [-2, 6], u: 28, geraden: [{ m: m1, n: n1 }, { m: m2, n: n2 }] }) },
+       { op: 'Berechnen', text: 'Berechnen Sie die Koordinaten des Schnittpunkts S der beiden Graphen.', be: 2, felder: [{ label: 'x =', typ: 'zahl', wert: sx }, { label: 'y =', typ: 'zahl', wert: sy }],
+         loesung: `${lin(m1, n1)} = ${lin(m2, n2)}, also ${fz(m1 - m2)}x = ${fz(n2 - n1)} und x = ${sx}. y = f(${sx}) = ${sy}. S(${sx} | ${sy})` },
+       { op: 'Berechnen', text: 'Berechnen Sie die Nullstellen der Funktionen f und g.', be: 2, felder: [{ label: 'Nullstelle von f:', typ: 'zahl', wert: r1 }, { label: 'Nullstelle von g:', typ: 'zahl', wert: r2 }],
+         loesung: `${lin(m1, n1)} = 0 ergibt x = ${fz(r1)}. ${lin(m2, n2)} = 0 ergibt x = ${fz(r2)}.` },
+       { op: 'Berechnen', text: 'Die Graphen von f und g bilden mit der x-Achse ein Dreieck. Berechnen Sie seinen Flächeninhalt (1 Längeneinheit = 1 cm).', be: 2, felder: [{ label: 'A =', einheit: 'cm²', typ: 'zahl', wert: (r2 - r1) * sy / 2 }],
+         loesung: `Grundseite von ${fz(r1)} bis ${fz(r2)}: g = ${fz(r2 - r1)} cm. Höhe = y-Koordinate von S: h = ${sy} cm. A = {g · h/2} = ${fz((r2 - r1) * sy / 2)} cm²` }
+     ] }; } },
+ wa: { thema: 'wahrscheinlichkeit', titel: 'Glücksrad', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const n = pick([5, 6, 10]), w = R(1, Math.min(4, n - 2)), s = n - w, N = 30;
+   const pSS = s * s / (n * n), pWS = w * s / (n * n), pG = (w * w + s * s) / (n * n);
+   return { kontext: `Ein Glücksrad besteht aus ${w === 1 ? 'einem' : w} weißen und ${s} schwarzen Feldern. Alle Felder sind gleich groß. Das Glücksrad wird zweimal gedreht.`, fig: rad(n, w),
+     teile: [
+       { op: 'Zeichnen', text: 'Zeichnen Sie ein Baumdiagramm zu diesem Zufallsversuch mit allen Wahrscheinlichkeiten.', be: 2, offen: true,
+         muster: `Zwei Stufen mit je zwei Ästen: weiß {${w}/${n}}, schwarz {${s}/${n}}. Die Wahrscheinlichkeiten sind auf beiden Stufen gleich. (1 BE Struktur, 1 BE Wahrscheinlichkeiten)` },
+       { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass beide Male ein schwarzes Feld angezeigt wird.', be: 1, felder: [{ label: 'P =', typ: 'wkt', wert: pSS }], loesung: `{${s}/${n}} · {${s}/${n}} = {${s * s}/${n * n}} ≈ ${prozent(pSS)}` },
+       { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass erst ein weißes und dann ein schwarzes Feld angezeigt wird.', be: 1, felder: [{ label: 'P =', typ: 'wkt', wert: pWS }], loesung: `{${w}/${n}} · {${s}/${n}} = {${w * s}/${n * n}} ≈ ${prozent(pWS)}` },
+       { op: 'Ermitteln', text: 'Ermitteln Sie die Wahrscheinlichkeit dafür, dass mindestens einmal ein weißes Feld angezeigt wird.', be: 2, felder: [{ label: 'P =', typ: 'wkt', wert: 1 - pSS }],
+         loesung: `Gegenereignis „zweimal schwarz“: {${s * s}/${n * n}}. P = 1 − {${s * s}/${n * n}} = {${n * n - s * s}/${n * n}} ≈ ${prozent(1 - pSS)}` },
+       { op: 'Ermitteln', text: `Ein neues Glücksrad soll ${N} gleich große Felder haben. Die Wahrscheinlichkeiten für weiß und schwarz sollen gleich bleiben. Ermitteln Sie, wie viele Felder weiß sein müssen.`, be: 1,
+         felder: [{ label: 'weiße Felder:', typ: 'zahl', wert: w * N / n }], loesung: `{${w}/${n}} von ${N} Feldern: ${N} · ${w} : ${n} = ${w * N / n}` },
+       { op: 'Beurteilen', text: 'Ben sagt: „Verdoppelt man die Anzahl der weißen und der schwarzen Felder, ändern sich die Wahrscheinlichkeiten.“ Beurteilen Sie diese Aussage.', be: 1, offen: true,
+         muster: `Die Aussage ist falsch. Zum Beispiel weiß: {${2 * w}/${2 * n}} = {${w}/${n}}. Zähler und Nenner werden verdoppelt, der Bruch bleibt gleich.` }
+     ] }; } },
+ wb: { thema: 'wahrscheinlichkeit', titel: 'Kugeln ziehen', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
+   const r = R(2, 5), b = R(3, 6), n = r + b;
+   const pRR = r * (r - 1) / (n * (n - 1)), pV = 2 * r * b / (n * (n - 1));
+   return { kontext: `In einer Urne liegen ${r} rote und ${b} blaue Kugeln. Es werden nacheinander zwei Kugeln gezogen, ohne die erste Kugel zurückzulegen.`,
+     teile: [
+       { op: 'Zeichnen', text: 'Zeichnen Sie ein Baumdiagramm zu diesem Zufallsversuch mit allen Wahrscheinlichkeiten.', be: 2, offen: true,
+         muster: `1. Zug: rot {${r}/${n}}, blau {${b}/${n}}. 2. Zug nach rot: rot {${r - 1}/${n - 1}}, blau {${b}/${n - 1}}. 2. Zug nach blau: rot {${r}/${n - 1}}, blau {${b - 1}/${n - 1}}. (1 BE Struktur, 1 BE Wahrscheinlichkeiten)` },
+       { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass zwei rote Kugeln gezogen werden.', be: 1, felder: [{ label: 'P =', typ: 'wkt', wert: pRR }], loesung: `{${r}/${n}} · {${r - 1}/${n - 1}} = {${r * (r - 1)}/${n * (n - 1)}} ≈ ${prozent(pRR)}` },
+       { op: 'Ermitteln', text: 'Ermitteln Sie die Wahrscheinlichkeit dafür, dass zwei verschiedenfarbige Kugeln gezogen werden.', be: 2, felder: [{ label: 'P =', typ: 'wkt', wert: pV }],
+         loesung: `{${r}/${n}} · {${b}/${n - 1}} + {${b}/${n}} · {${r}/${n - 1}} = {${2 * r * b}/${n * (n - 1)}} ≈ ${prozent(pV)}` },
+       { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass mindestens eine rote Kugel gezogen wird.', be: 2, felder: [{ label: 'P =', typ: 'wkt', wert: 1 - b * (b - 1) / (n * (n - 1)) }],
+         loesung: `Gegenereignis „keine rote Kugel“: {${b}/${n}} · {${b - 1}/${n - 1}} = {${b * (b - 1)}/${n * (n - 1)}}. P = 1 − {${b * (b - 1)}/${n * (n - 1)}} = {${n * (n - 1) - b * (b - 1)}/${n * (n - 1)}} ≈ ${prozent(1 - b * (b - 1) / (n * (n - 1)))}` },
+       { op: 'Beurteilen', text: 'Mia behauptet: „Wenn man die erste Kugel zurücklegt, ist die Wahrscheinlichkeit für zwei rote Kugeln größer.“ Beurteilen Sie diese Aussage.', be: 1, offen: true,
+         muster: `Mit Zurücklegen: {${r}/${n}} · {${r}/${n}} ≈ ${prozent(r * r / (n * n))}. Ohne Zurücklegen: ≈ ${prozent(pRR)}. Mia hat recht: Ohne Zurücklegen fehlt beim zweiten Zug eine rote Kugel.` }
+     ] }; } }
+};
+const PRUEF_ZU = {}; Object.entries(PRUEFUNG).forEach(([id, p]) => { (PRUEF_ZU[p.thema] = PRUEF_ZU[p.thema] || []).push(id); });
+
+function zeitLesen(s) { const m = String(s).trim().match(/^(\d{1,2})\s*[:.,]\s*(\d{2})/); return m ? +m[1] * 60 + +m[2] : NaN; }
+function pruefeFeld2(fd, roh) {
+  if (fd.typ !== 'zeit') return pruefeFeld(fd, roh);
+  const v = zeitLesen(roh || '');
+  if (isNaN(v)) return { leer: 'Gib die Uhrzeit so ein: 8:45' };
+  return { ok: v === fd.wert };
+}
+function ladeP() { try { return JSON.parse(localStorage.getItem('gf10-pruefung') || '{}'); } catch (e) { return {}; } }
+function speichereP(id, w) { try { const a = ladeP(); a[id] = w; localStorage.setItem('gf10-pruefung', JSON.stringify(a)); } catch (e) {} }
+function pruefKnoepfe(ids) {
+  const st = ladeP();
+  return `<div class="bausteine">${ids.map(id => `<button class="baustein pruef" data-p="${id}"><span>${PRUEFUNG[id].titel}</span>${PRUEFUNG[id].original ? '<span class="tag">Original</span>' : ''}${st[id] ? `<span class="haken">zuletzt ${fz(st[id].n)} von ${st[id].g} BE</span>` : ''}</button>`).join('')}</div>`;
+}
+function pruefKlicks() { app.querySelectorAll('.baustein.pruef').forEach(b => b.addEventListener('click', () => { location.hash = 'pruefung-' + b.dataset.p; })); }
+
+let pr = null;
+function pruefungStart(id) {
+  const P = PRUEFUNG[id];
+  zustand = null; ueb = null;
+  setzeFarbe(THEMEN.find(t => t.id === P.thema));
+  pr = { id, P, a: P.gen(), teile: [] };
+  pr.teile = pr.a.teile.map(() => ({ werte: {}, status: null, be: null, msg: '' }));
+  zeigePruefung();
+  window.scrollTo(0, 0);
+}
+function zeigePruefung() {
+  const { P, a, teile } = pr;
+  const thema = THEMEN.find(t => t.id === P.thema);
+  const gesamt = a.teile.reduce((s, t) => s + t.be, 0);
+  const fertig = teile.every(t => t.be !== null);
+  const erreicht = teile.reduce((s, t) => s + (t.be || 0), 0);
+  const sys = a.sys ? `<table class="sys">${a.sys.map(z => `<tr><td>${mathe(z[0])}</td><td>${mathe(z[1])}</td></tr>`).join('')}</table>` : '';
+  let html = '';
+  a.teile.forEach((tl, i) => {
+    const st = teile[i], zu = st.be !== null;
+    let ein = '';
+    if (!tl.offen) {
+      ein = `<div class="felder">${tl.felder.map((fd, k) => fd.typ === 'wahl'
+        ? `<div class="optionen">${fd.opts.map((o, j) => `<button class="opt ${zu && j === fd.richtig ? 'ist-r' : ''} ${zu && st.werte[k] === j && j !== fd.richtig ? 'ist-f' : ''}" data-t="${i}" data-w="${j}" aria-pressed="${st.werte[k] === j}" ${zu ? 'disabled' : ''}><span class="bu">${BU[j]}</span><span class="tx">${o}</span></button>`).join('')}</div>`
+        : `<label class="feld ${st.falsch && st.falsch.includes(k) ? 'falsch' : ''}"><span class="fl">${mathe(fd.label)}</span><input id="p${i}_${k}" data-t="${i}" data-k="${k}" type="text" autocomplete="off" spellcheck="false" value="${esc(st.werte[k] || '')}" ${zu ? 'disabled' : ''}>${fd.einheit ? `<span class="fe">${fd.einheit}</span>` : ''}</label>`).join('')}</div>`;
+    }
+    let knopf = '', rueck = '';
+    if (st.msg) rueck = `<div class="rueck f"><p>${st.msg}</p></div>`;
+    if (!zu && !tl.offen) knopf = `<button class="knopf klein" data-pr="${i}">Prüfen</button>`;
+    if (tl.offen && st.status !== 'zeigen' && !zu) knopf = `<button class="knopf klein leise" data-zeig="${i}">Bearbeitet, Lösung zeigen</button>`;
+    if (tl.offen && st.status === 'zeigen' && !zu) {
+      rueck = `<div class="rueck muster"><strong>Musterlösung</strong><p>${mathe(tl.muster)}</p>${tl.musterFig ? `<div class="fig">${tl.musterFig}</div>` : ''}<p class="hinweis">${OPERATOR[tl.op]}</p>
+        <p><strong>Wie viel hattest du?</strong></p><div class="knoepfe links">
+        <button class="knopf klein" data-se="${i}" data-be="${tl.be}">vollständig (${tl.be} BE)</button>
+        ${tl.be > 1 ? `<button class="knopf klein leise" data-se="${i}" data-be="${tl.be / 2}">teilweise (${fz(tl.be / 2)} BE)</button>` : ''}
+        <button class="knopf klein leise" data-se="${i}" data-be="0">nicht erreicht (0 BE)</button></div></div>`;
+    }
+    if (zu) {
+      const voll = st.be === tl.be;
+      rueck = `<div class="rueck ${voll ? 'r' : 'f'}"><strong>${fz(st.be)} von ${tl.be} BE</strong>
+        <p>${tl.offen ? mathe(tl.muster) : mathe(tl.loesung)}</p>${tl.offen && tl.musterFig ? `<div class="fig">${tl.musterFig}</div>` : ''}<p class="hinweis">${OPERATOR[tl.op]}</p></div>`;
+    }
+    html += `<div class="teil"><div class="tl">${String.fromCharCode(97 + i)})</div><div class="tm"><p>${mathe(tl.text)}</p>${ein}${rueck}${knopf ? `<div class="knoepfe links">${knopf}</div>` : ''}</div><div class="tb">${tl.be}</div></div>`;
+  });
+  const abschluss = fertig
+    ? `<div class="rueck ${erreicht / gesamt >= .75 ? 'r' : 'f'} geschafft"><strong>Ergebnis: ${fz(erreicht)} von ${gesamt} BE</strong>
+       <p>${erreicht / gesamt >= .75 ? 'Stark! Das ist Prüfungsniveau.' : erreicht / gesamt >= .5 ? 'Ein guter Anfang. Sieh dir die Lösungen der Teilaufgaben an, die nicht geklappt haben.' : 'Übe zuerst noch die passenden Bausteine und versuche es dann noch einmal.'}</p></div>
+       <div class="knoepfe">${P.original ? '' : '<button class="knopf leise" id="neu">Neue Zahlen</button>'}<button class="knopf" id="heim">Zur Startseite</button></div>` : '';
+  app.innerHTML = `<div class="leiste"><button class="zurueck" id="zurueck">← Zurück</button><span class="thema">${thema.titel}</span><span class="hinweis">${fz(erreicht)} / ${gesamt} BE</span></div>
+    <article class="karte pruefkarte">
+      <div class="nr"><b>§</b>Prüfungsaufgabe</div>
+      <h2>${P.titel}</h2>
+      <p class="hinweis">${P.quelle}${P.original ? '' : '. Die Zahlen sind bei jedem Aufruf neu.'}</p>
+      <p class="frage">${mathe(a.kontext)}</p>${sys}${a.fig ? `<div class="fig">${a.fig}</div>` : ''}
+      <p class="hinweis">Bearbeite die Teilaufgaben zuerst auf Papier. Taschenrechner und Tafelwerk sind erlaubt. Gib bei Rechenaufgaben dein Ergebnis ein. Bei Aufgaben zum Zeichnen, Begründen oder Beurteilen vergleichst du mit der Musterlösung und schätzt dich selbst ein.</p>
+      <div class="teile"><div class="teil kopfzeile"><div></div><div></div><div class="tb"><b>BE</b></div></div>${html}</div>
+      ${abschluss}
+    </article>`;
+  document.getElementById('zurueck').addEventListener('click', () => { zurueck(); });
+  app.querySelectorAll('.teile input').forEach(inp => {
+    inp.addEventListener('input', () => { pr.teile[+inp.dataset.t].werte[+inp.dataset.k] = inp.value; });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); pruefeTeil(+inp.dataset.t); } });
+  });
+  app.querySelectorAll('.teile .opt').forEach(b => b.addEventListener('click', () => { const i = +b.dataset.t; const k = a.teile[i].felder.findIndex(f => f.typ === 'wahl'); pr.teile[i].werte[k] = +b.dataset.w; zeigeMitScroll(); }));
+  app.querySelectorAll('[data-pr]').forEach(b => b.addEventListener('click', () => pruefeTeil(+b.dataset.pr)));
+  app.querySelectorAll('[data-zeig]').forEach(b => b.addEventListener('click', () => { pr.teile[+b.dataset.zeig].status = 'zeigen'; zeigeMitScroll(); }));
+  app.querySelectorAll('[data-se]').forEach(b => b.addEventListener('click', () => { pr.teile[+b.dataset.se].be = +b.dataset.be; abschliessen(); }));
+  const neu = document.getElementById('neu'); if (neu) neu.addEventListener('click', () => pruefungStart(pr.id));
+  const heim = document.getElementById('heim'); if (heim) heim.addEventListener('click', () => { zurueck(); });
+}
+function zeigeMitScroll() { const y = window.scrollY; zeigePruefung(); window.scrollTo(0, y); }
+function pruefeTeil(i) {
+  const tl = pr.a.teile[i], st = pr.teile[i];
+  const erg = tl.felder.map((fd, k) => pruefeFeld2(fd, st.werte[k]));
+  const leer = erg.find(e => e.leer);
+  if (leer) { st.msg = leer.leer; zeigeMitScroll(); return; }
+  st.msg = '';
+  const richtig = erg.filter(e => e.ok).length;
+  st.falsch = erg.map((e, k) => e.ok ? -1 : k).filter(k => k >= 0);
+  st.be = Math.round(tl.be * richtig / tl.felder.length * 2) / 2;
+  abschliessen();
+}
+function abschliessen() {
+  if (pr.teile.every(t => t.be !== null)) speichereP(pr.id, { n: pr.teile.reduce((s, t) => s + t.be, 0), g: pr.a.teile.reduce((s, t) => s + t.be, 0) });
+  zeigeMitScroll();
+}
+
+/* ---------- Ansichten ---------- */
+const app = document.getElementById('app');
+let zustand = null;
+
+let alleBausteine = false, letzterTab = 'grundlagen';
+const TABS = [['grundlagen', 'Grundlagen'], ['pruefungen', 'Prüfungsaufgaben'], ['uebersicht', 'Übersicht']];
+const alleIds = t => [...new Set(ZUORDNUNG[t.id].flat())].sort();
+function zurueck() { location.hash = letzterTab; }
+
+function start(tab) {
+  tab = TABS.some(x => x[0] === tab) ? tab : 'grundlagen';
+  letzterTab = tab;
+  setzeFarbe(null);
+  zustand = null; ueb = null; pr = null;
+  const erg = lade(), fertig = ladeB(), pst = ladeP();
+  let h = `<header class="kopf"><h1>Grundfertigkeiten Klasse 10</h1></header>
+    <nav class="tabs" role="tablist">${TABS.map(([id, n]) => `<a role="tab" href="#${id}" class="tab ${id === tab ? 'aktiv' : ''}" aria-selected="${id === tab}">${n}</a>`).join('')}</nav>`;
+  if (tab === 'grundlagen') h += tabGrundlagen(erg, fertig);
+  else if (tab === 'pruefungen') h += tabPruefungen(erg);
+  else h += tabUebersicht(erg, fertig, pst);
+  h += `<p class="fuss">Dein Fortschritt wird automatisch in diesem Browser gespeichert. Im Reiter „Übersicht“ kannst du ihn als Code sichern.</p>`;
+  app.innerHTML = h;
+  app.querySelectorAll('.kachel').forEach(k => k.addEventListener('click', () => { location.hash = k.dataset.id; }));
+  bausteinKlicks(); pruefKlicks();
+  const um = document.getElementById('umschalten');
+  if (um) um.addEventListener('click', () => { alleBausteine = !alleBausteine; start(tab); document.getElementById('umschalten').focus(); });
+  if (tab === 'uebersicht') sicherungKlicks();
+}
+
+function tabGrundlagen(erg, fertig) {
+  let h = `<section class="bereich"><p class="unter">Teste dich zu einem Thema. Zu jeder Frage gibt es vier Antworten, eine oder mehrere sind richtig. Nach dem Test siehst du, wie sicher du bist und welche Übungsbausteine zu deinen Fehlern passen.</p>
+    <p class="unter"><strong>Hilfsmittel:</strong> Taschenrechner und Tafelwerk sind erlaubt. Leg dir Papier für Nebenrechnungen bereit.</p></section>`;
+  for (const [key, b] of Object.entries(BEREICHE)) {
+    h += `<section class="bereich"><div class="bereich-name">${b.name}</div><div class="kacheln">`;
+    for (const t of THEMEN.filter(x => x.bereich === key)) {
+      const e = erg[t.id];
+      const nOffen = e ? (e.empf || []).filter(id => !fertig[id]).length : 0;
+      const chip = e ? `<span class="chip">zuletzt ${e.n} von ${e.g}</span>${nOffen ? `<span>${nOffen} ${nOffen === 1 ? 'Baustein' : 'Bausteine'} offen</span>` : ''}` : '';
+      h += `<button class="kachel" style="--k:var(${b.farbe});--k-soft:var(${b.farbe}-soft)" data-id="${t.id}">
+        <span class="t">${t.titel}</span><span class="info"><span>Test · ${t.fragen.length} Fragen</span>${chip}</span></button>`;
+    }
+    h += `</div></section>`;
+  }
+  const getestet = THEMEN.some(t => erg[t.id]);
+  const filtern = getestet && !alleBausteine;
+  h += `<section class="bereich ueben"><div class="ueben-kopf"><h2>Übungsbausteine</h2>${getestet ? `<button class="knopf leise klein" id="umschalten">${filtern ? 'Alle Bausteine einblenden' : 'Nur meine Bausteine zeigen'}</button>` : ''}</div>
+    <p class="unter">${filtern ? 'Bei Themen, die du schon getestet hast, siehst du nur die Bausteine, die zu deinen Fehlern passen. Bei allen anderen Themen siehst du alle Bausteine.' : 'Jeder Baustein erzeugt immer neue Aufgaben. Nach einem Test siehst du bei diesem Thema nur noch die Bausteine, die zu deinen Fehlern passen.'} Geschafft hast du einen Baustein, wenn du ${ZIEL} Aufgaben in Folge auf Anhieb richtig löst.</p>`;
+  for (const t of THEMEN) {
+    const f = BEREICHE[t.bereich].farbe, e = erg[t.id];
+    const ids = filtern && e ? (e.empf || []).filter(id => !fertig[id]) : alleIds(t);
+    const inhalt = ids.length ? bausteinKnoepfe(ids) : `<p class="hinweis erledigt">✓ Alle Bausteine zu deinen Fehlern geschafft.</p>`;
+    h += `<div class="ueb-gruppe" style="--topic:var(${f});--topic-soft:var(${f}-soft)"><div class="bereich-name">${t.titel}</div>${inhalt}</div>`;
+  }
+  return h + `</section>`;
+}
+
+function tabPruefungen(erg) {
+  let h = `<section class="bereich"><p class="unter">Komplexere Aufgaben im Stil der Abschlussprüfung, mit BE pro Teilaufgabe. Sie sind empfohlen, wenn dein Test zum Thema „sicher“ war. Bearbeite die Teilaufgaben zuerst auf Papier.</p></section>
+    <section class="bereich ueben">`;
+  for (const t of THEMEN) {
+    const f = BEREICHE[t.bereich].farbe, e = erg[t.id], emp = e && e.n >= t.grenzen[0];
+    h += `<div class="ueb-gruppe" style="--topic:var(${f});--topic-soft:var(${f}-soft)"><div class="bereich-name">${t.titel}${emp ? ' <span class="tag emp">empfohlen</span>' : ''}</div>${pruefKnoepfe(PRUEF_ZU[t.id])}</div>`;
+  }
+  return h + `</section>`;
+}
+
+function tabUebersicht(erg, fertig, pst) {
+  let zeilen = '';
+  for (const t of THEMEN) {
+    const e = erg[t.id], ids = alleIds(t), n = ids.filter(id => fertig[id]).length;
+    const offen = e ? (e.empf || []).filter(id => !fertig[id]) : [];
+    const test = e ? `${e.n} von ${e.g}<br><span class="stufe klein ${stufe(t, e.n)}">${STUFEN_NAME[stufe(t, e.n)]}</span>` : '<span class="hinweis">noch nicht gemacht</span>';
+    const bst = `${n} von ${ids.length} geschafft${offen.length ? `<br><span class="hinweis">offen: ${offen.map(id => BAUSTEINE[id].titel).join(', ')}</span>` : ''}`;
+    const pa = PRUEF_ZU[t.id].map(id => `${PRUEFUNG[id].titel}: ${pst[id] ? `<b>${fz(pst[id].n)} / ${pst[id].g} BE</b>` : '–'}`).join('<br>');
+    zeilen += `<tr style="--topic:var(${BEREICHE[t.bereich].farbe})"><th scope="row">${t.titel}</th><td>${test}</td><td>${bst}</td><td>${pa}</td></tr>`;
+  }
+  return `<section class="bereich"><p class="unter">Hier siehst du deinen Stand zu allen Themen. Du kannst die Übersicht deiner Lehrkraft zeigen.</p>
+    <div class="tabelle"><table class="stand"><thead><tr><th>Thema</th><th>Test</th><th>Übungsbausteine</th><th>Prüfungsaufgaben</th></tr></thead><tbody>${zeilen}</tbody></table></div></section>
+    <section class="bereich ueben"><h2>Zwischenstand sichern</h2>
+      <p class="unter">Dein Fortschritt bleibt nur in diesem Browser. Willst du an einem anderen Gerät weitermachen, erzeuge einen Code und speichere ihn, zum Beispiel in einer Notiz oder per Nachricht an dich selbst. Mit dem Code lädst du deinen Stand später wieder.</p>
+      <div class="sicherung">
+        <div class="knoepfe links"><button class="knopf klein" id="code-machen">Code erzeugen</button><button class="knopf klein leise" id="code-kopieren" hidden>Code kopieren</button></div>
+        <textarea id="code-aus" rows="3" readonly hidden aria-label="Dein Code"></textarea>
+        <label class="feldblock" for="code-ein">Code einfügen</label>
+        <textarea id="code-ein" rows="3" placeholder="GF10-…"></textarea>
+        <div class="knoepfe links"><button class="knopf klein" id="code-laden">Stand laden</button><button class="knopf klein leise" id="loeschen">Fortschritt löschen</button></div>
+        <p class="hinweis" id="code-status" role="status"></p>
+      </div></section>`;
+}
+
+function sicherungKlicks() {
+  const status = document.getElementById('code-status'), aus = document.getElementById('code-aus'), kop = document.getElementById('code-kopieren');
+  document.getElementById('code-machen').addEventListener('click', () => {
+    const daten = JSON.stringify({ v: 1, e: lade(), b: ladeB(), p: ladeP() });
+    aus.value = 'GF10-' + btoa(unescape(encodeURIComponent(daten)));
+    aus.hidden = false; kop.hidden = false; aus.select();
+    status.textContent = 'Code erzeugt. Kopiere ihn und speichere ihn an einem sicheren Ort.';
+  });
+  kop.addEventListener('click', () => {
+    navigator.clipboard.writeText(aus.value).then(() => { status.textContent = 'Code kopiert.'; })
+      .catch(() => { aus.select(); status.textContent = 'Kopieren hat nicht geklappt. Der Code ist markiert, kopiere ihn mit Strg + C.'; });
+  });
+  document.getElementById('code-laden').addEventListener('click', () => {
+    const roh = document.getElementById('code-ein').value.trim();
+    try {
+      if (!roh.startsWith('GF10-')) throw new Error();
+      const d = JSON.parse(decodeURIComponent(escape(atob(roh.slice(5)))));
+      if (!d || d.v !== 1) throw new Error();
+      localStorage.setItem('gf10-ergebnisse', JSON.stringify(d.e || {}));
+      localStorage.setItem('gf10-bausteine', JSON.stringify(d.b || {}));
+      localStorage.setItem('gf10-pruefung', JSON.stringify(d.p || {}));
+      start('uebersicht');
+      document.getElementById('code-status').textContent = 'Dein Stand wurde geladen.';
+    } catch (err) { status.textContent = 'Der Code ist nicht gültig. Prüfe, ob er vollständig kopiert wurde und mit GF10- beginnt.'; }
+  });
+  const lo = document.getElementById('loeschen');
+  lo.addEventListener('click', () => {
+    if (lo.dataset.sicher !== '1') { lo.dataset.sicher = '1'; lo.textContent = 'Wirklich alles löschen?'; status.textContent = 'Klicke noch einmal, um alle Ergebnisse zu löschen.'; return; }
+    try { ['gf10-ergebnisse', 'gf10-bausteine', 'gf10-pruefung'].forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    start('uebersicht');
+    document.getElementById('code-status').textContent = 'Alle Ergebnisse wurden gelöscht.';
+  });
+}
+
+function beginne(t) {
+  ueb = null;
+  setzeFarbe(t);
+  zustand = { t, i: 0, wahl: new Set(), geprueft: false, antworten: [] };
+  zeigeFrage();
+}
+
+function kopfleiste() {
+  const { t, i, antworten } = zustand;
+  let p = '';
+  t.fragen.forEach((_, k) => {
+    const c = k < antworten.length ? (antworten[k] ? 'r' : 'f') : (k === i ? 'jetzt' : '');
+    p += `<span class="${c}"></span>`;
+  });
+  return `<div class="leiste"><button class="zurueck" id="zurueck">← Zurück</button>
+    <span class="thema">${t.titel}</span><div class="punkte" aria-hidden="true">${p}</div></div>`;
+}
+
+function zeigeFrage() {
+  const { t, i, wahl, geprueft } = zustand;
+  const f = t.fragen[i];
+  let fig = f.fig ? `<div class="fig">${f.fig()}</div>` : '';
+  let sys = f.sys ? `<table class="sys">${f.sys.map(z => `<tr><td>${z[0]}</td><td>${mathe(z[1])}</td></tr>`).join('')}</table>` : '';
+  let opts = '';
+  const anz = f.o ? f.o.length : f.ofig.length;
+  for (let k = 0; k < anz; k++) {
+    const inhalt = f.o ? mathe(f.o[k]) : felder(...f.ofig[k]);
+    let kl = '', marke = '';
+    if (geprueft) {
+      const istR = f.r.includes(k), gew = wahl.has(k);
+      if (gew && istR) { kl = 'ist-r'; marke = 'richtig'; }
+      else if (gew && !istR) { kl = 'ist-f'; marke = 'falsch'; }
+      else if (!gew && istR) { kl = 'fehlt'; marke = 'auch richtig'; }
+    }
+    opts += `<button class="opt ${kl}" data-k="${k}" aria-pressed="${wahl.has(k)}" ${geprueft ? 'disabled' : ''}>
+      <span class="bu">${BU[k]}</span><span class="tx">${inhalt}</span>${marke ? `<span class="marke">${marke}</span>` : ''}</button>`;
+  }
+  let rueck = '';
+  if (geprueft) {
+    const ok = zustand.antworten[i];
+    rueck = `<div class="rueck ${ok ? 'r' : 'f'}" role="status"><strong>${ok ? 'Richtig!' : 'Noch nicht ganz.'}</strong>
+      <p>${ok ? '' : 'Richtig ist ' + f.r.map(k => BU[k]).join(', ') + '. '}${mathe(f.e)}</p></div>`;
+  }
+  const letzte = i === t.fragen.length - 1;
+  app.innerHTML = `${kopfleiste()}
+    <article class="karte">
+      <div class="nr"><b>${i + 1}</b>Frage ${i + 1} von ${t.fragen.length}</div>
+      <p class="frage">${mathe(f.q)}</p>${sys}${fig}
+      <p class="hinweis">Eine oder mehrere Antworten sind richtig. Taschenrechner und Tafelwerk sind erlaubt.</p>
+      <div class="optionen">${opts}</div>
+      ${rueck}
+      <div class="knoepfe">${geprueft
+        ? `<button class="knopf" id="weiter">${letzte ? 'Zum Ergebnis' : 'Nächste Frage'}</button>`
+        : `<button class="knopf" id="pruefen" ${wahl.size ? '' : 'disabled'}>Prüfen</button>`}</div>
+    </article>
+    <p class="hinweis">Tipp: Mit den Tasten A bis D wählst du Antworten aus, mit Enter geht es weiter.</p>`;
+  document.getElementById('zurueck').addEventListener('click', zurueck);
+  app.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => waehle(+b.dataset.k)));
+  const pr = document.getElementById('pruefen'); if (pr) pr.addEventListener('click', pruefe);
+  const we = document.getElementById('weiter'); if (we) { we.addEventListener('click', weiter); we.focus(); }
+}
+
+function waehle(k) {
+  if (!zustand || zustand.geprueft || zustand.ergebnis) return;
+  zustand.wahl.has(k) ? zustand.wahl.delete(k) : zustand.wahl.add(k);
+  zeigeFrage();
+  const b = app.querySelector(`.opt[data-k="${k}"]`); if (b) b.focus();
+}
+function pruefe() {
+  const { t, i, wahl } = zustand;
+  if (!wahl.size) return;
+  const r = t.fragen[i].r;
+  zustand.antworten[i] = r.length === wahl.size && r.every(k => wahl.has(k));
+  zustand.geprueft = true;
+  zeigeFrage();
+}
+function weiter() {
+  if (zustand.i < zustand.t.fragen.length - 1) {
+    zustand.i++; zustand.wahl = new Set(); zustand.geprueft = false; zeigeFrage();
+  } else ergebnis();
+}
+
+function ergebnis() {
+  const { t, antworten } = zustand;
+  zustand.ergebnis = true;
+  const n = antworten.filter(Boolean).length, g = t.fragen.length, s = stufe(t, n);
+  const fehler = t.fragen.map((f, k) => ({ f, k })).filter(x => !antworten[x.k]);
+  const empfSp = [...new Set(fehler.flatMap(({ k }) => ZUORDNUNG[t.id][k]))];
+  speichere(t.id, { n, g, empf: empfSp });
+  try { const fb = ladeB(); empfSp.forEach(id => delete fb[id]); localStorage.setItem('gf10-bausteine', JSON.stringify(fb)); } catch (e) {}
+  const liste = fehler.length
+    ? `<h3>Das solltest du dir noch einmal ansehen</h3><ul class="fehlerliste">${fehler.map(({ f, k }) =>
+        `<li><span class="q">Frage ${k + 1}: ${mathe(f.q)}</span><span class="rl">Richtig: ${f.r.map(j => BU[j]).join(', ')}. ${mathe(f.e)}</span></li>`).join('')}</ul>`
+    : '';
+  const [a, b] = t.grenzen;
+  const empf = [...new Set(fehler.flatMap(({ k }) => ZUORDNUNG[t.id][k]))];
+  const alle = [...new Set(ZUORDNUNG[t.id].flat())].sort();
+  const ueben = empf.length
+    ? `<h3>Damit übst du gezielt weiter</h3><p class="hinweis">Diese Bausteine passen zu deinen Fehlern.</p>${bausteinKnoepfe(empf)}`
+    : `<h3>Zum Vertiefen</h3><p class="hinweis">Du hattest keine Fehler. Wenn du möchtest, kannst du hier trotzdem üben.</p>${bausteinKnoepfe(alle)}`;
+  app.innerHTML = `${kopfleiste()}
+    <article class="karte">
+      <h2>Dein Ergebnis</h2>
+      <div class="ergebnis-kopf"><span class="zahl">${n} von ${g}</span><span class="stufe ${s}">${STUFEN_NAME[s]}</span></div>
+      <p>${STUFEN_TEXT[s]}</p>
+      <p class="hinweis">${a === g ? g : a + ' bis ' + g} richtig: sicher · ${b === a - 1 ? b : b + ' bis ' + (a - 1)} richtig: teilweise sicher · weniger als ${b}: noch unsicher</p>
+      ${s === 's1' ? `<h3>Bereit für mehr: Prüfungsaufgaben</h3><p class="hinweis">Dein Ergebnis ist sicher. Probiere komplexere Aufgaben im Stil der Abschlussprüfung.</p>${pruefKnoepfe(PRUEF_ZU[t.id])}` : ''}
+      ${ueben}
+      ${s !== 's1' ? `<p class="hinweis">Wenn du sicherer bist, kannst du dich an den Prüfungsaufgaben versuchen:</p>${pruefKnoepfe(PRUEF_ZU[t.id])}` : ''}
+      ${liste}
+      <div class="knoepfe"><button class="knopf leise" id="nochmal">Test wiederholen</button><button class="knopf" id="andere">Zur Startseite</button></div>
+    </article>`;
+  document.getElementById('zurueck').addEventListener('click', zurueck);
+  document.getElementById('nochmal').addEventListener('click', () => beginne(t));
+  bausteinKlicks(); pruefKlicks();
+  document.getElementById('andere').addEventListener('click', zurueck);
+}
+
+/* ---------- Übungsmodus ---------- */
+const ZIEL = 5;
+let ueb = null;
+function ladeB() { try { return JSON.parse(localStorage.getItem('gf10-bausteine') || '{}'); } catch (e) { return {}; } }
+function speichereB(id) { try { const a = ladeB(); a[id] = true; localStorage.setItem('gf10-bausteine', JSON.stringify(a)); } catch (e) {} }
+function bausteinKnoepfe(ids) {
+  const fertig = ladeB();
+  return `<div class="bausteine">${ids.map(id => `<button class="baustein" data-b="${id}"><span>${BAUSTEINE[id].titel}</span>${fertig[id] ? '<span class="haken" aria-label="geschafft">✓ geschafft</span>' : ''}</button>`).join('')}</div>`;
+}
+function bausteinKlicks() { app.querySelectorAll('.baustein').forEach(b => b.addEventListener('click', () => { location.hash = 'ueben-' + b.dataset.b; })); }
+
+function uebe(id) {
+  const B = BAUSTEINE[id];
+  zustand = null;
+  setzeFarbe(THEMEN.find(t => t.id === B.thema));
+  ueb = { id, B, serie: 0, fertig: false };
+  neueAufgabe();
+}
+function neueAufgabe() { Object.assign(ueb, { a: ueb.B.gen(), versuch: 0, status: null, werte: {}, falsch: [], msg: '' }); zeigeUebung(); }
+
+function zeigeUebung() {
+  const { B, a, serie, status, werte, falsch, msg, fertig } = ueb;
+  const thema = THEMEN.find(t => t.id === B.thema);
+  let punkte = ''; for (let k = 0; k < ZIEL; k++) punkte += `<span class="${k < serie ? 'r' : ''}"></span>`;
+  const sys = a.sys ? `<table class="sys">${a.sys.map(z => `<tr><td>${z[0]}</td><td>${mathe(z[1])}</td></tr>`).join('')}</table>` : '';
+  const fig = a.fig ? `<div class="fig">${a.fig}</div>` : '';
+  const zu = status === 'r' || status === 'f2';
+  let felder = '';
+  a.felder.forEach((fd, k) => {
+    if (fd.typ === 'wahl') {
+      felder += `<div class="optionen">${fd.opts.map((o, j) => `<button class="opt ${zu && j === fd.richtig ? 'ist-r' : ''} ${zu && werte[k] === j && j !== fd.richtig ? 'ist-f' : ''}" data-w="${j}" aria-pressed="${werte[k] === j}" ${zu ? 'disabled' : ''}><span class="bu">${BU[j]}</span><span class="tx">${o}</span></button>`).join('')}</div>`;
+    } else {
+      felder += `<label class="feld ${falsch.includes(k) ? 'falsch' : ''}"><span class="fl">${mathe(fd.label)}</span>
+        <input id="f${k}" type="text" inputmode="text" autocomplete="off" spellcheck="false" value="${esc(werte[k] || '')}" ${zu ? 'disabled' : ''}>
+        ${fd.einheit ? `<span class="fe">${fd.einheit}</span>` : ''}</label>`;
+    }
+  });
+  let rueck = '';
+  if (msg) rueck = `<div class="rueck f" role="status"><p>${msg}</p></div>`;
+  else if (status === 'r') rueck = `<div class="rueck r" role="status"><strong>Richtig!</strong><p>${mathe(a.loesung)}</p></div>`;
+  else if (status === 'f1') rueck = `<div class="rueck f" role="status"><strong>Noch nicht richtig.</strong><p>Tipp: ${mathe(B.tipp)} Versuche es noch einmal.</p></div>`;
+  else if (status === 'f2') rueck = `<div class="rueck f" role="status"><strong>Leider falsch.</strong><p>So geht es: ${mathe(a.loesung)}</p></div>`;
+  const geschafft = fertig ? `<div class="rueck r geschafft" role="status"><strong>Geschafft!</strong><p>Du hast ${ZIEL} Aufgaben in Folge auf Anhieb richtig gelöst. Du kannst weiterüben oder ein anderes Thema wählen.</p></div>` : '';
+  const termHilfe = a.felder.some(fd => fd.typ === 'term') ? '<p class="hinweis">Schreibweise: 3x − 4, 2(x + 5), x² oder x^2, Brüche mit / oder :.</p>' : '';
+  const wktHilfe = a.felder.some(fd => fd.typ === 'wkt') ? '<p class="hinweis">Antworte als Bruch (3/8), Dezimalzahl (0,375) oder in Prozent (37,5 %).</p>' : '';
+  app.innerHTML = `<div class="leiste"><button class="zurueck" id="zurueck">← Zurück</button>
+      <span class="thema">${thema.titel}</span><div class="punkte" title="${serie} von ${ZIEL} in Folge richtig">${punkte}</div></div>
+    <article class="karte">
+      <div class="nr"><b>✎</b>Üben: ${B.titel}</div>
+      <p class="frage">${mathe(a.text)}</p>${sys}${fig}
+      <div class="felder">${felder}</div>${termHilfe}${wktHilfe}
+      <details class="tipp"><summary>Tipp anzeigen</summary><p>${mathe(B.tipp)}</p></details>
+      ${rueck}${geschafft}
+      <div class="knoepfe">${zu ? `<button class="knopf" id="naechste">Nächste Aufgabe</button>` : `<button class="knopf" id="pruefen">Prüfen</button>`}</div>
+    </article>
+    <p class="hinweis">Ziel: ${ZIEL} Aufgaben in Folge auf Anhieb richtig. Die Zahlen sind bei jeder Aufgabe neu. Taschenrechner und Tafelwerk sind erlaubt.</p>`;
+  document.getElementById('zurueck').addEventListener('click', () => { zurueck(); });
+  app.querySelectorAll('.felder input').forEach(inp => {
+    inp.addEventListener('input', () => { ueb.werte[+inp.id.slice(1)] = inp.value; });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); pruefeUebung(); } });
+  });
+  app.querySelectorAll('.felder .opt').forEach(b => b.addEventListener('click', () => {
+    const k = a.felder.findIndex(fd => fd.typ === 'wahl'); ueb.werte[k] = +b.dataset.w; ueb.msg = ''; zeigeUebung();
+  }));
+  const pr = document.getElementById('pruefen'); if (pr) pr.addEventListener('click', pruefeUebung);
+  const na = document.getElementById('naechste'); if (na) { na.addEventListener('click', neueAufgabe); na.focus(); }
+  else { const erstes = app.querySelector('.felder input:not([disabled])'); if (erstes && !msg && status !== 'f1') erstes.focus(); }
+}
+
+function pruefeUebung() {
+  const { a, werte } = ueb;
+  const erg = a.felder.map((fd, k) => pruefeFeld(fd, werte[k]));
+  const leer = erg.find(e => e.leer);
+  if (leer) { ueb.msg = leer.leer; ueb.falsch = []; zeigeUebung(); return; }
+  ueb.msg = '';
+  ueb.falsch = erg.map((e, k) => e.ok ? -1 : k).filter(k => k >= 0);
+  if (!ueb.falsch.length) {
+    if (ueb.versuch === 0) ueb.serie++;
+    ueb.status = 'r';
+    if (ueb.serie >= ZIEL && !ueb.fertig) { ueb.fertig = true; speichereB(ueb.id); }
+  } else {
+    ueb.versuch++; ueb.serie = 0;
+    const hin = erg.find(e => e.msg);
+    ueb.status = ueb.versuch >= 2 ? 'f2' : 'f1';
+    if (hin && ueb.status === 'f1') { zeigeUebung(); const r = app.querySelector('.rueck p'); if (r) r.textContent = hin.msg + ' Versuche es noch einmal.'; return; }
+  }
+  zeigeUebung();
+}
+
+document.addEventListener('keydown', e => {
+  if (!zustand || zustand.ergebnis || e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = 'abcd'.indexOf(e.key.toLowerCase());
+  if (k >= 0 && !zustand.geprueft) { waehle(k); return; }
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('opt')) {
+    e.preventDefault(); zustand.geprueft ? weiter() : pruefe();
+  }
+});
+
+function route() {
+  const id = location.hash.slice(1);
+  if (id.startsWith('ueben-') && BAUSTEINE[id.slice(6)]) { uebe(id.slice(6)); return; }
+  if (id.startsWith('pruefung-') && PRUEFUNG[id.slice(9)]) { pruefungStart(id.slice(9)); return; }
+  const t = THEMEN.find(x => x.id === id);
+  if (t) { beginne(t); return; }
+  start(id);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
