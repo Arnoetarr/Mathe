@@ -1083,7 +1083,7 @@ function start(tab) {
   setzeFarbe(null);
   zustand = null; ueb = null; pr = null;
   const erg = lade(), fertig = ladeB(), pst = ladeP();
-  let h = `<header class="kopf"><h1>Grundfertigkeiten Klasse 10</h1></header>
+  let h = `<header class="kopf"><h1>Prüfungsvorbereitung Weltgeister</h1></header>
     <nav class="tabs" role="tablist">${TABS.map(([id, n]) => `<a role="tab" href="#${id}" class="tab ${id === tab ? 'aktiv' : ''}" aria-selected="${id === tab}">${n}</a>`).join('')}</nav>`;
   if (tab === 'grundlagen') h += tabGrundlagen(erg, fertig);
   else if (tab === 'pruefungen') h += tabPruefungen(erg);
