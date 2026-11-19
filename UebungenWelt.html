@@ -1,4 +1,4 @@
-<title>Grundfertigkeiten Klasse 10</title>
+<title>Grundfertigkeiten Prüfungsvorbereitung Weltgeister</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -299,7 +299,7 @@ const THEMEN = [
 ]},
 { id: 'lgs', titel: 'Lineare Gleichungssysteme', bereich: 'funktionen', grenzen: [7, 5], fragen: [
  { q: 'Gib die Lösungsmenge des Gleichungssystems an.', sys: [['I', 'x + y = 7'], ['II', 'x − y = 3']], o: ['L = {(5; 2)}', 'L = {(2; 5)}', 'L = {5}', 'L = {(4; 3)}'], r: [0],
-   e: 'Addiert man beide Gleichungen, erhält man 2x = 10, also x = 5. Aus I folgt y = 2. Die Lösung ist ein Zahlenpaar (x; y).' },
+   e: 'Aus I folgt x = 7 − y. Setzt man das in II ein, erhält man 7 − y − y = 3, also y = 2 und x = 5. Die Lösung ist ein Zahlenpaar (x; y).' },
  { q: 'Welche zweite Gleichung bildet mit y = 2x − 1 ein Gleichungssystem mit unendlich vielen Lösungen?', o: ['y = 2x + 1', '2y = 4x − 2', 'y = −2x − 1', '4x − 2y = 2'], r: [1, 3],
    e: 'Unendlich viele Lösungen gibt es, wenn beide Gleichungen dieselbe Gerade beschreiben. Stellt man B und D nach y um, erhält man jeweils y = 2x − 1.' },
  { q: 'Welche zweite Gleichung bildet mit y = −x + 2 ein Gleichungssystem ohne Lösung?', o: ['y = −x + 5', 'y = x + 2', '2y = −2x + 4', 'x + y = −1'], r: [0, 3],
@@ -312,7 +312,7 @@ const THEMEN = [
  { q: 'Paul ist dreimal so alt wie Lea. Zusammen sind sie 32 Jahre alt. Welcher Term gibt in diesem Gleichungssystem Pauls Alter an?', sys: [['I', '3x = y'], ['II', 'x + y = 32']], o: ['x', 'y', '3y', 'kein Term'], r: [1],
    e: 'Aus I folgt: y ist das Dreifache von x. Also steht x für Leas Alter und y für Pauls Alter.' },
  { q: 'Welche Gleichung entsteht, wenn man Gleichung I in Gleichung II einsetzt?', sys: [['I', 'y = 2x'], ['II', '3x + y = 15']], o: ['3x + 2x = 15', '3 · 2x + y = 15', '3x + y = 2x', '3x + 2 = 15'], r: [0],
-   e: 'Beim Einsetzungsverfahren ersetzt man y in Gleichung II durch 2x. Man erhält x = 3 und y = 6.' },
+   e: 'Setzt man I in II ein, ersetzt man y durch 2x. Man erhält 5x = 15, also x = 3 und y = 6.' },
  { q: 'Anna kauft 3 Roggenbrötchen und 2 Körnerbrötchen für 2,90 €. Ben kauft 4 Roggenbrötchen und 5 Körnerbrötchen für 5,50 €. Welche Gleichungssysteme passen? (r: Preis eines Roggenbrötchens, k: Preis eines Körnerbrötchens)',
    o: ['I  3r + 2k = 2,90\nII  4r + 5k = 5,50', 'I  3k + 2r = 2,90\nII  4k + 5r = 5,50', 'I  3r + 2k = 5,50\nII  4r + 5k = 2,90', 'I  2k + 3r = 2,90\nII  5k + 4r = 5,50'], r: [0, 3],
    e: 'Die Anzahl muss zur richtigen Sorte gehören. Bei D sind nur die Summanden vertauscht. Ein Roggenbrötchen kostet 0,50 €, ein Körnerbrötchen 0,70 €.' }
@@ -329,10 +329,10 @@ const THEMEN = [
    e: '−2y = −6x + 8. Dividiert durch −2 ergibt sich y = 3x − 4.' },
  { q: 'Welche Geraden verlaufen durch den Punkt P(2 | 3) und haben den Anstieg m = −1?', o: ['y = −x + 5', 'y = −x + 3', 'y = x + 1', 'x + y = 5'], r: [0, 3],
    e: 'Setze P ein: 3 = −1 · 2 + n, also n = 5. Die Gleichung x + y = 5 ist nach y umgestellt dieselbe Gerade.' },
- { q: 'Welche Gleichung hat die Gerade, die parallel zur x-Achse durch den Punkt P(4 | −2) verläuft?', o: ['y = −2', 'y = 4', 'x = 4', 'y = −2x'], r: [0],
-   e: 'Eine Parallele zur x-Achse hat den Anstieg 0. Jeder ihrer Punkte hat dieselbe y-Koordinate wie P.' },
- { q: 'Was trifft auf alle Graphen linearer Funktionen zu?', o: ['Sie sind Geraden.', 'Sie verlaufen durch den Koordinatenursprung.', 'Sie schneiden die y-Achse.', 'Sie schneiden die x-Achse.'], r: [0, 2],
-   e: 'Jeder Graph schneidet die y-Achse bei n. Durch den Ursprung gehen nur Graphen mit n = 0. Parallelen zur x-Achse wie y = 3 haben keine Nullstelle.' },
+ { q: 'Welche Geraden verlaufen parallel zur Geraden y = 2x − 3?', o: ['y = 2x + 1', 'y = −2x − 3', 'y = 3x − 2', 'y = 2x'], r: [0, 3],
+   e: 'Parallele Geraden haben denselben Anstieg. Bei A und D ist m = 2. Der y-Achsenabschnitt darf verschieden sein.' },
+ { q: 'Was trifft auf alle Graphen linearer Funktionen zu?', o: ['Sie sind Geraden.', 'Sie verlaufen durch den Koordinatenursprung.', 'Sie schneiden die y-Achse.', 'Sie steigen.'], r: [0, 2],
+   e: 'Jeder Graph schneidet die y-Achse bei n. Durch den Ursprung gehen nur Graphen mit n = 0. Ist m negativ, fällt der Graph.' },
  { q: 'Welchen Anstieg hat die Gerade durch die Punkte P(1 | 4) und Q(3 | −2)?', o: ['m = −3', 'm = 3', 'm = −2', 'm = −{1/3}'], r: [0],
    e: 'm = (−2 − 4) : (3 − 1) = −6 : 2 = −3.' },
  { q: 'Welche Zuordnungen sind linear?', o: ['Anzahl der Hefte → Preis', 'gefahrene Kilometer → Preis einer Taxifahrt (Grundgebühr und Preis pro Kilometer)', 'Seitenlänge eines Quadrats → Flächeninhalt', 'Fahrzeit bei 50 km/h → zurückgelegter Weg'], r: [0, 1, 3],
@@ -542,7 +542,7 @@ const BAUSTEINE = {
    return { text: `Wie viele Lösungen hat die Gleichung ${a}(${lin(1, b)}) = ${lin(c, d)}?`, felder: [{ typ: 'wahl', opts, richtig: 1 }],
      loesung: `Die Anzahl der x ist auf beiden Seiten verschieden. Es gibt genau eine Lösung: x = ${fz(x)}.` }; } },
 
- l1: { thema: 'lgs', titel: 'Gleichungssysteme rechnerisch lösen', tipp: 'Einsetzungsverfahren: Ist eine Gleichung nach y umgestellt, setze sie in die andere ein. Additionsverfahren: Multipliziere so, dass beim Addieren eine Variable wegfällt.', gen() {
+ l1: { thema: 'lgs', titel: 'Gleichungssysteme rechnerisch lösen', tipp: 'Stelle eine Gleichung nach x oder y um, falls sie es noch nicht ist. Setze sie dann in die andere Gleichung ein. Jetzt kommt nur noch eine Variable vor.', gen() {
    const x = R(-4, 6), y = R(-4, 6);
    if (Math.random() < .5) {
      let m, a, b; do { m = nz(-3, 3); a = nz(-4, 5); b = nz(-3, 4); } while (a + b * m === 0 || (m === 2 && y - m * x === -7));
@@ -551,10 +551,10 @@ const BAUSTEINE = {
        felder: [{ label: 'x =', typ: 'zahl', wert: x }, { label: 'y =', typ: 'zahl', wert: y }],
        loesung: `I in II einsetzen: ${poly([[a, 'x']])} ${b < 0 ? '−' : '+'} ${Math.abs(b) === 1 ? '' : fz(Math.abs(b))}(${lin(m, n)}) = ${fz(c)}. Daraus folgt x = ${fz(x)} und y = ${fz(y)}, also L = {(${fz(x)}; ${fz(y)})}.` };
    }
-   let a1, b1, a2, b2; do { a1 = R(1, 4); b1 = nz(-3, 3); a2 = R(1, 4); b2 = nz(-3, 3); } while (a1 * b2 - a2 * b1 === 0);
+   let a1 = 1, b1, a2, b2; do { b1 = nz(-3, 3); a2 = R(1, 4); b2 = nz(-3, 3); } while (a1 * b2 - a2 * b1 === 0);
    return { text: 'Löse das Gleichungssystem.', sys: [['I', `${poly([[a1, 'x'], [b1, 'y']])} = ${fz(a1 * x + b1 * y)}`], ['II', `${poly([[a2, 'x'], [b2, 'y']])} = ${fz(a2 * x + b2 * y)}`]],
      felder: [{ label: 'x =', typ: 'zahl', wert: x }, { label: 'y =', typ: 'zahl', wert: y }],
-     loesung: `x = ${fz(x)} und y = ${fz(y)}, also L = {(${fz(x)}; ${fz(y)})}. Probe in I: ${fz(a1)} · ${par(x)} ${b1 < 0 ? '−' : '+'} ${fz(Math.abs(b1))} · ${par(y)} = ${fz(a1 * x + b1 * y)}.` }; } },
+     loesung: `I nach x umstellen: x = ${poly([[-b1, 'y'], [a1 * x + b1 * y, '']])}. In II einsetzen und nach y lösen. Ergebnis: x = ${fz(x)} und y = ${fz(y)}, also L = {(${fz(x)}; ${fz(y)})}. Probe in I: ${fz(a1)} · ${par(x)} ${b1 < 0 ? '−' : '+'} ${fz(Math.abs(b1))} · ${par(y)} = ${fz(a1 * x + b1 * y)}.` }; } },
  l2: { thema: 'lgs', titel: 'Anzahl der Lösungen bei Gleichungssystemen', tipp: 'Stelle beide Gleichungen nach y um. Gleicher Anstieg und gleicher y-Achsenabschnitt: unendlich viele Lösungen. Gleicher Anstieg, anderer Abschnitt: keine Lösung. Verschiedener Anstieg: genau eine Lösung.', gen() {
    const m = pick([-3, -2, -1, -0.5, 0.5, 1, 2, 3]), n = nz(-4, 4), t = R(0, 2);
    let m2 = m, n2 = n;
@@ -601,7 +601,7 @@ const BAUSTEINE = {
      felder: [{ label: 'm =', typ: 'zahl', wert: m }, { label: 'n =', typ: 'zahl', wert: n }],
      loesung: `Der Graph schneidet die y-Achse bei ${fz(n)}. ${Number.isInteger(m) ? `Geht man 1 nach rechts, ändert sich y um ${fz(m)}.` : `Geht man 2 nach rechts, ändert sich y um ${fz(2 * m)}.`} Also y = ${lin(m, n)}.` }; } },
  f3: { thema: 'funktionen', titel: 'Gleichung aus zwei Punkten', tipp: 'm = (y₂ − y₁) : (x₂ − x₁). Setze dann einen Punkt in y = mx + n ein und berechne n.', gen() {
-   const m = pick([-3, -2, -1, -0.5, 0, 0.5, 1, 2, 3]), n = R(-4, 5), x1 = 2 * R(-2, 1), x2 = x1 + pick([2, 4]), y1 = m * x1 + n, y2 = m * x2 + n;
+   const m = pick([-3, -2, -1, -0.5, 0.5, 1, 2, 3]), n = R(-4, 5), x1 = 2 * R(-2, 1), x2 = x1 + pick([2, 4]), y1 = m * x1 + n, y2 = m * x2 + n;
    return { text: `Eine Gerade verläuft durch die Punkte P(${fz(x1)} | ${fz(y1)}) und Q(${fz(x2)} | ${fz(y2)}). Bestimme ihre Gleichung y = mx + n.`,
      felder: [{ label: 'm =', typ: 'zahl', wert: m }, { label: 'n =', typ: 'zahl', wert: n }],
      loesung: `m = (${fz(y2)} − ${par(y1)}) : (${fz(x2)} − ${par(x1)}) = ${fz(y2 - y1)} : ${fz(x2 - x1)} = ${fz(m)}. Aus ${fz(y1)} = ${fz(m)} · ${par(x1)} + n folgt n = ${fz(n)}. Also y = ${lin(m, n)}.` }; } },
@@ -897,7 +897,7 @@ const PRUEFUNG = {
        { op: 'Aufstellen', text: 'Stellen Sie ein lineares Gleichungssystem auf, mit dem sich die Grundgebühr g und der Arbeitspreis p ermitteln lassen.', be: 2, offen: true,
          muster: `(I) g + ${k1} · p = ${fz(C1)}, (II) g + ${k2} · p = ${fz(C2)}. (1 BE je Gleichung, die Variablen müssen erklärt sein)` },
        { op: 'Ermitteln', text: 'Ermitteln Sie den Arbeitspreis pro kWh und die monatliche Grundgebühr.', be: 2, felder: [{ label: 'Arbeitspreis:', einheit: '€/kWh', typ: 'zahl', wert: ap }, { label: 'Grundgebühr:', einheit: '€', typ: 'zahl', wert: g }],
-         loesung: `(I) − (II): ${k1 - k2}p = ${fz(Math.round((C1 - C2) * 100) / 100)}, also p = ${fz(ap)} €/kWh. Eingesetzt: g = ${fz(C1)} − ${k1} · ${fz(ap)} = ${fz(g)} €` },
+         loesung: `Aus (I): g = ${fz(C1)} − ${k1}p. In (II) eingesetzt: ${fz(C1)} − ${k1}p + ${k2}p = ${fz(C2)}, also ${k2 - k1}p = ${fz(Math.round((C2 - C1) * 100) / 100)} und p = ${fz(ap)} €/kWh. Dann g = ${fz(C1)} − ${k1} · ${fz(ap)} = ${fz(g)} €` },
        { op: 'Berechnen', text: `Berechnen Sie die Kosten für einen Monat mit ${k3} kWh.`, be: 1, felder: [{ label: 'Kosten:', einheit: '€', typ: 'zahl', wert: g + ap * k3 }], loesung: `${fz(g)} + ${k3} · ${fz(ap)} = ${fz(g + ap * k3)}, also ${fe(g + ap * k3)}` },
        { op: 'Ermitteln', text: `Ein anderer Anbieter verlangt eine Grundgebühr von ${fe(g + dg)} und ${fz(ap2)} € pro kWh. Ermitteln Sie, ab welchem monatlichen Verbrauch der andere Anbieter günstiger ist.`, be: 2,
          felder: [{ label: 'ab mehr als', einheit: 'kWh', typ: 'zahl', wert: gr }], loesung: `${fz(g)} + ${fz(ap)}x = ${fz(g + dg)} + ${fz(ap2)}x, also 0,04x = ${dg} und x = ${fz(gr)}. Ab mehr als ${fz(gr)} kWh ist der andere Anbieter günstiger.` }
@@ -933,7 +933,7 @@ const PRUEFUNG = {
          loesung: `Grundseite von ${fz(r1)} bis ${fz(r2)}: g = ${fz(r2 - r1)} cm. Höhe = y-Koordinate von S: h = ${sy} cm. A = {g · h/2} = ${fz((r2 - r1) * sy / 2)} cm²` }
      ] }; } },
  wa: { thema: 'wahrscheinlichkeit', titel: 'Glücksrad', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
-   const n = pick([5, 6, 10]), w = R(1, Math.min(4, n - 2)), s = n - w, N = 30;
+   const n = pick([5, 6, 10]), w = R(1, Math.floor((n - 1) / 2)), s = n - w;
    const pSS = s * s / (n * n), pWS = w * s / (n * n), pG = (w * w + s * s) / (n * n);
    return { kontext: `Ein Glücksrad besteht aus ${w === 1 ? 'einem' : w} weißen und ${s} schwarzen Feldern. Alle Felder sind gleich groß. Das Glücksrad wird zweimal gedreht.`, fig: rad(n, w),
      teile: [
@@ -943,10 +943,10 @@ const PRUEFUNG = {
        { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass erst ein weißes und dann ein schwarzes Feld angezeigt wird.', be: 1, felder: [{ label: 'P =', typ: 'wkt', wert: pWS }], loesung: `{${w}/${n}} · {${s}/${n}} = {${w * s}/${n * n}} ≈ ${prozent(pWS)}` },
        { op: 'Ermitteln', text: 'Ermitteln Sie die Wahrscheinlichkeit dafür, dass mindestens einmal ein weißes Feld angezeigt wird.', be: 2, felder: [{ label: 'P =', typ: 'wkt', wert: 1 - pSS }],
          loesung: `Gegenereignis „zweimal schwarz“: {${s * s}/${n * n}}. P = 1 − {${s * s}/${n * n}} = {${n * n - s * s}/${n * n}} ≈ ${prozent(1 - pSS)}` },
-       { op: 'Ermitteln', text: `Ein neues Glücksrad soll ${N} gleich große Felder haben. Die Wahrscheinlichkeiten für weiß und schwarz sollen gleich bleiben. Ermitteln Sie, wie viele Felder weiß sein müssen.`, be: 1,
-         felder: [{ label: 'weiße Felder:', typ: 'zahl', wert: w * N / n }], loesung: `{${w}/${n}} von ${N} Feldern: ${N} · ${w} : ${n} = ${w * N / n}` },
-       { op: 'Beurteilen', text: 'Ben sagt: „Verdoppelt man die Anzahl der weißen und der schwarzen Felder, ändern sich die Wahrscheinlichkeiten.“ Beurteilen Sie diese Aussage.', be: 1, offen: true,
-         muster: `Die Aussage ist falsch. Zum Beispiel weiß: {${2 * w}/${2 * n}} = {${w}/${n}}. Zähler und Nenner werden verdoppelt, der Bruch bleibt gleich.` }
+       { op: 'Berechnen', text: 'Berechnen Sie die Wahrscheinlichkeit dafür, dass genau einmal ein weißes Feld angezeigt wird.', be: 1, felder: [{ label: 'P =', typ: 'wkt', wert: 2 * pWS }],
+         loesung: `weiß–schwarz oder schwarz–weiß: {${w * s}/${n * n}} + {${w * s}/${n * n}} = {${2 * w * s}/${n * n}} ≈ ${prozent(2 * pWS)}` },
+       { op: 'Beurteilen', text: 'Ben sagt: „Zweimal weiß ist genauso wahrscheinlich wie zweimal schwarz, denn es gibt nur zwei Farben.“ Beurteilen Sie diese Aussage.', be: 1, offen: true,
+         muster: `Die Aussage ist falsch. Zweimal weiß: {${w * w}/${n * n}}, zweimal schwarz: {${s * s}/${n * n}}. Es gibt mehr schwarze als weiße Felder, deshalb ist zweimal schwarz wahrscheinlicher.` }
      ] }; } },
  wb: { thema: 'wahrscheinlichkeit', titel: 'Kugeln ziehen', quelle: 'eigene Aufgabe, prüfungsnah', gen() {
    const r = R(2, 5), b = R(3, 6), n = r + b;
