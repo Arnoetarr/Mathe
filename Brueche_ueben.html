@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brüche üben mit deinem Bruchling</title>
+<style>
+:root{
+  --bg:#fdf6ec; --card:#ffffff; --ink:#2b2d42; --muted:#6c6f80; --line:#e6dccb;
+  --ok:#2f9e5b; --bad:#d1495b; --gold:#e8b923; --tc:#2a9d8f; --tcl:#e3f4f1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.4}
+button{font:inherit;cursor:pointer}
+input{font:inherit}
+.hidden{display:none!important}
+#app{max-width:1100px;margin:0 auto;padding:12px;min-height:100%}
+.screen{display:none}
+.screen.active{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border-radius:20px;box-shadow:0 3px 0 var(--line),0 6px 18px rgba(0,0,0,.06);padding:18px}
+.btn{border:none;border-radius:14px;padding:12px 20px;background:var(--tc);color:#fff;font-weight:bold;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.btn.sec{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.btn.gold{background:var(--gold);color:#3b2a00}
+.btn:disabled{opacity:.45;cursor:default}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.topbar h1,.topbar h2{margin:0;font-size:1.3em;flex:1}
+.coins{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 14px;font-weight:bold;box-shadow:0 2px 0 var(--line)}
+.coin{display:inline-block;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#e8b923 60%,#b98a00);border:2px solid #b98a00;vertical-align:middle}
+.pop{animation:pop .5s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+/* Start */
+.start{max-width:560px;margin:30px auto;text-align:center}
+.start h1{margin:.2em 0}
+.start label{display:block;text-align:left;margin:12px 0 4px;font-weight:bold}
+.start input{width:100%;padding:12px;border-radius:12px;border:2px solid var(--line);font-size:1.1em}
+.creature-wrap{width:200px;height:200px;margin:0 auto}
+
+/* Home */
+.home{display:grid;grid-template-columns:300px 1fr;gap:14px}
+@media (max-width:800px){.home{grid-template-columns:1fr}}
+.petcard{text-align:center}
+.petcard .creature-wrap{width:220px;height:220px}
+.petname{font-size:1.3em;font-weight:bold;margin:6px 0 0}
+.stage{color:var(--muted);font-size:.9em}
+.xpbar{height:14px;background:#eee;border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.xpbar>div{height:100%;background:linear-gradient(90deg,#8bd17c,#2f9e5b);border-radius:99px;transition:width .6s}
+.small{font-size:.85em;color:var(--muted)}
+.petbtns{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.tile{border:none;text-align:left;background:#fff;border-radius:18px;padding:12px;box-shadow:0 4px 0 var(--line);border-top:8px solid var(--c);display:flex;flex-direction:column;gap:6px;min-height:150px}
+.tile:active{transform:translateY(3px)}
+.tile .ti{height:56px;display:flex;align-items:center}
+.tile .ti svg{height:56px;width:auto}
+.tile b{font-size:1.05em}
+.stars{color:var(--gold);letter-spacing:2px;font-size:1.15em}
+.stars .off{color:#ddd}
+.lvl{font-size:.8em;color:var(--muted)}
+
+/* Practice */
+.pr-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.pr-head h2{margin:0;font-size:1.2em;flex:1}
+.lvldots{display:inline-flex;gap:5px;align-items:center;font-size:.85em;color:var(--muted)}
+.lvldots i{width:14px;height:14px;border-radius:50%;background:#ddd;display:inline-block}
+.lvldots i.on{background:var(--tc)}
+.pr-main{display:grid;grid-template-columns:1fr 170px;gap:14px}
+@media (max-width:760px){.pr-main{grid-template-columns:1fr}.pr-side{display:none}}
+.taskcard{border-top:8px solid var(--tc);min-height:380px;display:flex;flex-direction:column}
+.q{font-size:1.1em}
+.q p{margin:.3em 0 .6em}
+.figbox{display:flex;justify-content:center;margin:8px 0}
+.fig{max-width:100%;height:auto}
+.fig .part{fill:#fff;stroke:#2b2d42;stroke-width:2}
+.fig .part.on{fill:var(--tc)}
+.fig.clickable .part{cursor:pointer}
+.fig.clickable .part:hover{fill:var(--tcl)}
+.fig.clickable .part.on:hover{fill:var(--tc)}
+.fig .dot{fill:#f4a261;stroke:#b5651d;stroke-width:2}
+.fig .tickhit{fill:transparent;cursor:pointer}
+.fig .pt{fill:var(--tc);opacity:0}
+.fig .pt.sel{opacity:1}
+.fig .pt.solution{opacity:1;fill:var(--ok)}
+.answer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:10px 0}
+.finput{display:inline-flex;flex-direction:column;align-items:center;gap:4px}
+.finput input,.ginput,.ninput{width:76px;padding:8px;font-size:1.4em;text-align:center;border-radius:12px;border:2px solid var(--line);background:#fffdf8}
+.finput .fbar{width:90px;height:4px;background:var(--ink);border-radius:2px}
+.finput input:disabled{background:#f1f1f1;color:var(--ink)}
+.ginput{width:66px}
+.ninput{width:120px}
+input:focus{outline:none;border-color:var(--tc)}
+.unit{font-size:1.2em}
+.mc{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.mc button{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px;font-size:1.05em;box-shadow:0 3px 0 var(--line);min-height:56px}
+.mc button.wrong{border-color:var(--bad);background:#fdecee;opacity:.7}
+.mc button.right{border-color:var(--ok);background:#e6f6ec}
+.mc button.big{font-size:2em;font-weight:bold}
+.actions{display:flex;gap:10px;margin-top:auto;padding-top:12px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:120px}
+.fb{margin-top:10px;padding:12px 14px;border-radius:14px;display:none}
+.fb.show{display:block;animation:fade .2s}
+.fb.ok{background:#e6f6ec;border:2px solid #a8dcb9}
+.fb.hint{background:#fff5d6;border:2px solid #f1d27a}
+.fb.bad{background:#fdecee;border:2px solid #f2b3bc}
+.fb h4{margin:0 0 4px}
+.sol{margin-top:6px}
+.sol ol{margin:4px 0;padding-left:22px}
+.gain{font-weight:bold;color:#9a7400}
+.pr-side{text-align:center}
+.pr-side .creature-wrap{width:160px;height:160px}
+.streak{font-size:.9em;color:var(--muted);margin-top:6px}
+
+/* fractions */
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;line-height:1.1}
+.fr .fz{border-bottom:2px solid currentColor;padding:0 .2em}
+.fr .fn{padding:0 .2em}
+.mx{display:inline-flex;align-items:center;white-space:nowrap}
+.bigfrac{font-size:2.6em;text-align:center;margin:6px 0}
+.eqs{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .2em;line-height:1}
+.eqs .lbl{font-size:.7em;color:var(--tc);font-weight:bold;min-height:1em}
+.math{font-size:1.15em}
+
+/* Shop */
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.item{background:#fff;border-radius:16px;padding:10px;text-align:center;box-shadow:0 3px 0 var(--line);display:flex;flex-direction:column;gap:6px;align-items:center}
+.item .prev{width:90px;height:90px}
+.item.equipped{outline:3px solid var(--ok)}
+.item .btn{padding:8px 12px;font-size:.9em;width:100%}
+.shopsec h3{margin:16px 0 8px}
+.shoplayout{display:grid;grid-template-columns:260px 1fr;gap:14px}
+@media (max-width:760px){.shoplayout{grid-template-columns:1fr}}
+
+/* Report */
+table.rep{border-collapse:collapse;width:100%;font-size:.92em}
+table.rep th,table.rep td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:center}
+table.rep th:first-child,table.rep td:first-child{text-align:left}
+table.rep th{background:#faf3e6}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(30,30,50,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:14px}
+.mbox{background:#fff;border-radius:22px;max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:20px;text-align:center;animation:fade .2s}
+.mbox h3{margin-top:0}
+table.merk{border-collapse:collapse;width:100%;text-align:left;margin:8px 0 14px}
+table.merk td{border:1px solid var(--line);padding:8px;vertical-align:middle}
+table.merk td:first-child{width:58%}
+table.merk tr:nth-child(odd) td{background:#fcf8f1}
+.wobble{animation:wob 2.4s ease-in-out infinite;transform-origin:100px 180px}
+@keyframes wob{0%,100%{transform:rotate(0)}20%{transform:rotate(-4deg)}40%{transform:rotate(4deg)}60%{transform:rotate(0)}}
+.bounce{animation:bnc .6s}
+@keyframes bnc{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+.confetti{position:fixed;top:-10px;width:10px;height:14px;z-index:60;pointer-events:none;animation:fall 1.6s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- START -->
+<section id="s-start" class="screen">
+  <div class="card start">
+    <h1>Brüche üben</h1>
+    <p>In diesem Ei wartet dein <b>Bruchling</b>. Er wächst, wenn du Aufgaben löst. Mit den Münzen kannst du ihn ausstatten.</p>
+    <div class="creature-wrap" id="startPet"></div>
+    <label for="inName">Dein Vorname</label>
+    <input id="inName" maxlength="30" autocomplete="off" placeholder="z. B. Mia">
+    <label for="inPet">Wie soll dein Bruchling heißen?</label>
+    <input id="inPet" maxlength="20" autocomplete="off" placeholder="z. B. Krümel">
+    <p id="startMsg" class="small"></p>
+    <button class="btn" id="btnStart">Los geht's</button>
+  </div>
+</section>
+
+<!-- HOME -->
+<section id="s-home" class="screen">
+  <div class="topbar">
+    <h1 id="hello">Hallo!</h1>
+    <span class="coins" id="coinsHome"><span class="coin"></span><span class="cval">0</span></span>
+  </div>
+  <div class="home">
+    <div class="card petcard">
+      <div class="creature-wrap" id="homePet"></div>
+      <div class="petname" id="petName"></div>
+      <div class="stage" id="petStage"></div>
+      <div class="xpbar"><div id="xpFill" style="width:0"></div></div>
+      <div class="small" id="xpText"></div>
+      <div class="petbtns">
+        <button class="btn gold" id="btnShop">Shop</button>
+        <button class="btn sec" id="btnReport">Rückmeldung</button>
+      </div>
+    </div>
+    <div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRACTICE -->
+<section id="s-practice" class="screen">
+  <div class="pr-head">
+    <button class="btn sec" id="btnBack">◀ Übersicht</button>
+    <h2 id="prTitle"></h2>
+    <span class="lvldots" id="lvlDots"></span>
+    <span class="coins" id="coinsPr"><span class="coin"></span><span class="cval">0</span></span>
+  </div>
+  <div class="pr-main">
+    <div class="card taskcard">
+      <div class="q" id="q"></div>
+      <div id="ans"></div>
+      <div class="fb" id="fb"></div>
+      <div class="actions">
+        <button class="btn sec" id="btnMerk">Merkkarte</button>
+        <button class="btn" id="btnCheck">Prüfen</button>
+        <button class="btn hidden" id="btnNext">Weiter ▶</button>
+      </div>
+    </div>
+    <div class="card pr-side">
+      <div class="creature-wrap" id="sidePet"></div>
+      <div class="streak" id="streakInfo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="s-shop" class="screen">
+  <div class="topbar">
+    <button class="btn sec" id="btnShopBack">◀ Übersicht</button>
+    <h2>Shop</h2>
+    <span class="coins" id="coinsShop"><span class="coin"></span><span class="cval">0</span></span>
+  </div>
+  <div class="shoplayout">
+    <div class="card petcard" style="align-self:start"><div class="creature-wrap" id="shopPet"></div><div class="small" id="shopInfo"></div></div>
+    <div class="card" id="shopBody"></div>
+  </div>
+</section>
+
+<!-- REPORT -->
+<section id="s-report" class="screen">
+  <div class="topbar">
+    <button class="btn sec" id="btnRepBack">◀ Übersicht</button>
+    <h2>Rückmeldung</h2>
+  </div>
+  <div class="card">
+    <p id="repIntro"></p>
+    <div style="overflow-x:auto"><table class="rep" id="repTable"></table></div>
+    <p class="small">Die Datei enthält diese Übersicht und eine Liste deiner Aufgaben mit deinen Eingaben. Gib sie deiner Lehrkraft.</p>
+    <div class="actions">
+      <button class="btn" id="btnDownload">Rückmeldung herunterladen</button>
+      <button class="btn sec" id="btnReset">Neu beginnen</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<div id="modal" class="modal hidden"><div class="mbox"><div id="mcontent"></div><button class="btn" id="mclose">OK</button></div></div>
+
+<script>
+"use strict";
+/* ---------- Hilfsfunktionen ---------- */
+const $ = s => document.querySelector(s);
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const gcd = (a,b) => b ? gcd(b, a % b) : Math.abs(a);
+const range = n => Array.from({length:n}, (_,i) => i);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const F = (z,n) => `<span class="fr"><span class="fz">${z}</span><span class="fn">${n}</span></span>`;
+const M = (g,z,n) => `<span class="mx">${g}${F(z,n)}</span>`;
+const EQ = (lbl,pos) => pos==='top' ? `<span class="eqs"><span class="lbl">${lbl}</span>=<span class="lbl"></span></span>` : `<span class="eqs"><span class="lbl"></span>=<span class="lbl">${lbl}</span></span>`;
+const coprime = (lo,hi,maxN) => { let z,n; do{ n=rnd(lo,maxN); z=rnd(1,n-1);}while(gcd(z,n)!==1); return [z,n]; };
+const plain = h => String(h).replace(/<span class="fr"><span class="fz">(.*?)<\/span><span class="fn">(.*?)<\/span><\/span>/g,'$1/$2').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Themen ---------- */
+const TOPICS = [
+  {id:'begriffe', name:'Grundbegriffe', c:'#e76f51', cl:'#fbe5de'},
+  {id:'gleich',   name:'Gleich große Teile', c:'#e09f3e', cl:'#fbefd9'},
+  {id:'anteile',  name:'Anteile benennen', c:'#2a9d8f', cl:'#dcf1ee'},
+  {id:'strahl',   name:'Zahlenstrahl', c:'#457b9d', cl:'#dfeaf2'},
+  {id:'erweitern',name:'Erweitern und Kürzen', c:'#8e5ea2', cl:'#efe4f4'},
+  {id:'gemischt', name:'Unechte Brüche und gemischte Schreibweise', c:'#d1495b', cl:'#f9e0e3'},
+  {id:'mengen',   name:'Anteile von Mengen', c:'#4c956c', cl:'#e0f0e6'}
+];
+const TOP = Object.fromEntries(TOPICS.map(t=>[t.id,t]));
+
+/* ---------- Merkkarten (Erklärung links, Beispiel rechts) ---------- */
+const MERKF = () => ({
+  begriffe:[
+    ['Der <b>Nenner</b> steht unter dem Bruchstrich. Er gibt an, in wie viele gleich große Teile das Ganze geteilt wird.', `${F(3,4)} : Das Ganze ist in 4 gleich große Teile geteilt.`],
+    ['Der <b>Zähler</b> steht über dem Bruchstrich. Er gibt an, wie viele dieser Teile genommen werden.', `${F(3,4)} : Es werden 3 Teile genommen.`],
+    ['Bei einem <b>Stammbruch</b> ist der Zähler 1.', `${F(1,5)}, ${F(1,8)}`],
+    ['Bei einem <b>echten Bruch</b> ist der Zähler kleiner als der Nenner. Der Bruch ist kleiner als ein Ganzes.', `${F(2,3)}, ${F(5,9)}`],
+    ['Bei einem <b>unechten Bruch</b> ist der Zähler größer als der Nenner oder gleich groß. Der Bruch ist mindestens ein Ganzes.', `${F(7,4)}, ${F(9,2)}`]
+  ],
+  gleich:[
+    ['Einen Bruch kannst du nur angeben, wenn das Ganze in <b>gleich große Teile</b> geteilt ist.', svgBar(4,[0],{w:160,h:36})],
+    ['Sind die Teile unterschiedlich groß, beschreibt die Anzahl der Teile keinen Bruch.', svgBar(3,[0],{w:160,h:36,widths:[.2,.3,.5]})],
+    ['Die Teile müssen nicht gleich aussehen. Sie müssen nur <b>gleich groß</b> sein, also die gleiche Fläche haben.', FIGS[0].svg.replace('class="fig"','class="fig" width="90"')]
+  ],
+  anteile:[
+    ['Zähle zuerst <b>alle</b> Teile. Diese Anzahl ist der Nenner.', `${svgBar(5,[0,1,2],{w:150,h:34})}<br>5 Teile`],
+    ['Zähle dann die <b>gefärbten</b> Teile. Diese Anzahl ist der Zähler.', `3 Teile gefärbt: ${F(3,5)}`],
+    ['Der Anteil, der <b>nicht gefärbt</b> ist, besteht aus den übrigen Teilen.', `nicht gefärbt: ${F(2,5)}`]
+  ],
+  strahl:[
+    ['Die Strecke von 0 bis 1 ist das <b>Ganze</b>.', svgLine(0,1,4,{marker:3/4,w:200})],
+    ['Zähle, in wie viele gleich große <b>Abschnitte</b> die Strecke von 0 bis 1 geteilt ist. Das ist der Nenner.', '4 Abschnitte, also Nenner 4'],
+    ['Zähle von 0 aus die Abschnitte bis zur Markierung. Das ist der Zähler. Zähle Abschnitte, keine Striche.', `3 Abschnitte: ${F(3,4)}`],
+    ['Hinter der 1 geht es weiter. Dort liegen die unechten Brüche.', `${F(5,4)} liegt einen Abschnitt hinter der 1.`]
+  ],
+  erweitern:[
+    ['<b>Erweitern</b>: Zähler und Nenner werden mit der gleichen Zahl multipliziert. Der Wert bleibt gleich, die Teile werden feiner.', `<span class="math">${F(2,3)}${EQ('·4','top')}${F(8,12)}</span>`],
+    ['<b>Kürzen</b>: Zähler und Nenner werden durch die gleiche Zahl dividiert. Kürzen ist die Umkehrung des Erweiterns. Teile werden zusammengefasst.', `<span class="math">${F(12,18)}${EQ(':6','bottom')}${F(2,3)}</span>`],
+    ['Ein Bruch ist <b>vollständig gekürzt</b>, wenn Zähler und Nenner keinen gemeinsamen Teiler außer 1 haben.', `${F(2,3)} ist vollständig gekürzt, ${F(4,6)} nicht.`]
+  ],
+  gemischt:[
+    ['<b>Unechter Bruch in gemischte Schreibweise</b>: Dividiere den Zähler durch den Nenner. Das Ergebnis sind die Ganzen. Der Rest kommt in den Zähler, der Nenner bleibt.', `<span class="math">${F(11,4)}</span><br>11 : 4 = 2 Rest 3<br><span class="math">${F(11,4)} = ${M(2,3,4)}</span>`],
+    ['<b>Gemischte Schreibweise in unechten Bruch</b>: Multipliziere die Ganzen mit dem Nenner und addiere den Zähler. Der Nenner bleibt.', `<span class="math">${M(2,3,4)}</span><br>2 · 4 + 3 = 11<br><span class="math">${M(2,3,4)} = ${F(11,4)}</span>`]
+  ],
+  mengen:[
+    ['<b>Anteil einer Menge</b>: Dividiere die Menge durch den Nenner. So erhältst du einen Teil. Multipliziere dann mit dem Zähler.', `${F(3,4)} von 20 €<br>20 € : 4 = 5 €<br>5 € · 3 = 15 €`],
+    ['<b>Vom Anteil zum Ganzen</b>: Dividiere durch den Zähler. So erhältst du einen Teil. Multipliziere dann mit dem Nenner.', `${F(3,5)} sind 12 Kinder.<br>12 : 3 = 4<br>4 · 5 = 20 Kinder`]
+  ]
+});
+
+/* ---------- SVG-Figuren ---------- */
+function svgBar(n, shaded, o={}){
+  const W=o.w||320, H=o.h||64; const ws=o.widths||Array(n).fill(1/n);
+  let x=3, s=`<svg viewBox="0 0 ${W+6} ${H+6}" class="fig${o.click?' clickable':''}" ${o.w?`width="${W+6}"`:''}>`;
+  ws.forEach((w,i)=>{ const pw=w*W; s+=`<rect data-part="${i}" x="${x.toFixed(2)}" y="3" width="${pw.toFixed(2)}" height="${H}" class="part${shaded.includes(i)?' on':''}"/>`; x+=pw; });
+  return s+'</svg>';
+}
+function svgCircle(n, shaded, o={}){
+  const r=o.r||80, cx=r+4, cy=r+4; const as=o.angles||Array(n).fill(1/n);
+  let s=`<svg viewBox="0 0 ${2*r+8} ${2*r+8}" class="fig${o.click?' clickable':''}" width="${o.size||(2*r+8)}">`;
+  if(as.length===1){ return s+`<circle data-part="0" cx="${cx}" cy="${cy}" r="${r}" class="part${shaded.includes(0)?' on':''}"/></svg>`; }
+  let a=-Math.PI/2;
+  as.forEach((f,i)=>{ const b=a+f*2*Math.PI; const x1=cx+r*Math.cos(a), y1=cy+r*Math.sin(a), x2=cx+r*Math.cos(b), y2=cy+r*Math.sin(b);
+    s+=`<path data-part="${i}" d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${f>0.5?1:0} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" class="part${shaded.includes(i)?' on':''}"/>`; a=b; });
+  return s+'</svg>';
+}
+function svgGrid(rows, cols, shaded, o={}){
+  const c=o.cell||48; let s=`<svg viewBox="0 0 ${cols*c+6} ${rows*c+6}" class="fig${o.click?' clickable':''}" width="${cols*c+6}">`;
+  for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){const i=r*cols+k; s+=`<rect data-part="${i}" x="${3+k*c}" y="${3+r*c}" width="${c}" height="${c}" class="part${shaded.includes(i)?' on':''}"/>`;}
+  return s+'</svg>';
+}
+function svgDots(total, cols){
+  const d=40, rows=Math.ceil(total/cols); let s=`<svg viewBox="0 0 ${cols*d+10} ${rows*d+10}" class="fig" width="${Math.min(cols*d+10,360)}">`;
+  for(let i=0;i<total;i++){const r=Math.floor(i/cols),k=i%cols; s+=`<circle class="dot" cx="${5+k*d+d/2}" cy="${5+r*d+d/2}" r="14"/>`;}
+  return s+'</svg>';
+}
+function svgCircles(count, n, filledParts){ // mehrere Kreise, filledParts Teile insgesamt gefärbt
+  const r=44; let s=`<svg viewBox="0 0 ${count*(2*r+16)} ${2*r+10}" class="fig" width="${Math.min(count*(2*r+16),420)}">`;
+  let left=filledParts;
+  for(let c=0;c<count;c++){ const cx=8+r+c*(2*r+16), cy=r+5; let a=-Math.PI/2;
+    for(let i=0;i<n;i++){ const b=a+2*Math.PI/n; const on=left>0; left--;
+      const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(b),y2=cy+r*Math.sin(b);
+      s+= n===1 ? `<circle cx="${cx}" cy="${cy}" r="${r}" class="part${on?' on':''}"/>` : `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 0 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" class="part${on?' on':''}"/>`; a=b; }
+  }
+  return s+'</svg>';
+}
+function svgLine(min, max, d, o={}){
+  const W=o.w||380, pad=22, H=82, y=40; const units=max-min, steps=units*d;
+  const X = v => pad + (v-min)/units*(W-2*pad);
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="fig${o.click?' clickable':''}" ${o.w?`width="${W}"`:''}>`;
+  s+=`<line x1="${pad-10}" y1="${y}" x2="${W-pad+12}" y2="${y}" stroke="#2b2d42" stroke-width="3"/>`;
+  s+=`<polygon points="${W-pad+14},${y} ${W-pad+4},${y-6} ${W-pad+4},${y+6}" fill="#2b2d42"/>`;
+  for(let i=0;i<=steps;i++){ const v=min+i/d, x=X(v), big=(i%d===0);
+    s+=`<line x1="${x}" y1="${y-(big?14:9)}" x2="${x}" y2="${y+(big?14:9)}" stroke="#2b2d42" stroke-width="${big?3:2}"/>`;
+    if(big) s+=`<text x="${x}" y="${y+34}" text-anchor="middle" font-size="18" font-weight="bold" fill="#2b2d42">${v}</text>`;
+  }
+  if(o.marker!=null){ const x=X(o.marker); s+=`<polygon points="${x},${y-8} ${x-9},${y-26} ${x+9},${y-26}" fill="#d1495b"/>`; }
+  if(o.click){ const step=(W-2*pad)/steps;
+    for(let i=0;i<=steps;i++){ const x=X(min+i/d); s+=`<circle class="pt" data-pt="${i}" cx="${x}" cy="${y}" r="9"/>`; }
+    for(let i=0;i<=steps;i++){ const x=X(min+i/d); s+=`<rect class="tickhit" data-tick="${i}" x="${x-step/2}" y="0" width="${step}" height="${H}"/>`; }
+  }
+  return s+'</svg>';
+}
+/* Feste Figuren für Stufe 3 bei "Gleich große Teile" */
+const FIGS = [
+  {svg:`<svg viewBox="0 0 166 166" class="fig" width="170"><path class="part on" d="M3,3 L163,3 L83,83 Z"/><path class="part" d="M163,3 L163,163 L83,83 Z"/><path class="part" d="M163,163 L3,163 L83,83 Z"/><path class="part" d="M3,163 L3,3 L83,83 Z"/></svg>`,
+   ask:[1,4], yes:true, why:'Die vier Dreiecke sind gleich groß. Der gefärbte Teil ist ein Viertel.'},
+  {svg:`<svg viewBox="0 0 246 126" class="fig" width="250"><rect class="part" x="3" y="3" width="120" height="120"/><rect class="part on" x="123" y="3" width="120" height="60"/><rect class="part" x="123" y="63" width="120" height="60"/></svg>`,
+   ask:[1,3], yes:false, why:'Die drei Teile sind nicht gleich groß. Die linke Hälfte ist doppelt so groß wie die kleinen Teile. Der gefärbte Teil ist ein Viertel.'},
+  {svg:`<svg viewBox="0 0 246 126" class="fig" width="250"><rect class="part" x="3" y="3" width="120" height="120"/><rect class="part on" x="123" y="3" width="120" height="60"/><rect class="part" x="123" y="63" width="120" height="60"/></svg>`,
+   ask:[1,4], yes:true, why:'Denke dir die linke Hälfte auch in zwei Teile geteilt. Dann gibt es vier gleich große Teile. Der gefärbte Teil ist ein Viertel.'},
+  {svg:`<svg viewBox="0 0 166 166" class="fig" width="170"><path class="part on" d="M3,3 L163,3 L163,83 Z"/><path class="part" d="M3,3 L163,83 L163,163 L83,163 Z"/><path class="part" d="M3,3 L83,163 L3,163 Z"/></svg>`,
+   ask:[1,3], yes:false, why:'Die drei Teile sind nicht gleich groß. Das mittlere Teil ist doppelt so groß wie jedes Dreieck. Der gefärbte Teil ist ein Viertel.'},
+  {svg:`<svg viewBox="0 0 186 156" class="fig" width="190"><path class="part" d="M93,3 L48,78 L138,78 Z"/><path class="part" d="M3,153 L48,78 L93,153 Z"/><path class="part" d="M183,153 L138,78 L93,153 Z"/><path class="part on" d="M48,78 L138,78 L93,153 Z"/></svg>`,
+   ask:[1,4], yes:true, why:'Alle vier Dreiecke sind gleich groß, auch das mittlere, das auf dem Kopf steht. Der gefärbte Teil ist ein Viertel.'},
+  {svg:`<svg viewBox="0 0 246 86" class="fig" width="250"><rect class="part" x="3" y="3" width="60" height="80"/><rect class="part" x="63" y="3" width="60" height="80"/><rect class="part on" x="123" y="3" width="120" height="80"/></svg>`,
+   ask:[1,3], yes:false, why:'Der gefärbte Streifen ist doppelt so breit wie die anderen. Er ist die Hälfte des Rechtecks, also kein Drittel.'},
+  {svg:svgCircle(3,[2],{angles:[.25,.25,.5],r:76}),
+   ask:[1,3], yes:false, why:'Die drei Teile sind nicht gleich groß. Der gefärbte Teil ist die Hälfte des Kreises.'},
+  {svg:svgCircle(3,[0],{angles:[.25,.25,.5],r:76}),
+   ask:[1,4], yes:true, why:'Der gefärbte Teil passt genau viermal in den Kreis. Er ist ein Viertel, auch wenn die anderen Teile unterschiedlich groß sind.'}
+];
+
+/* ---------- Aufgabengeneratoren ---------- */
+function T(o){ return Object.assign({max:2,type:'frac'}, o); }
+function chkFrac(a, Z, N, mode){
+  if(a.n===0) return {ok:false,msg:'Der Nenner darf nicht 0 sein.'};
+  const eq = a.z*N === Z*a.n;
+  if(mode==='exact'){
+    if(a.z===Z && a.n===N) return {ok:true};
+    if(eq) return {ok:false,msg:'Der Wert stimmt, aber gesucht ist genau der angegebene Bruch. Lies die Aufgabe noch einmal.'};
+  } else if(mode==='lowest'){
+    if(eq && gcd(a.z,a.n)===1) return {ok:true};
+    if(eq) return {ok:false,msg:'Der Wert stimmt. Du kannst aber noch weiter kürzen. Suche einen gemeinsamen Teiler von Zähler und Nenner.'};
+  } else { if(eq) return {ok:true}; }
+  if(a.z===N && a.n===Z) return {ok:false,msg:'Hast du Zähler und Nenner vertauscht? Der Nenner steht unten.'};
+  return {ok:false};
+}
+const mc = (q,text,opts,correct,o={}) => T(Object.assign({type:'mc',q,text,options:opts,correct,max:opts.length<=2?1:2},o));
+
+const GEN = {
+begriffe(L){
+  let z=rnd(1,9), n=rnd(2,12); while(n===z) n=rnd(2,12);
+  if(L===1){
+    if(Math.random()<.5){ const unter=Math.random()<.5; const ok=unter?'Nenner':'Zähler'; const opts=shuffle(['Zähler','Nenner','Bruchstrich']);
+      return mc(`<div class="bigfrac">${F(z,n)}</div><p>Wie heißt die Zahl <b>${unter?'unter':'über'}</b> dem Bruchstrich?</p>`, `Name der Zahl ${unter?'unter':'über'} dem Bruchstrich (${z}/${n})`, opts, opts.indexOf(ok),
+        {hint:'Der Nenner nennt, in wie viele Teile geteilt wird. Er steht unten.', sol:`Die Zahl über dem Bruchstrich heißt <b>Zähler</b>, die Zahl unter dem Bruchstrich heißt <b>Nenner</b>. Hier ist ${z} der Zähler und ${n} der Nenner.`}); }
+    const wantN=Math.random()<.5; const opts=[String(z),String(n)];
+    return mc(`<div class="bigfrac">${F(z,n)}</div><p>Tippe auf den <b>${wantN?'Nenner':'Zähler'}</b>.</p>`, `${wantN?'Nenner':'Zähler'} von ${z}/${n} antippen`, opts, wantN?1:0,
+      {big:true, sol:`Der Zähler steht über dem Bruchstrich, der Nenner darunter. Der ${wantN?'Nenner':'Zähler'} ist hier ${wantN?n:z}.`});
+  }
+  if(L===2){
+    if(Math.random()<.6){ n=rnd(3,12); const k=rnd(1,n-1);
+      const ctx=pick([
+        [`Eine Tafel Schokolade hat ${n} gleich große Stücke. Du isst ${k} davon.`,'Welcher Anteil der Tafel ist das?'],
+        [`Ein Schulbeet wird in ${n} gleich große Felder geteilt. In ${k} Feldern wachsen Bohnen.`,'Welcher Anteil des Beets ist das?'],
+        [`Ein Kuchen wird in ${n} gleich große Stücke geschnitten. ${k} Stücke werden gegessen.`,'Welcher Anteil des Kuchens wurde gegessen?'],
+        [`Ein Weg wird in ${n} gleich lange Abschnitte geteilt. ${k} Abschnitte sind schon geschafft.`,'Welcher Anteil des Weges ist das?']]);
+      return T({q:`<p>${ctx[0]} ${ctx[1]} Schreibe den Anteil als Bruch.</p>`, text:`${ctx[0]} ${ctx[1]}`, check:a=>chkFrac(a,k,n,'equiv'),
+        hint:'Das Ganze ist in gleich große Teile geteilt. Die Anzahl aller Teile ist der Nenner.', sol:`Das Ganze hat ${n} gleich große Teile, also ist der Nenner ${n}. Genommen werden ${k} Teile, also ist der Zähler ${k}. Der Anteil ist ${F(k,n)}.`, ansZ:k,ansN:n}); }
+    const isN=Math.random()<.5;
+    const opts=shuffle(['in wie viele gleich große Teile das Ganze geteilt wird','wie viele der Teile genommen werden','wie groß das Ganze ist']);
+    const ok= isN?'in wie viele gleich große Teile das Ganze geteilt wird':'wie viele der Teile genommen werden';
+    return mc(`<p>Was gibt der <b>${isN?'Nenner':'Zähler'}</b> eines Bruchs an? Wähle aus.</p><p>Der ${isN?'Nenner':'Zähler'} gibt an, …</p>`, `Was gibt der ${isN?'Nenner':'Zähler'} an?`, opts, opts.indexOf(ok),
+      {sol:'Der Nenner gibt an, in wie viele gleich große Teile das Ganze geteilt wird. Der Zähler gibt an, wie viele dieser Teile genommen werden.'});
+  }
+  const v=rnd(0,3);
+  if(v===0){ const unecht=Math.random()<.5; let a,b; do{ b=rnd(2,9); a=unecht?rnd(b+1,3*b):rnd(1,b-1);}while(a===b);
+    return mc(`<div class="bigfrac">${F(a,b)}</div><p>Ist dieser Bruch ein echter oder ein unechter Bruch?</p>`, `${a}/${b} echt oder unecht?`, ['echter Bruch','unechter Bruch'], unecht?1:0,
+      {sol: unecht?`Der Zähler ${a} ist größer als der Nenner ${b}. Es ist ein <b>unechter Bruch</b>, er ist größer als ein Ganzes.`:`Der Zähler ${a} ist kleiner als der Nenner ${b}. Es ist ein <b>echter Bruch</b>, er ist kleiner als ein Ganzes.`}); }
+  if(v===1){ const nS=rnd(2,12); const fr=[[1,nS]]; while(fr.length<4){ const b=rnd(2,12), a=rnd(2,15); if(a!==b && !fr.some(f=>f[0]===a&&f[1]===b)) fr.push([a,b]); }
+    shuffle(fr); const opts=fr.map(f=>F(f[0],f[1]));
+    return mc(`<p>Welcher dieser Brüche ist ein <b>Stammbruch</b>?</p>`, 'Stammbruch auswählen', opts, fr.findIndex(f=>f[0]===1), {html:true, sol:`Bei einem Stammbruch ist der Zähler 1. Gesucht ist also ${F(1,nS)}.`}); }
+  if(v===2){ const fr=[]; const [ez,en]=coprime(2,9,9); fr.push([ez,en]); while(fr.length<4){ const b=rnd(2,9), a=rnd(b+1,2*b+3); if(!fr.some(f=>f[0]===a&&f[1]===b)) fr.push([a,b]); }
+    shuffle(fr); const opts=fr.map(f=>F(f[0],f[1]));
+    return mc(`<p>Welcher Bruch ist <b>kleiner als ein Ganzes</b>?</p>`, 'Bruch kleiner als ein Ganzes auswählen', opts, fr.findIndex(f=>f[0]===ez&&f[1]===en),
+      {html:true, sol:`Ein Bruch ist kleiner als ein Ganzes, wenn der Zähler kleiner ist als der Nenner. Das ist bei ${F(ez,en)} der Fall.`}); }
+  const N=rnd(3,10), unecht=Math.random()<.5;
+  return T({q:`<p>Schreibe einen <b>${unecht?'unechten':'echten'}</b> Bruch mit dem Nenner ${N}.</p>`, text:`${unecht?'unechten':'echten'} Bruch mit Nenner ${N} angeben`,
+    check:a=>{ if(a.n!==N) return {ok:false,msg:`Der Nenner soll ${N} sein.`}; if(unecht){ if(a.z>N) return {ok:true}; if(a.z===N) return {ok:false,msg:'Das ist genau ein Ganzes. Nimm einen größeren Zähler.'}; return {ok:false,msg:'Bei einem unechten Bruch ist der Zähler größer als der Nenner.'}; }
+      if(a.z>0 && a.z<N) return {ok:true}; return {ok:false,msg:'Bei einem echten Bruch ist der Zähler kleiner als der Nenner.'}; },
+    sol: unecht?`Der Zähler muss größer als ${N} sein, zum Beispiel ${F(N+rnd(1,5),N)}.`:`Der Zähler muss kleiner als ${N} sein, zum Beispiel ${F(rnd(1,N-1),N)}.`});
+},
+
+gleich(L){
+  const unequal = ws => { let w; do{ w=ws.map(()=>rnd(1,4)); }while(Math.max(...w)/Math.min(...w)<2); const s=w.reduce((a,b)=>a+b,0); return w.map(x=>x/s); };
+  if(L===1){ const n=rnd(2,5), eq=Math.random()<.5; const widths=eq?null:unequal(range(n));
+    return mc(`<p>Ist der Streifen in <b>gleich große Teile</b> geteilt?</p><div class="figbox">${svgBar(n,[],{widths})}</div>`, `Streifen mit ${n} Teilen, ${eq?'gleich':'ungleich'} groß`, ['Ja','Nein'], eq?0:1,
+      {sol: eq?`Ja. Alle ${n} Teile sind gleich groß. Ein Teil ist ${F(1,n)} des Streifens.`:'Nein. Die Teile sind unterschiedlich breit. Deshalb ist ein Teil hier kein Bruchteil wie ein Halbes oder ein Drittel.'}); }
+  if(L===2){ const n=rnd(3,8);
+    if(Math.random()<.4){ return T({q:`<p>Der Kreis ist in gleich große Teile geteilt. Welcher Bruch beschreibt <b>einen</b> Teil?</p><div class="figbox">${svgCircle(n,[0])}</div>`, text:`Kreis mit ${n} gleichen Teilen, ein Teil als Bruch`,
+      check:a=>chkFrac(a,1,n,'equiv'), hint:'Zähle alle Teile. Diese Anzahl ist der Nenner.', sol:`Der Kreis hat ${n} gleich große Teile. Ein Teil ist ${F(1,n)}.`}); }
+    const eq=Math.random()<.5; const ang=eq?null:unequal(range(n));
+    return mc(`<p>Ist der Kreis in <b>gleich große Teile</b> geteilt?</p><div class="figbox">${svgCircle(n,[],{angles:ang})}</div>`, `Kreis mit ${n} Teilen, ${eq?'gleich':'ungleich'} groß`, ['Ja','Nein'], eq?0:1,
+      {sol: eq?`Ja. Alle ${n} Teile sind gleich groß. Ein Teil ist ${F(1,n)} des Kreises.`:'Nein. Die Kreisteile sind unterschiedlich groß.'}); }
+  const f=pick(FIGS);
+  return mc(`<p>Ist der gefärbte Teil ${F(f.ask[0],f.ask[1])} der ganzen Figur?</p><div class="figbox">${f.svg}</div>`, `Figur: gefärbter Teil ${f.ask[0]}/${f.ask[1]}?`, ['Ja','Nein'], f.yes?0:1, {sol:(f.yes?'Ja. ':'Nein. ')+f.why});
+},
+
+anteile(L){
+  if(L===1){ const n=rnd(2,8), k=rnd(1,n-1);
+    return T({q:`<p>Welcher Anteil des Streifens ist gefärbt? Schreibe als Bruch.</p><div class="figbox">${svgBar(n,range(k))}</div>`, text:`Streifen ${k} von ${n} gefärbt`,
+      check:a=>chkFrac(a,k,n,'equiv'), hint:'Zähle alle Teile, das ist der Nenner. Zähle dann die gefärbten Teile, das ist der Zähler.', sol:`Der Streifen hat ${n} gleich große Teile. ${k} davon sind gefärbt. Der Anteil ist ${F(k,n)}.`}); }
+  if(L===2){ const v=rnd(0,2);
+    if(v===0){ const n=rnd(3,10), k=rnd(1,n-1); const sh=shuffle(range(n)).slice(0,k);
+      return T({q:`<p>Welcher Anteil des Kreises ist gefärbt? Schreibe als Bruch.</p><div class="figbox">${svgCircle(n,sh)}</div>`, text:`Kreis ${k} von ${n} gefärbt`,
+        check:a=>chkFrac(a,k,n,'equiv'), hint:'Zähle alle Kreisteile und dann die gefärbten Teile.', sol:`Der Kreis hat ${n} gleich große Teile, ${k} davon sind gefärbt. Der Anteil ist ${F(k,n)}.`}); }
+    if(v===1){ const n=rnd(3,8), k=rnd(1,n-1);
+      return T({type:'click', q:`<p>Färbe ${F(k,n)} des Streifens. Tippe dazu auf die Teile.</p><div class="figbox" id="clickfig">${svgBar(n,[],{click:true})}</div>`, text:`${k}/${n} eines Streifens mit ${n} Teilen färben`,
+        check:sel=>sel.size===k?{ok:true}:{ok:false,msg:sel.size===n-k&&k!==n-k?'Du hast die Teile gefärbt, die übrig bleiben sollen. Der Zähler sagt, wie viele Teile gefärbt werden.':null},
+        hint:'Der Streifen hat so viele Teile, wie der Nenner angibt. Färbe so viele Teile, wie der Zähler angibt.', sol:`Der Streifen hat ${n} Teile. Für ${F(k,n)} färbst du ${k} Teile.<div class="figbox">${svgBar(n,range(k))}</div>`}); }
+    const rows=rnd(2,3), cols=rnd(3,4), N=rows*cols, k=rnd(1,N-1); const sh=shuffle(range(N)).slice(0,k);
+    return T({q:`<p>Welcher Anteil der Fläche ist gefärbt? Schreibe als Bruch.</p><div class="figbox">${svgGrid(rows,cols,sh)}</div>`, text:`Raster ${rows}x${cols}, ${k} gefärbt`,
+      check:a=>chkFrac(a,k,N,'equiv'), hint:`Zähle alle Kästchen. Du kannst auch rechnen: ${rows} Reihen mit je ${cols} Kästchen.`, sol:`Es gibt ${rows} · ${cols} = ${N} Kästchen, ${k} davon sind gefärbt. Der Anteil ist ${F(k,N)}.`}); }
+  const v=rnd(0,2);
+  if(v===0){ const rows=rnd(2,4), cols=rnd(3,5), N=rows*cols, k=rnd(1,N-1); const sh=shuffle(range(N)).slice(0,k);
+    return T({q:`<p>Welcher Anteil der Fläche ist <b>nicht</b> gefärbt? Schreibe als Bruch.</p><div class="figbox">${svgGrid(rows,cols,sh,{cell:42})}</div>`, text:`Raster ${rows}x${cols}, ${k} gefärbt, Anteil nicht gefärbt`,
+      check:a=>{ const r=chkFrac(a,N-k,N,'equiv'); if(!r.ok && a.z*N===k*a.n) return {ok:false,msg:'Das ist der gefärbte Anteil. Gesucht ist der Anteil, der nicht gefärbt ist.'}; return r; },
+      hint:'Zähle die weißen Kästchen. Der Nenner ist die Anzahl aller Kästchen.', sol:`Es gibt ${N} Kästchen. ${k} sind gefärbt, also sind ${N-k} nicht gefärbt. Der Anteil ist ${F(N-k,N)}.`}); }
+  if(v===1){ const d=rnd(2,4), m=rnd(2,3), n=d*m, z=rnd(1,d-1);
+    return T({type:'click', q:`<p>Der Streifen hat ${n} Teile. Färbe ${F(z,d)} des Streifens.</p><div class="figbox" id="clickfig">${svgBar(n,[],{click:true})}</div>`, text:`${z}/${d} eines Streifens mit ${n} Teilen färben`,
+      check:sel=>sel.size===z*m?{ok:true}:{ok:false,msg:sel.size===z?`Der Streifen hat nicht ${d}, sondern ${n} Teile. Überlege, wie viele Teile zu ${F(1,d)} gehören.`:null},
+      hint:`Überlege, wie viele der ${n} Teile zu ${F(1,d)} gehören. Du kannst dazu erweitern.`, sol:`${F(z,d)}${EQ('·'+m,'top')}${F(z*m,n)}. Du färbst ${z*m} Teile.<div class="figbox">${svgBar(n,range(z*m))}</div>`}); }
+  const n=pick([6,8,10,12]); let k; do{ k=rnd(2,n-2);}while(gcd(k,n)===1); const g=gcd(k,n);
+  return T({q:`<p>Welcher Anteil des Kreises ist gefärbt? Gib den Bruch <b>vollständig gekürzt</b> an.</p><div class="figbox">${svgCircle(n,range(k))}</div>`, text:`Kreis ${k} von ${n}, gekürzt angeben`,
+    check:a=>chkFrac(a,k,n,'lowest'), hint:'Schreibe zuerst den Bruch aus allen Teilen und gefärbten Teilen. Kürze ihn dann.', sol:`Gefärbt sind ${F(k,n)}. Vollständig gekürzt: ${F(k,n)}${EQ(':'+g,'bottom')}${F(k/g,n/g)}.`});
+},
+
+strahl(L){
+  const lineHint='Zähle die Abschnitte zwischen 0 und 1. Das ist der Nenner. Zähle dann von 0 aus die Abschnitte bis zur Markierung. Das ist der Zähler.';
+  const clickTask = (max,d,target,askZ,askN,extra) => T({type:'line', q:`<p>Markiere ${F(askZ,askN)} auf dem Zahlenstrahl. Tippe auf die richtige Stelle.</p>${extra||''}<div class="figbox" id="linefig">${svgLine(0,max,d,{click:true})}</div>`, text:`${askZ}/${askN} auf Zahlenstrahl 0 bis ${max} (Unterteilung ${d}) markieren`,
+      lineSteps:max*d, target, check:t=>t===target?{ok:true}:{ok:false,msg:(t===target-1||t===target+1)?'Knapp daneben. Zähle die Abschnitte, nicht die Striche. Beginne bei 0.':null},
+      hint:'Zähle, in wie viele Abschnitte die Strecke von 0 bis 1 geteilt ist.', sol:`Von 0 bis 1 gibt es ${d} Abschnitte. ${askN!==d?`Erweitere: ${F(askZ,askN)}${EQ('·'+(d/askN),'top')}${F(target,d)}. `:''}Gehe von 0 aus ${target} Abschnitte weiter.<div class="figbox">${svgLine(0,max,d,{marker:target/d})}</div>`});
+  if(L===1){ const d=rnd(2,8), k=rnd(1,d-1);
+    return T({q:`<p>Welcher Bruch gehört zur Markierung? Schreibe als Bruch.</p><div class="figbox">${svgLine(0,1,d,{marker:k/d})}</div>`, text:`Zahlenstrahl 0 bis 1, ${d} Abschnitte, Markierung bei ${k}/${d}`,
+      check:a=>chkFrac(a,k,d,'equiv'), hint:lineHint, sol:`Die Strecke von 0 bis 1 ist in ${d} Abschnitte geteilt. Die Markierung liegt ${k} Abschnitte hinter der 0. Das ist ${F(k,d)}.`}); }
+  if(L===2){ const v=rnd(0,2);
+    if(v===0){ const d=rnd(3,8), k=rnd(1,d-1); return clickTask(1,d,k,k,d); }
+    if(v===1){ const d=rnd(2,5); let k; do{k=rnd(1,2*d-1);}while(k===d);
+      return T({q:`<p>Welcher Bruch gehört zur Markierung? Du darfst einen unechten Bruch schreiben.</p><div class="figbox">${svgLine(0,2,d,{marker:k/d})}</div>`, text:`Zahlenstrahl 0 bis 2, Markierung bei ${k}/${d}`,
+        check:a=>chkFrac(a,k,d,'equiv'), hint:lineHint+' Zähle über die 1 hinaus weiter.', sol:`Jedes Ganze ist in ${d} Abschnitte geteilt. Die Markierung liegt ${k} Abschnitte hinter der 0. Das ist ${F(k,d)}.`}); }
+    const d=rnd(2,4); let k; do{k=rnd(1,2*d-1);}while(k===d); return clickTask(2,d,k,k,d); }
+  const v=rnd(0,1);
+  if(v===0){ const d=rnd(2,4), m=rnd(2,3); const z=rnd(1,d-1); return clickTask(1,d*m,z*m,z,d,`<p class="small">Achtung, die Unterteilung passt nicht direkt zum Nenner.</p>`); }
+  const d=rnd(2,4); let k; do{k=rnd(1,3*d-1);}while(k%d===0);
+  return T({q:`<p>Welcher Bruch gehört zur Markierung? Schreibe als Bruch.</p><div class="figbox">${svgLine(0,3,d,{marker:k/d})}</div>`, text:`Zahlenstrahl 0 bis 3, Markierung bei ${k}/${d}`,
+    check:a=>chkFrac(a,k,d,'equiv'), hint:'Zähle die Abschnitte von 0 bis 1. Zähle dann alle Abschnitte von 0 bis zur Markierung.', sol:`Jedes Ganze hat ${d} Abschnitte. Bis zur Markierung sind es ${k} Abschnitte. Das ist ${F(k,d)}${k>d?` oder ${M(Math.floor(k/d),k%d,d)}`:''}.`});
+},
+
+erweitern(L){
+  const hintE='Beim Erweitern werden Zähler und Nenner mit der gleichen Zahl multipliziert.';
+  const hintK='Beim Kürzen werden Zähler und Nenner durch die gleiche Zahl dividiert.';
+  if(L===1){ const [z,n]=coprime(2,8,8), f=rnd(2,5);
+    return T({q:`<p>Erweitere ${F(z,n)} mit ${f}.</p>`, text:`${z}/${n} mit ${f} erweitern`,
+      check:a=>{ if(a.z===z*f && a.n===n) return {ok:false,msg:'Du hast nur den Zähler multipliziert. Der Nenner wird auch multipliziert.'}; if(a.z===z && a.n===n*f) return {ok:false,msg:'Du hast nur den Nenner multipliziert. Der Zähler wird auch multipliziert.'}; return chkFrac(a,z*f,n*f,'exact'); },
+      hint:hintE, sol:`<span class="math">${F(z,n)}${EQ('·'+f,'top')}${F(z+' · '+f,n+' · '+f)} = ${F(z*f,n*f)}</span>`}); }
+  if(L===2){ const v=rnd(0,2); const [z,n]=coprime(2,9,9), f=rnd(2,6);
+    if(v===0) return T({q:`<p>Kürze ${F(z*f,n*f)} mit ${f}.</p>`, text:`${z*f}/${n*f} mit ${f} kürzen`,
+      check:a=>chkFrac(a,z,n,'exact'), hint:hintK, sol:`<span class="math">${F(z*f,n*f)}${EQ(':'+f,'bottom')}${F(z*f+' : '+f,n*f+' : '+f)} = ${F(z,n)}</span>`});
+    if(v===1) return T({fixed:{n:n*f}, q:`<p>Ergänze den fehlenden Zähler.</p><div class="bigfrac" style="font-size:1.8em">${F(z,n)} = ${F('?',n*f)}</div>`, text:`${z}/${n} = ?/${n*f}`,
+      check:a=>chkFrac(a,z*f,n*f,'exact'), hint:`Mit welcher Zahl wurde der Nenner ${n} multipliziert, damit ${n*f} herauskommt? Mit dieser Zahl wird auch der Zähler multipliziert.`, sol:`${n} · ${f} = ${n*f}. Also wird mit ${f} erweitert: <span class="math">${F(z,n)}${EQ('·'+f,'top')}${F(z*f,n*f)}</span>`});
+    return T({fixed:{z:z*f}, q:`<p>Ergänze den fehlenden Nenner.</p><div class="bigfrac" style="font-size:1.8em">${F(z,n)} = ${F(z*f,'?')}</div>`, text:`${z}/${n} = ${z*f}/?`,
+      check:a=>chkFrac(a,z*f,n*f,'exact'), hint:`Mit welcher Zahl wurde der Zähler ${z} multipliziert? Mit dieser Zahl wird auch der Nenner multipliziert.`, sol:`${z} · ${f} = ${z*f}. Also wird mit ${f} erweitert: <span class="math">${F(z,n)}${EQ('·'+f,'top')}${F(z*f,n*f)}</span>`}); }
+  const v=rnd(0,2); const [z,n]=coprime(2,9,9);
+  if(v===0){ const g=pick([4,6,8,9,10,12]);
+    return T({q:`<p>Kürze ${F(z*g,n*g)} <b>vollständig</b>.</p>`, text:`${z*g}/${n*g} vollständig kürzen`,
+      check:a=>chkFrac(a,z,n,'lowest'), hint:`${hintK} Suche den größten gemeinsamen Teiler oder kürze mehrmals hintereinander.`, sol:`Der größte gemeinsame Teiler von ${z*g} und ${n*g} ist ${g}. <span class="math">${F(z*g,n*g)}${EQ(':'+g,'bottom')}${F(z,n)}</span>`}); }
+  if(v===1){ const f=rnd(2,7);
+    return T({fixed:{z:z}, q:`<p>Ergänze den fehlenden Nenner.</p><div class="bigfrac" style="font-size:1.8em">${F(z*f,n*f)} = ${F(z,'?')}</div>`, text:`${z*f}/${n*f} = ${z}/?`,
+      check:a=>chkFrac(a,z,n,'exact'), hint:`Durch welche Zahl wurde ${z*f} dividiert, damit ${z} herauskommt? Dividiere den Nenner durch die gleiche Zahl.`, sol:`${z*f} : ${f} = ${z}. Also wird mit ${f} gekürzt: <span class="math">${F(z*f,n*f)}${EQ(':'+f,'bottom')}${F(z,n)}</span>`}); }
+  const f=rnd(2,6), Tn=n*f;
+  return T({fixed:{n:Tn}, q:`<p>Erweitere ${F(z,n)} so, dass der Nenner ${Tn} ist.</p>`, text:`${z}/${n} auf Nenner ${Tn} erweitern`,
+    check:a=>chkFrac(a,z*f,Tn,'exact'), hint:`Rechne ${n} · ? = ${Tn}. Mit dieser Zahl wird auch der Zähler multipliziert.`, sol:`${n} · ${f} = ${Tn}. <span class="math">${F(z,n)}${EQ('·'+f,'top')}${F(z*f,Tn)}</span>`});
+},
+
+gemischt(L){
+  const toMixed = (Z,n,pic) => { const g=Math.floor(Z/n), r=Z%n;
+    return T({type:'mixed', q:`<p>Schreibe ${F(Z,n)} in <b>gemischter Schreibweise</b>.${pic?' Das Bild hilft dir.':''}</p>${pic?`<div class="figbox">${svgCircles(g+1,n,Z)}</div>`:''}`, text:`${Z}/${n} in gemischte Schreibweise`,
+      check:a=>{ if(a.n===0) return {ok:false,msg:'Der Nenner darf nicht 0 sein.'}; if(a.z>=a.n) return {ok:false,msg:'Der Bruch hinter der ganzen Zahl muss kleiner als ein Ganzes sein. Darin steckt noch ein Ganzes.'};
+        if((a.g*a.n+a.z)*n===Z*a.n && a.z>0) return {ok:true}; return {ok:false}; },
+      hint:`Wie oft passt ${n} in ${Z}? Das sind die Ganzen. Der Rest kommt in den Zähler.`, sol:`<ol><li>${Z} : ${n} = ${g} Rest ${r}</li><li>${g} Ganze, ${r} ${r===1?'Teil bleibt':'Teile bleiben'} übrig.</li><li><span class="math">${F(Z,n)} = ${M(g,r,n)}</span></li></ol>`}); };
+  const toImproper = (g,r,n) => T({q:`<p>Schreibe ${M(g,r,n)} als <b>unechten Bruch</b>.</p>`, text:`${g} ${r}/${n} als unechten Bruch`,
+      check:a=>{ const Z=g*n+r; if(a.n===n && a.z===g*r+n) return {ok:false}; if(a.n===n && a.z===g+r) return {ok:false,msg:`Ein Ganzes hat ${n} Teile. Multipliziere die Ganzen mit dem Nenner.`}; return chkFrac(a,Z,n,'equiv'); },
+      hint:`Ein Ganzes sind ${F(n,n)}. Wie viele Teile sind dann ${g} Ganze? Addiere dann den Zähler.`, sol:`<ol><li>${g} · ${n} = ${g*n} Teile aus den Ganzen</li><li>${g*n} + ${r} = ${g*n+r}</li><li><span class="math">${M(g,r,n)} = ${F(g*n+r,n)}</span></li></ol>`});
+  if(L===1){ const n=rnd(2,4), g=rnd(1,2), r=rnd(1,n-1); return toMixed(g*n+r,n,true); }
+  if(L===2){ const n=rnd(2,6), g=rnd(1,4), r=rnd(1,n-1); return Math.random()<.5 ? toImproper(g,r,n) : toMixed(g*n+r,n,false); }
+  const n=rnd(3,9), g=rnd(2,9), r=rnd(1,n-1); return Math.random()<.5 ? toImproper(g,r,n) : toMixed(g*n+r,n,false);
+},
+
+mengen(L){
+  const numT = (q,text,ans,unit,hint,sol,extra) => T(Object.assign({type:'num', q, text, unit, check:v=>v===ans?{ok:true}:{ok:false}, hint, sol, ansV:ans}, extra||{}));
+  if(L===1){ const n=rnd(2,5), m=rnd(2,5), T0=n*m; const k=Math.random()<.6?1:rnd(2,n-1)||1;
+    const kk=Math.min(k,n-1)||1;
+    return numT(`<p>Wie viele Kugeln sind ${F(kk,n)} von ${T0} Kugeln?</p><div class="figbox">${svgDots(T0,m)}</div><p class="small">Jede Reihe ist ${F(1,n)} aller Kugeln.</p>`, `${kk}/${n} von ${T0} Kugeln`, kk*m, 'Kugeln',
+      'Teile die Kugeln in so viele gleich große Gruppen, wie der Nenner angibt.', `${T0} : ${n} = ${m}. Eine Reihe hat ${m} Kugeln.${kk>1?` ${kk} Reihen: ${m} · ${kk} = ${kk*m}.`:''} Also sind ${F(kk,n)} von ${T0} genau ${kk*m} Kugeln.`,
+      {check:v=>v===kk*m?{ok:true}:{ok:false,msg:(kk>1&&v===m)?`${m} ist erst ${F(1,n)}. Du brauchst ${kk} solche Teile.`:null}}); }
+  const ctxs = [
+    (k,n,T0)=>[`Von ${T0} Kindern einer Schule kommen ${F(k,n)} mit dem Fahrrad. Wie viele Kinder sind das?`,'Kinder'],
+    (k,n,T0)=>[`In einem Fass sind ${T0} l Regenwasser. ${F(k,n)} davon werden zum Gießen im Schulgarten verwendet. Wie viele Liter sind das?`,'l'],
+    (k,n,T0)=>[`Eine Solaranlage erzeugt an einem Tag ${T0} kWh Strom. ${F(k,n)} davon werden im Haus verbraucht. Wie viele kWh sind das?`,'kWh'],
+    (k,n,T0)=>[`Beim Müllsammeln wurden ${T0} Flaschen gefunden. ${F(k,n)} davon sind aus Glas. Wie viele Glasflaschen sind das?`,'Flaschen'],
+    (k,n,T0)=>[`Ein Beet ist ${T0} m² groß. Auf ${F(k,n)} der Fläche wachsen Kartoffeln. Wie viele m² sind das?`,'m²'],
+    (k,n,T0)=>[`Aus dem Schulgarten wurden ${T0} Äpfel geerntet. ${F(k,n)} davon werden zu Saft gepresst. Wie viele Äpfel sind das?`,'Äpfel'],
+    (k,n,T0)=>[`Eine Radtour ist ${T0} km lang. ${F(k,n)} der Strecke sind geschafft. Wie viele km sind das?`,'km'],
+    (k,n,T0)=>[`Die Klasse hat ${T0} € mit einem Kuchenbasar eingenommen. ${F(k,n)} davon werden für Bäume gespendet. Wie viel Geld ist das?`,'€']
+  ];
+  const ofTask = (k,n,m) => { const T0=n*m; const [q,unit]=pick(ctxs)(k,n,T0);
+    return numT(`<p>${q}</p>`, plain(q)+` [${k}/${n} von ${T0}]`, k*m, unit,
+      'Teile zuerst durch den Nenner. So erhältst du einen Teil. Multipliziere dann mit dem Zähler.', `<ol><li>${F(1,n)} von ${T0}: ${T0} : ${n} = ${m}</li><li>${F(k,n)} von ${T0}: ${m} · ${k} = ${k*m}</li></ol>Ergebnis: ${k*m} ${unit}`,
+      {check:v=>v===k*m?{ok:true}:{ok:false,msg:(k>1&&v===m)?`${m} ist erst ${F(1,n)}. Du brauchst ${k} solche Teile.`:(v===T0*k?'Du hast nur mit dem Zähler multipliziert. Teile auch durch den Nenner.':null)}}); };
+  if(L===2){ const n=rnd(2,8), k=rnd(1,n-1), m=rnd(2,12); return ofTask(k,n,m); }
+  const v=rnd(0,2);
+  if(v===0){ const U=pick([{g:'1 h',val:60,u:'min',d:[2,3,4,5,6,10,12]},{g:'1 kg',val:1000,u:'g',d:[2,4,5,8,10]},{g:'1 m',val:100,u:'cm',d:[2,4,5,10,20]},{g:'1 Tag',val:24,u:'h',d:[2,3,4,6,8,12]},{g:'1 €',val:100,u:'ct',d:[2,4,5,10,20]}]);
+    const n=pick(U.d), k=rnd(1,n-1), one=U.val/n;
+    return numT(`<p>Wie viel sind ${F(k,n)} von ${U.g}? Gib das Ergebnis in ${U.u} an.</p>`, `${k}/${n} von ${U.g} in ${U.u}`, k*one, U.u,
+      `Rechne zuerst ${U.g} in ${U.u} um.`, `<ol><li>${U.g} = ${U.val} ${U.u}</li><li>${U.val} : ${n} = ${one}</li><li>${one} · ${k} = ${k*one}</li></ol>Ergebnis: ${k*one} ${U.u}`); }
+  if(v===1){ const n=rnd(2,8), k=rnd(1,n-1), m=rnd(2,8), P=k*m, W=n*m;
+    const c=pick([[`${F(k,n)} der Lernenden einer Klasse fahren mit dem Bus. Das sind ${P} Lernende. Wie viele Lernende sind in der Klasse?`,'Lernende'],
+      [`${F(k,n)} einer Wanderung sind ${P} km. Wie lang ist die ganze Wanderung?`,'km'],
+      [`${F(k,n)} des Sparziels sind ${P} €. Wie hoch ist das ganze Sparziel?`,'€'],
+      [`Auf ${F(k,n)} eines Feldes wächst Mais. Das sind ${P} m². Wie groß ist das ganze Feld?`,'m²']]);
+    return numT(`<p>${c[0]}</p>`, plain(c[0])+` [${k}/${n} sind ${P}]`, W, c[1],
+      `Teile durch den Zähler. So weißt du, wie viel ${F(1,n)} ist. Multipliziere dann mit dem Nenner.`, `<ol><li>${F(k,n)} sind ${P}, also ist ${F(1,n)}: ${P} : ${k} = ${m}</li><li>Das Ganze sind ${F(n,n)}: ${m} · ${n} = ${W}</li></ol>Ergebnis: ${W} ${c[1]}`); }
+  const n=rnd(3,9), k=rnd(2,n-1), m=rnd(5,25); return ofTask(k,n,m);
+}
+};
+
+/* ---------- Spielstand ---------- */
+const KEY='brueche-ueben-bruchling-v1';
+const STAGES=[{xp:0,name:'Ei'},{xp:15,name:'Frisch geschlüpft'},{xp:50,name:'Kleiner Bruchling'},{xp:110,name:'Neugieriger Bruchling'},{xp:200,name:'Großer Bruchling'},{xp:320,name:'Meister-Bruchling'}];
+const COLORS={gruen:{c:'#7cc576',name:'Grün',p:0},blau:{c:'#6aa9e9',name:'Blau',p:10},lila:{c:'#a98ee0',name:'Lila',p:10},orange:{c:'#f6a650',name:'Orange',p:10},pink:{c:'#f191b8',name:'Pink',p:10},tuerkis:{c:'#4cc9c0',name:'Türkis',p:15},gold:{c:'#e8c13a',name:'Gold',p:40}};
+const ITEMS={
+  schleife:{name:'Schleife',slot:'head',p:15}, muetze:{name:'Mütze',slot:'head',p:25}, zauberhut:{name:'Zauberhut',slot:'head',p:50}, krone:{name:'Krone',slot:'head',p:60},
+  brille:{name:'Brille',slot:'eyes',p:20}, sonnenbrille:{name:'Sonnenbrille',slot:'eyes',p:30}, schal:{name:'Schal',slot:'neck',p:25}, fliege:{name:'Fliege',slot:'neck',p:20}
+};
+const BGS={himmel:{name:'Himmel',p:0},wiese:{name:'Wiese',p:20},nacht:{name:'Sternennacht',p:30},meer:{name:'Unter Wasser',p:30}};
+
+function freshState(){ const t={}; TOPICS.forEach(x=>t[x.id]={level:1,maxLevel:1,streak:0,wrong:0,tasks:0,first:0,second:0,failed:0,attempts:0,l3first:0,time:0});
+  return {v:1,name:'',pet:'',coins:0,xp:0,color:'gruen',owned:['gruen','himmel'],equip:{head:null,eyes:null,neck:null},bg:'himmel',topics:t,log:[],streak:0,bestStreak:0,started:Date.now(),lastSeen:Date.now()}; }
+let S=freshState();
+function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const o=JSON.parse(raw); if(o&&o.v===1){ S=Object.assign(freshState(),o); TOPICS.forEach(x=>{ S.topics[x.id]=Object.assign(freshState().topics[x.id],S.topics[x.id]||{}); }); } } }catch(e){} }
+function save(){ S.lastSeen=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+const stageOf = xp => { let s=0; STAGES.forEach((st,i)=>{ if(xp>=st.xp) s=i; }); return s; };
+function stars(t){ const st=S.topics[t]; let n=0; if(st.maxLevel>=2) n=1; if(st.maxLevel>=3) n=2; if(st.l3first>=5) n=3; return n; }
+
+/* ---------- Bruchling zeichnen ---------- */
+function shade(hex,f){ const n=parseInt(hex.slice(1),16); let r=n>>16,g=(n>>8)&255,b=n&255; r=Math.round(r*f);g=Math.round(g*f);b=Math.round(b*f); return '#'+((1<<24)+(Math.min(r,255)<<16)+(Math.min(g,255)<<8)+Math.min(b,255)).toString(16).slice(1); }
+function creatureSVG(o={}){
+  const st=o.stage!=null?o.stage:stageOf(S.xp), col=COLORS[o.color||S.color].c, dk=shade(col,.72), eq=o.equip||S.equip, bg=o.bg||S.bg, mood=o.mood||'happy';
+  const uid='g'+Math.random().toString(36).slice(2,8);
+  let s=`<svg viewBox="0 0 200 200" width="100%" height="100%"><defs><clipPath id="${uid}"><rect x="0" y="0" width="200" height="200" rx="26"/></clipPath></defs><g clip-path="url(#${uid})">`;
+  if(bg==='himmel') s+=`<rect width="200" height="200" fill="#dff1fb"/><ellipse cx="45" cy="40" rx="24" ry="10" fill="#fff"/><ellipse cx="150" cy="28" rx="20" ry="8" fill="#fff"/><rect y="172" width="200" height="28" fill="#cbe8c0"/>`;
+  if(bg==='wiese') s+=`<rect width="200" height="200" fill="#e6f6ff"/><circle cx="168" cy="34" r="16" fill="#ffd95a"/><rect y="160" width="200" height="40" fill="#8fd07c"/>${[20,48,150,178].map(x=>`<circle cx="${x}" cy="168" r="4" fill="#ff8fab"/><circle cx="${x}" cy="168" r="1.6" fill="#fff3b0"/>`).join('')}`;
+  if(bg==='nacht') s+=`<rect width="200" height="200" fill="#26285a"/>${[[20,30],[60,18],[150,40],[180,20],[110,12],[30,90],[175,95]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2" fill="#fff"/>`).join('')}<circle cx="160" cy="60" r="14" fill="#fff6c8"/><circle cx="166" cy="55" r="12" fill="#26285a"/><rect y="172" width="200" height="28" fill="#3b3f7a"/>`;
+  if(bg==='meer') s+=`<rect width="200" height="200" fill="#9ad7ec"/><rect y="0" width="200" height="40" fill="#bfe7f4"/>${[[30,70,5],[40,50,3],[170,90,6],[160,60,3]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" fill="none" stroke="#fff" stroke-width="2"/>`).join('')}<rect y="172" width="200" height="28" fill="#f2dca2"/><path d="M15,172 q5,-30 0,-50 M24,172 q-6,-24 2,-40" stroke="#3a9d5d" stroke-width="5" fill="none"/>`;
+  if(st===0){
+    s+=`<g class="wobble"><ellipse cx="100" cy="122" rx="46" ry="56" fill="#fff8e7" stroke="#c9b48a" stroke-width="3"/><circle cx="82" cy="105" r="9" fill="${col}"/><circle cx="116" cy="130" r="12" fill="${col}"/><circle cx="92" cy="150" r="6" fill="${col}"/><circle cx="120" cy="96" r="5" fill="${col}"/></g></g></svg>`;
+    return s;
+  }
+  const r=[0,36,44,52,58,64][st], cy=176-r, top=cy-r, ex=r*0.38, ey=cy-r*0.15, er=r*0.21;
+  if(st>=5) s+=`<ellipse cx="${100-r-6}" cy="${cy-6}" rx="26" ry="14" fill="#fff" opacity=".85" transform="rotate(-25 ${100-r-6} ${cy-6})"/><ellipse cx="${100+r+6}" cy="${cy-6}" rx="26" ry="14" fill="#fff" opacity=".85" transform="rotate(25 ${100+r+6} ${cy-6})"/>`;
+  if(st>=3) s+=`<line x1="${100-r*0.35}" y1="${top+6}" x2="${100-r*0.5}" y2="${top-16}" stroke="${dk}" stroke-width="3"/><circle cx="${100-r*0.5}" cy="${top-18}" r="5" fill="${dk}"/><line x1="${100+r*0.35}" y1="${top+6}" x2="${100+r*0.5}" y2="${top-16}" stroke="${dk}" stroke-width="3"/><circle cx="${100+r*0.5}" cy="${top-18}" r="5" fill="${dk}"/>`;
+  if(st>=4) s+=`<path d="M${100+r*0.8},${cy+r*0.4} q${r*0.6},0 ${r*0.55},-${r*0.6}" stroke="${dk}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  if(st>=2) s+=`<ellipse cx="${100-r*0.45}" cy="${cy+r-2}" rx="${r*0.28}" ry="${r*0.14}" fill="${dk}"/><ellipse cx="${100+r*0.45}" cy="${cy+r-2}" rx="${r*0.28}" ry="${r*0.14}" fill="${dk}"/>`;
+  s+=`<circle cx="100" cy="${cy}" r="${r}" fill="${col}" stroke="${dk}" stroke-width="3"/>`;
+  if(st>=2) s+=`<ellipse cx="${100-r*0.98}" cy="${cy+r*0.2}" rx="${r*0.16}" ry="${r*0.3}" fill="${col}" stroke="${dk}" stroke-width="2.5"/><ellipse cx="${100+r*0.98}" cy="${cy+r*0.2}" rx="${r*0.16}" ry="${r*0.3}" fill="${col}" stroke="${dk}" stroke-width="2.5"/>`;
+  if(st>=4){ const br=r*0.3, by=cy+r*0.48; s+=`<circle cx="100" cy="${by}" r="${br}" fill="${shade(col,1.25)}" stroke="${dk}" stroke-width="2"/><path d="M100,${by} L100,${by-br} A${br},${br} 0 0 1 ${100+br},${by} Z" fill="${dk}"/><line x1="${100-br}" y1="${by}" x2="${100+br}" y2="${by}" stroke="${dk}" stroke-width="2"/><line x1="100" y1="${by-br}" x2="100" y2="${by+br}" stroke="${dk}" stroke-width="2"/>`; }
+  // Augen
+  s+=`<circle cx="${100-ex}" cy="${ey}" r="${er}" fill="#fff" stroke="${dk}" stroke-width="2"/><circle cx="${100+ex}" cy="${ey}" r="${er}" fill="#fff" stroke="${dk}" stroke-width="2"/>`;
+  const pr=er*0.5, py=ey+(mood==='think'?-er*0.25:er*0.1);
+  s+=`<circle cx="${100-ex+er*0.1}" cy="${py}" r="${pr}" fill="#2b2d42"/><circle cx="${100+ex+er*0.1}" cy="${py}" r="${pr}" fill="#2b2d42"/><circle cx="${100-ex+er*0.3}" cy="${py-pr*0.4}" r="${pr*0.35}" fill="#fff"/><circle cx="${100+ex+er*0.3}" cy="${py-pr*0.4}" r="${pr*0.35}" fill="#fff"/>`;
+  s+=`<ellipse cx="${100-r*0.62}" cy="${cy+r*0.15}" rx="${r*0.12}" ry="${r*0.07}" fill="#ff8fab" opacity=".7"/><ellipse cx="${100+r*0.62}" cy="${cy+r*0.15}" rx="${r*0.12}" ry="${r*0.07}" fill="#ff8fab" opacity=".7"/>`;
+  const my=cy+r*0.2;
+  if(mood==='happy') s+=`<path d="M${100-r*0.22},${my} q${r*0.22},${r*0.22} ${r*0.44},0" stroke="#2b2d42" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  else if(mood==='joy') s+=`<path d="M${100-r*0.25},${my-2} q${r*0.25},${r*0.36} ${r*0.5},0 Z" fill="#7a2e3b" stroke="#2b2d42" stroke-width="2"/>`;
+  else s+=`<ellipse cx="100" cy="${my+3}" rx="${r*0.08}" ry="${r*0.06}" fill="#2b2d42"/>`;
+  if(st===1) s+=`<path d="M${100-r-4},${cy+r*0.35} l12,-12 l12,12 l12,-12 l12,12 l12,-12 l12,12 l12,-12 l${2*r+8-84},12 L${100+r+4},${cy+r+6} L${100-r-4},${cy+r+6} Z" fill="#fff8e7" stroke="#c9b48a" stroke-width="3"/>`;
+  // Zubehör
+  if(eq.neck==='schal') s+=`<path d="M${100-r*0.8},${cy+r*0.5} q${r*0.8},${r*0.3} ${r*1.6},0 l0,${r*0.18} q-${r*0.8},${r*0.3} -${r*1.6},0 Z" fill="#e63946"/><rect x="${100+r*0.3}" y="${cy+r*0.6}" width="${r*0.22}" height="${r*0.45}" rx="3" fill="#e63946"/>`;
+  if(eq.neck==='fliege') s+=`<path d="M100,${cy+r*0.55} l-${r*0.28},-${r*0.15} l0,${r*0.3} Z M100,${cy+r*0.55} l${r*0.28},-${r*0.15} l0,${r*0.3} Z" fill="#3a5bd9"/><circle cx="100" cy="${cy+r*0.55}" r="${r*0.07}" fill="#24399a"/>`;
+  if(eq.eyes==='brille') s+=`<circle cx="${100-ex}" cy="${ey}" r="${er*1.25}" fill="none" stroke="#2b2d42" stroke-width="3"/><circle cx="${100+ex}" cy="${ey}" r="${er*1.25}" fill="none" stroke="#2b2d42" stroke-width="3"/><line x1="${100-ex+er*1.25}" y1="${ey}" x2="${100+ex-er*1.25}" y2="${ey}" stroke="#2b2d42" stroke-width="3"/>`;
+  if(eq.eyes==='sonnenbrille') s+=`<rect x="${100-ex-er*1.3}" y="${ey-er*0.9}" width="${er*2.6}" height="${er*1.8}" rx="${er*0.6}" fill="#1d1d2b"/><rect x="${100+ex-er*1.3}" y="${ey-er*0.9}" width="${er*2.6}" height="${er*1.8}" rx="${er*0.6}" fill="#1d1d2b"/><line x1="${100-ex+er*1.3}" y1="${ey-er*0.3}" x2="${100+ex-er*1.3}" y2="${ey-er*0.3}" stroke="#1d1d2b" stroke-width="3"/><line x1="${100-ex-er*0.8}" y1="${ey-er*0.4}" x2="${100-ex-er*0.2}" y2="${ey-er*0.4}" stroke="#fff" stroke-width="2" opacity=".6"/>`;
+  if(eq.head==='muetze') s+=`<path d="M${100-r*0.78},${top+r*0.42} q${r*0.78},-${r*1.2} ${r*1.56},0 Z" fill="#457b9d"/><rect x="${100-r*0.82}" y="${top+r*0.32}" width="${r*1.64}" height="${r*0.2}" rx="5" fill="#a8dadc"/><circle cx="100" cy="${top-r*0.38}" r="${r*0.16}" fill="#f1faee"/>`;
+  if(eq.head==='zauberhut') s+=`<ellipse cx="100" cy="${top+r*0.25}" rx="${r*0.85}" ry="${r*0.16}" fill="#5a3d8a"/><path d="M${100-r*0.5},${top+r*0.25} L${112},${top-r*1.0} L${100+r*0.5},${top+r*0.25} Z" fill="#6c4ab6"/><text x="100" y="${top-r*0.05}" text-anchor="middle" font-size="${r*0.35}" fill="#ffd95a">★</text>`;
+  if(eq.head==='krone') s+=`<path d="M${100-r*0.55},${top+r*0.2} L${100-r*0.55},${top-r*0.35} L${100-r*0.27},${top-r*0.05} L100,${top-r*0.5} L${100+r*0.27},${top-r*0.05} L${100+r*0.55},${top-r*0.35} L${100+r*0.55},${top+r*0.2} Z" fill="#ffd23f" stroke="#c99a00" stroke-width="2"/><circle cx="100" cy="${top-r*0.02}" r="${r*0.07}" fill="#e63946"/>`;
+  if(eq.head==='schleife') s+=`<g transform="translate(${100+r*0.5},${top+r*0.18}) rotate(20)"><path d="M0,0 l-${r*0.3},-${r*0.18} l0,${r*0.36} Z M0,0 l${r*0.3},-${r*0.18} l0,${r*0.36} Z" fill="#ff5d8f"/><circle r="${r*0.08}" fill="#d63b6c"/></g>`;
+  if(st>=5) s+=`<text x="28" y="60" font-size="18" fill="#ffd23f">✦</text><text x="160" y="120" font-size="14" fill="#ffd23f">✦</text>`;
+  return s+'</g></svg>';
+}
+function drawPets(mood){ ['#homePet','#sidePet','#shopPet','#startPet'].forEach(id=>{ const el=$(id); if(el) el.innerHTML=creatureSVG({mood}); }); }
+
+/* ---------- Navigation ---------- */
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#s-'+id).classList.add('active'); window.scrollTo(0,0); }
+function updCoins(anim){ document.querySelectorAll('.cval').forEach(e=>e.textContent=S.coins); if(anim) document.querySelectorAll('.coins').forEach(e=>{e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop');}); }
+function modal(html){ $('#mcontent').innerHTML=html; $('#modal').classList.remove('hidden'); }
+$('#mclose').onclick=()=>$('#modal').classList.add('hidden');
+function confetti(){ const cs=['#e76f51','#2a9d8f','#e8b923','#8e5ea2','#457b9d']; for(let i=0;i<40;i++){ const d=document.createElement('div'); d.className='confetti'; d.style.left=Math.random()*100+'vw'; d.style.background=pick(cs); d.style.animationDelay=(Math.random()*.5)+'s'; document.body.appendChild(d); setTimeout(()=>d.remove(),2300);} }
+
+function renderHome(){
+  $('#hello').textContent=`Hallo ${S.name}!`;
+  const st=stageOf(S.xp); $('#petName').textContent=S.pet; $('#petStage').textContent=STAGES[st].name;
+  if(st<STAGES.length-1){ const a=STAGES[st].xp,b=STAGES[st+1].xp; $('#xpFill').style.width=Math.round((S.xp-a)/(b-a)*100)+'%'; $('#xpText').textContent=st===0?`Noch ${b-S.xp} Punkte, bis dein Ei schlüpft`:`Noch ${b-S.xp} Punkte bis zur nächsten Stufe`; }
+  else { $('#xpFill').style.width='100%'; $('#xpText').textContent='Höchste Stufe erreicht!'; }
+  let h='';
+  TOPICS.forEach(t=>{ const s=stars(t.id), tp=S.topics[t.id];
+    h+=`<button class="tile" style="--c:${t.c}" data-topic="${t.id}"><div class="ti" style="--tc:${t.c}">${tileIcon(t.id)}</div><b>${t.name}</b><span class="stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3-s)}</span></span><span class="lvl">Stufe ${tp.level} · ${tp.tasks} Aufgaben</span></button>`; });
+  h+=`<button class="tile" style="--c:#2b2d42" data-topic="mix"><div class="ti" style="--tc:#e8b923">${svgCircle(4,[0,2],{r:24})}</div><b>Bunte Mischung</b><span class="lvl">Aufgaben aus allen Bereichen</span></button>`;
+  $('#tiles').innerHTML=h;
+  document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>startPractice(b.dataset.topic));
+  updCoins(); drawPets('happy');
+}
+function tileIcon(id){
+  switch(id){
+    case 'begriffe': return `<span style="font-size:2.2em;color:var(--tc)">${F(3,4)}</span>`;
+    case 'gleich': return svgBar(3,[1],{w:110,h:40,widths:[.25,.5,.25]})+'&nbsp;'+svgBar(3,[1],{w:80,h:40});
+    case 'anteile': return svgCircle(5,[0,1],{r:26});
+    case 'strahl': return svgLine(0,1,4,{marker:.75,w:170});
+    case 'erweitern': return `<span style="font-size:1.5em;color:var(--tc)">${F(1,2)}=${F(2,4)}</span>`;
+    case 'gemischt': return svgCircles(2,4,6);
+    case 'mengen': return svgDots(6,6);
+  }
+}
+
+/* ---------- Üben ---------- */
+let mode=null, cur=null, lastText='';
+function startPractice(m){ mode=m; show('practice'); nextTask(); }
+function setTopicColor(tid){ const t=TOP[tid]; const el=$('#s-practice'); el.style.setProperty('--tc',t.c); el.style.setProperty('--tcl',t.cl); }
+function nextTask(){
+  const tid = mode==='mix' ? pick(TOPICS).id : mode; const tp=S.topics[tid];
+  let task, tries=0; do{ task=GEN[tid](tp.level); tries++; }while(task.text===lastText && tries<8);
+  lastText=task.text;
+  cur={tid, task, attempts:0, answers:[], t0:Date.now(), done:false, sel:new Set(), tick:null};
+  setTopicColor(tid);
+  $('#prTitle').textContent = (mode==='mix'?'Bunte Mischung · ':'') + TOP[tid].name;
+  $('#lvlDots').innerHTML = 'Stufe ' + [1,2,3].map(i=>`<i class="${i<=tp.level?'on':''}"></i>`).join('');
+  $('#q').innerHTML = task.q;
+  const A=$('#ans'); A.innerHTML='';
+  if(task.type==='frac'){ const fz=task.fixed&&task.fixed.z!=null, fn=task.fixed&&task.fixed.n!=null;
+    A.innerHTML=`<div class="answer"><span>Dein Ergebnis:</span><span class="finput"><input id="iz" inputmode="numeric" ${fz?`value="${task.fixed.z}" disabled`:''} aria-label="Zähler"><span class="fbar"></span><input id="in" inputmode="numeric" ${fn?`value="${task.fixed.n}" disabled`:''} aria-label="Nenner"></span></div>`; }
+  else if(task.type==='mixed') A.innerHTML=`<div class="answer"><span>Dein Ergebnis:</span><input id="ig" class="ginput" inputmode="numeric" aria-label="Ganze"><span class="finput"><input id="iz" inputmode="numeric" aria-label="Zähler"><span class="fbar"></span><input id="in" inputmode="numeric" aria-label="Nenner"></span></div>`;
+  else if(task.type==='num') A.innerHTML=`<div class="answer"><span>Ergebnis:</span><input id="iv" class="ninput" inputmode="decimal" aria-label="Ergebnis"><span class="unit">${task.unit||''}</span></div>`;
+  else if(task.type==='mc'){ A.innerHTML=`<div class="mc">${task.options.map((o,i)=>`<button data-i="${i}" class="${task.big?'big':''}">${o}</button>`).join('')}</div>`;
+    A.querySelectorAll('.mc button').forEach(b=>b.onclick=()=>answerMC(+b.dataset.i,b)); }
+  if(task.type==='click'){ document.querySelectorAll('#clickfig [data-part]').forEach(p=>p.onclick=()=>{ if(cur.done) return; const i=+p.dataset.part; if(cur.sel.has(i)){cur.sel.delete(i);p.classList.remove('on');}else{cur.sel.add(i);p.classList.add('on');} }); }
+  if(task.type==='line'){ document.querySelectorAll('#linefig [data-tick]').forEach(h=>h.onclick=()=>{ if(cur.done) return; cur.tick=+h.dataset.tick; document.querySelectorAll('#linefig .pt').forEach(p=>p.classList.toggle('sel',+p.dataset.pt===cur.tick)); }); }
+  $('#btnCheck').classList.toggle('hidden', task.type==='mc'); $('#btnCheck').disabled=false;
+  $('#btnNext').classList.add('hidden');
+  const fb=$('#fb'); fb.className='fb'; fb.innerHTML='';
+  A.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter') check(); }));
+  const first=A.querySelector('input:not([disabled])'); if(first && window.matchMedia('(pointer:fine)').matches) first.focus();
+  $('#streakInfo').textContent = S.streak>=2 ? `${S.streak} richtig in Folge!` : 'Löse Aufgaben, damit ich wachse!';
+  $('#sidePet').innerHTML=creatureSVG({mood:'think'});
+  updCoins();
+}
+const toInt = v => { v=String(v).trim(); return /^\d+$/.test(v)?parseInt(v,10):null; };
+function readAnswer(){
+  const t=cur.task.type;
+  if(t==='frac'){ const z=toInt($('#iz').value), n=toInt($('#in').value); if(z===null||n===null) return null; return {z,n,str:`${z}/${n}`}; }
+  if(t==='mixed'){ const g=toInt($('#ig').value), z=toInt($('#iz').value), n=toInt($('#in').value); if(g===null||z===null||n===null) return null; return {g,z,n,str:`${g} ${z}/${n}`}; }
+  if(t==='num'){ const raw=$('#iv').value.trim().replace(',','.'); if(raw===''||isNaN(+raw)) return null; return {v:+raw,str:raw.replace('.',',')+(cur.task.unit?' '+cur.task.unit:'')}; }
+  if(t==='click'){ if(cur.sel.size===0) return null; return {sel:cur.sel,str:`${cur.sel.size} Teile gefärbt`}; }
+  if(t==='line'){ if(cur.tick===null) return null; return {tick:cur.tick,str:''}; }
+}
+function check(){
+  if(!cur||cur.done) return; const t=cur.task; const a=readAnswer(); const fb=$('#fb');
+  if(!a){ fb.className='fb hint show'; fb.innerHTML= t.type==='click'?'Tippe zuerst Teile an.': t.type==='line'?'Tippe zuerst auf eine Stelle am Zahlenstrahl.':(t.type==='mixed'?'Fülle alle drei Felder aus. Schreibe nur ganze Zahlen.':'Trage zuerst eine Zahl in jedes Feld ein.'); return; }
+  if(t.type==='line') a.str=`Stelle ${a.tick} (Unterteilung ${t.lineSteps})`;
+  let r; if(t.type==='click') r=t.check(a.sel); else if(t.type==='line') r=t.check(a.tick); else if(t.type==='num') r=t.check(a.v); else r=t.check(a);
+  attempt(r,a.str);
+}
+function answerMC(i,btn){ if(!cur||cur.done) return; const t=cur.task; const ok=i===t.correct;
+  if(ok) btn.classList.add('right'); else { btn.classList.add('wrong'); btn.disabled=true; }
+  attempt({ok}, plain(t.options[i]));
+}
+function attempt(r,str){
+  const t=cur.task, fb=$('#fb'); cur.attempts++; cur.answers.push(str); S.topics[cur.tid].attempts++;
+  if(r.ok){ finish(cur.attempts===1?'1':'2'); return; }
+  if(cur.attempts<t.max){ fb.className='fb hint show'; fb.innerHTML=`<h4>Noch nicht ganz. Versuche es noch einmal.</h4>${r.msg||t.hint||''}`; $('#sidePet').innerHTML=creatureSVG({mood:'think'}); return; }
+  finish('x', r.msg);
+}
+function finish(res,msg){
+  cur.done=true; const tp=S.topics[cur.tid], t=cur.task, L=tp.level, fb=$('#fb');
+  tp.tasks++; tp.time += Math.min(Date.now()-cur.t0, 300000);
+  let gain=0, extra='';
+  if(res==='1'){ tp.first++; gain=L+1; tp.streak++; tp.wrong=0; S.streak++; if(L===3) tp.l3first++; }
+  else if(res==='2'){ tp.second++; gain=1; tp.streak=0; tp.wrong=0; S.streak=0; }
+  else { tp.failed++; tp.streak=0; tp.wrong++; S.streak=0; }
+  S.bestStreak=Math.max(S.bestStreak,S.streak);
+  if(res==='1' && S.streak>0 && S.streak%5===0){ gain+=5; extra=`<br><span class="gain">Bonus: ${S.streak} richtig in Folge, +5 Münzen!</span>`; }
+  const oldStage=stageOf(S.xp); S.coins+=gain; S.xp+=gain; const newStage=stageOf(S.xp);
+  S.log.push({t:Date.now(),topic:cur.tid,level:L,q:t.text,a:cur.answers.slice(),r:res});
+  if(S.log.length>600) S.log=S.log.slice(-600);
+  let lvlMsg='';
+  if(tp.streak>=3 && tp.level<3){ tp.level++; tp.streak=0; tp.maxLevel=Math.max(tp.maxLevel,tp.level); lvlMsg=`<br><b>Stufe ${tp.level} freigeschaltet!</b> Die nächsten Aufgaben werden kniffliger.`; }
+  if(tp.wrong>=2 && tp.level>1){ tp.level--; tp.wrong=0; lvlMsg=`<br>Wir üben jetzt ein paar Aufgaben auf Stufe ${tp.level}. Danach geht es wieder hoch.`; }
+  save();
+  if(res==='x'){ fb.className='fb bad show'; fb.innerHTML=`<h4>Diesmal leider nicht richtig.</h4>${msg?msg+'<br>':''}<div class="sol"><b>So geht es:</b><br>${t.sol}</div>${lvlMsg}`;
+    if(t.type==='mc'){ const b=document.querySelectorAll('.mc button')[t.correct]; if(b) b.classList.add('right'); }
+    if(t.type==='line'){ const p=document.querySelector(`#linefig .pt[data-pt="${t.target}"]`); if(p) p.classList.add('solution'); }
+    $('#sidePet').innerHTML=creatureSVG({mood:'think'}); }
+  else { fb.className='fb ok show'; fb.innerHTML=`<h4>${pick(res==='1'?['Richtig!','Super!','Klasse gemacht!','Genau so!','Stark!']:['Richtig, im zweiten Versuch!','Gut, dass du es nochmal probiert hast!'])}</h4><span class="gain">+${gain} <span class="coin"></span></span>${extra}${lvlMsg}${res==='2'?`<div class="sol small">${t.sol}</div>`:''}`;
+    const sp=$('#sidePet'); sp.innerHTML=creatureSVG({mood:'joy'}); sp.classList.remove('bounce'); void sp.offsetWidth; sp.classList.add('bounce'); updCoins(true); }
+  document.querySelectorAll('#ans input').forEach(i=>i.disabled=true);
+  document.querySelectorAll('.mc button').forEach(b=>b.disabled=true);
+  $('#btnCheck').classList.add('hidden'); $('#btnNext').classList.remove('hidden');
+  $('#streakInfo').textContent = S.streak>=2 ? `${S.streak} richtig in Folge!` : '';
+  if(newStage>oldStage){ confetti(); setTimeout(()=>modal(`<h3>${oldStage===0?'Dein Ei ist geschlüpft!':S.pet+' ist gewachsen!'}</h3><div class="creature-wrap">${creatureSVG({mood:'joy'})}</div><p><b>${STAGES[newStage].name}</b></p>${oldStage===0?'<p>Jetzt kannst du im Shop Zubehör für deinen Bruchling kaufen.</p>':''}`),500); }
+}
+$('#btnCheck').onclick=check;
+$('#btnNext').onclick=nextTask;
+$('#btnBack').onclick=()=>{ show('home'); renderHome(); };
+$('#btnMerk').onclick=()=>{ const tid=cur?cur.tid:'begriffe'; modal(`<h3>Merkkarte: ${TOP[tid].name}</h3><table class="merk">${MERKF()[tid].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`); };
+
+/* ---------- Shop ---------- */
+function renderShop(){
+  const st=stageOf(S.xp); updCoins();
+  $('#shopPet').innerHTML=creatureSVG({mood:'happy'});
+  $('#shopInfo').textContent = st===0 ? 'Zubehör gibt es erst, wenn dein Ei geschlüpft ist. Farben und Hintergründe kannst du schon kaufen.' : 'Tippe auf ein gekauftes Teil, um es an- oder abzulegen.';
+  const card=(key,name,price,preview,owned,equipped,locked)=>`<div class="item${equipped?' equipped':''}"><div class="prev">${preview}</div><b>${name}</b>${owned?`<button class="btn ${equipped?'sec':''}" data-act="use" data-key="${key}">${equipped?'Ablegen':'Anlegen'}</button>`:`<button class="btn gold" data-act="buy" data-key="${key}" ${(S.coins<price||locked)?'disabled':''}>${locked?'nach dem Schlüpfen':price+' Münzen'}</button>`}</div>`;
+  let h='<div class="shopsec"><h3>Farbe</h3><div class="shopgrid">';
+  Object.entries(COLORS).forEach(([k,c])=>{ h+=card('c:'+k,c.name,c.p,creatureSVG({color:k,stage:Math.max(1,st),equip:{},bg:S.bg,mood:'happy'}),S.owned.includes(k),S.color===k,false).replace('>Ablegen<','>Gewählt<'); });
+  h+='</div></div><div class="shopsec"><h3>Zubehör</h3><div class="shopgrid">';
+  Object.entries(ITEMS).forEach(([k,it])=>{ const eq={head:null,eyes:null,neck:null}; eq[it.slot]=k; h+=card('i:'+k,it.name,it.p,creatureSVG({stage:Math.max(2,st),equip:eq,mood:'happy'}),S.owned.includes(k),S.equip[it.slot]===k,st===0); });
+  h+='</div></div><div class="shopsec"><h3>Hintergrund</h3><div class="shopgrid">';
+  Object.entries(BGS).forEach(([k,b])=>{ h+=card('b:'+k,b.name,b.p,creatureSVG({bg:k,mood:'happy'}),S.owned.includes(k),S.bg===k,false).replace('>Ablegen<','>Gewählt<'); });
+  h+='</div></div>';
+  $('#shopBody').innerHTML=h;
+  document.querySelectorAll('#shopBody [data-act]').forEach(b=>b.onclick=()=>shopAct(b.dataset.act,b.dataset.key));
+}
+function shopAct(act,key){
+  const [type,k]=key.split(':'); const price = type==='c'?COLORS[k].p : type==='i'?ITEMS[k].p : BGS[k].p;
+  if(act==='buy'){ if(S.coins<price) return; S.coins-=price; S.owned.push(k); }
+  if(type==='c') S.color=k;
+  if(type==='b') S.bg=k;
+  if(type==='i'){ const sl=ITEMS[k].slot; S.equip[sl] = (act==='use' && S.equip[sl]===k) ? null : k; }
+  save(); renderShop();
+}
+$('#btnShop').onclick=()=>{ show('shop'); renderShop(); };
+$('#btnShopBack').onclick=()=>{ show('home'); renderHome(); };
+
+/* ---------- Rückmeldung ---------- */
+const fmtMin = ms => Math.round(ms/60000)+' min';
+const fmtDate = t => { const d=new Date(t), p=n=>String(n).padStart(2,'0'); return `${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+function totals(){ const o={tasks:0,first:0,second:0,failed:0,attempts:0,time:0}; TOPICS.forEach(t=>{const s=S.topics[t.id]; for(const k in o) o[k]+=s[k];}); return o; }
+function renderReport(){
+  const tt=totals();
+  $('#repIntro').innerHTML=`<b>${esc(S.name)}</b>, du hast ${tt.tasks} Aufgaben bearbeitet. ${tt.first} davon hast du beim ersten Versuch richtig gelöst. Dein Bruchling <b>${esc(S.pet)}</b> ist auf der Stufe „${STAGES[stageOf(S.xp)].name}“.`;
+  let h='<tr><th>Bereich</th><th>Aufgaben</th><th>1. Versuch richtig</th><th>2. Versuch richtig</th><th>nicht gelöst</th><th>Stufe</th><th>Sterne</th></tr>';
+  TOPICS.forEach(t=>{ const s=S.topics[t.id]; h+=`<tr><td>${t.name}</td><td>${s.tasks}</td><td>${s.first}</td><td>${s.second}</td><td>${s.failed}</td><td>${s.level}</td><td class="stars">${'★'.repeat(stars(t.id))}<span class="off">${'★'.repeat(3-stars(t.id))}</span></td></tr>`; });
+  h+=`<tr><th>Gesamt</th><th>${tt.tasks}</th><th>${tt.first}</th><th>${tt.second}</th><th>${tt.failed}</th><th></th><th></th></tr>`;
+  $('#repTable').innerHTML=h;
+}
+function reportText(){
+  const tt=totals(), pad=(s,n)=>String(s).padEnd(n), lp=(s,n)=>String(s).padStart(n);
+  const L=[];
+  L.push('RÜCKMELDUNG: BRÜCHE ÜBEN'); L.push('='.repeat(60));
+  L.push(`Name:                ${S.name}`);
+  L.push(`Erstellt am:         ${fmtDate(Date.now())}`);
+  L.push(`Begonnen am:         ${fmtDate(S.started)}`);
+  L.push(`Bruchling:           ${S.pet} (${STAGES[stageOf(S.xp)].name}, ${S.xp} Punkte)`);
+  L.push(`Übungszeit gesamt:   ${fmtMin(tt.time)}`);
+  L.push(`Aufgaben gesamt:     ${tt.tasks}`);
+  L.push(`  1. Versuch richtig: ${tt.first}${tt.tasks?` (${Math.round(tt.first/tt.tasks*100)} %)`:''}`);
+  L.push(`  2. Versuch richtig: ${tt.second}`);
+  L.push(`  nicht gelöst:       ${tt.failed}`);
+  L.push(`Eingaben gesamt:     ${tt.attempts}`);
+  L.push(`Längste Serie:       ${S.bestStreak} richtig in Folge`);
+  L.push(''); L.push('NACH BEREICHEN'); L.push('-'.repeat(60));
+  L.push(pad('Bereich',26)+lp('Aufg.',6)+lp('1.V.',6)+lp('2.V.',6)+lp('falsch',7)+lp('Stufe',6)+lp('max',5)+lp('Zeit',8));
+  TOPICS.forEach(t=>{ const s=S.topics[t.id]; const nm=t.id==='gemischt'?'Unecht/gemischt':t.name; L.push(pad(nm.slice(0,25),26)+lp(s.tasks,6)+lp(s.first,6)+lp(s.second,6)+lp(s.failed,7)+lp(s.level,6)+lp(s.maxLevel,5)+lp(fmtMin(s.time),8)); });
+  L.push(''); L.push('Stufe = aktuelle Schwierigkeitsstufe (1 bis 3), max = höchste erreichte Stufe');
+  L.push(''); L.push('AUFGABENPROTOKOLL (neueste zuletzt)'); L.push('-'.repeat(60));
+  L.push('Ergebnis: R1 = beim 1. Versuch richtig, R2 = beim 2. Versuch richtig, X = nicht gelöst');
+  S.log.forEach(e=>{ L.push(`${fmtDate(e.t)} | ${TOP[e.topic].name} | Stufe ${e.level} | ${e.r==='1'?'R1':e.r==='2'?'R2':'X '} | ${e.q} | Eingaben: ${e.a.join(' ; ')}`); });
+  return L.join('\r\n');
+}
+function download(){
+  const txt=reportText(); const safe=(S.name||'Name').replace(/[^A-Za-zÄÖÜäöüß0-9_-]+/g,'_');
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  const fn=`Rueckmeldung_Brueche_${safe}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.txt`;
+  try{ const blob=new Blob(['﻿'+txt],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fn; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
+    modal(`<h3>Datei wird gespeichert</h3><p>Die Datei heißt<br><b>${esc(fn)}</b></p><p>Sie liegt meist im Ordner „Downloads“. Gib sie deiner Lehrkraft.</p>`); }
+  catch(e){ modal(`<h3>Speichern hat nicht geklappt</h3><p>Zeige diesen Bildschirm deiner Lehrkraft.</p>`); }
+}
+$('#btnReport').onclick=()=>{ show('report'); renderReport(); };
+$('#btnRepBack').onclick=()=>{ show('home'); renderHome(); };
+$('#btnDownload').onclick=download;
+$('#btnReset').onclick=()=>{ if(confirm('Willst du wirklich neu beginnen? Münzen, Bruchling und alle Ergebnisse werden gelöscht. Lade vorher deine Rückmeldung herunter.')){ S=freshState(); save(); initStart(); } };
+
+/* ---------- Start ---------- */
+function initStart(){ show('start'); $('#startPet').innerHTML=creatureSVG({stage:0}); $('#inName').value=S.name||''; $('#inPet').value=S.pet||''; }
+$('#btnStart').onclick=()=>{ const n=$('#inName').value.trim(); if(!n){ $('#startMsg').textContent='Bitte trage deinen Vornamen ein.'; return; }
+  S.name=n; S.pet=$('#inPet').value.trim()||'Krümel'; S.started=Date.now(); save(); show('home'); renderHome(); };
+
+load();
+if(S.name){ show('home'); renderHome(); } else initStart();
+</script>
+</body>
+</html>
