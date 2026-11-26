@@ -197,6 +197,7 @@ table.merk tr:nth-child(odd) td{background:#fcf8f1}
         <button class="btn gold" id="btnShop">Shop</button>
         <button class="btn sec" id="btnReport">Mein Ergebnis</button>
       </div>
+      <button class="linkbtn" id="btnNames">✎ Namen ändern</button>
     </div>
     <div>
       <div class="tiles" id="tiles"></div>
@@ -286,8 +287,10 @@ const TOPICS = [
   {id:'strahl',   name:'Zahlenstrahl', c:'#457b9d', cl:'#dfeaf2'},
   {id:'erweitern',name:'Erweitern und Kürzen', c:'#8e5ea2', cl:'#efe4f4'},
   {id:'gemischt', name:'Unechte Brüche und gemischte Schreibweise', c:'#d1495b', cl:'#f9e0e3'},
-  {id:'mengen',   name:'Anteile von Mengen', c:'#4c956c', cl:'#e0f0e6'}
+  {id:'mengen',   name:'Anteile von Mengen', c:'#4c956c', cl:'#e0f0e6'},
+  {id:'knobel',   name:'Super-Knobelaufgaben', c:'#3d348b', cl:'#e4e1f5', special:true}
 ];
+const BASIC = TOPICS.filter(t=>!t.special);
 const TOP = Object.fromEntries(TOPICS.map(t=>[t.id,t]));
 
 /* ---------- Merkkarten (Erklärung links, Beispiel rechts) ---------- */
@@ -323,6 +326,12 @@ const MERKF = () => ({
   gemischt:[
     ['<b>Unechter Bruch in gemischte Schreibweise</b>: Dividiere den Zähler durch den Nenner. Das Ergebnis sind die Ganzen. Der Rest kommt in den Zähler, der Nenner bleibt.', `<span class="math">${F(11,4)}</span><br>11 : 4 = 2 Rest 3<br><span class="math">${F(11,4)} = ${M(2,3,4)}</span>`],
     ['<b>Gemischte Schreibweise in unechten Bruch</b>: Multipliziere die Ganzen mit dem Nenner und addiere den Zähler. Der Nenner bleibt.', `<span class="math">${M(2,3,4)}</span><br>2 · 4 + 3 = 11<br><span class="math">${M(2,3,4)} = ${F(11,4)}</span>`]
+  ],
+  knobel:[
+    ['<b>Lies genau.</b> Schreibe dir auf, was gegeben ist und was gesucht ist.', 'gegeben: …<br>gesucht: …'],
+    ['<b>Zeichne eine Skizze</b>, zum Beispiel einen Bruchstreifen. Teile ihn in gleich große Teile.', svgBar(6,[0,1],{w:150,h:30})],
+    ['<b>Rückwärts denken</b>: Wenn du einen Teil kennst, kannst du auf das Ganze schließen.', `${F(2,5)} sind 8.<br>${F(1,5)} sind 4, das Ganze sind 20.`],
+    ['<b>Gleiche Nenner</b> helfen beim Vergleichen. Erweitere die Brüche dazu.', `${F(1,4)} und ${F(2,8)}: ${F(1,4)} = ${F(2,8)}`]
   ],
   mengen:[
     ['<b>Anteil einer Menge</b>: Dividiere die Menge durch den Nenner. So erhältst du einen Teil. Multipliziere dann mit dem Zähler.', `${F(3,4)} von 20 €<br>20 € : 4 = 5 €<br>5 € · 3 = 15 €`],
@@ -569,6 +578,52 @@ gemischt(L){
   const n=rnd(3,9), g=rnd(2,9), r=rnd(1,n-1); return Math.random()<.5 ? toImproper(g,r,n) : toMixed(g*n+r,n,false);
 },
 
+knobel(L){
+  const numK = (q,text,ans,unit,hint,sol,chk) => T({type:'num', q, text, unit, check:chk||(v=>v===ans?{ok:true}:{ok:false}), hint, sol, ansV:ans});
+  const names=['Mia','Ben','Lea','Noah','Emma','Finn','Ida','Paul','Ella','Jonas'];
+  if(L===1){ const v=rnd(0,2);
+    if(v===0){ const [a,b]=pick([[1,2],[1,3],[1,4],[2,3],[3,4],[2,5],[3,5]]); const f=rnd(2,3); let [p1,p2]=shuffle(names.slice()).slice(0,2);
+      const kind=rnd(0,2); let x=[a,b], y;
+      if(kind===0) y=[a*f,b*f]; else if(kind===1) y=[a*f+1,b*f]; else y=[a*f-1,b*f];
+      if(y[0]<1) y=[a*f+1,b*f];
+      const cmp = x[0]*y[1]-y[0]*x[1]; const correct = cmp>0?0:cmp<0?1:2;
+      const ctx=pick(['Pizza','Tafel Schokolade','Kuchen']);
+      return mc(`<p>${p1} isst ${F(x[0],x[1])} einer ${ctx}. ${p2} isst ${F(y[0],y[1])} einer gleich großen ${ctx}. Wer isst mehr?</p>`, `${p1} ${x[0]}/${x[1]}, ${p2} ${y[0]}/${y[1]}, wer isst mehr?`, [p1,p2,'beide gleich viel'], correct,
+        {hint:'Erweitere die Brüche so, dass sie den gleichen Nenner haben.', sol:`Erweitere ${F(x[0],x[1])} mit ${f}: ${F(x[0],x[1])}${EQ('·'+f,'top')}${F(x[0]*f,x[1]*f)}. Vergleiche mit ${F(y[0],y[1])}. ${correct===2?'Beide essen gleich viel.':(correct===0?p1:p2)+' isst mehr.'}`}); }
+    if(v===1){ const n=pick([2,3,4,5,6,8]), g=rnd(1,5), r=rnd(0,n-1); const name={2:'Halbe',3:'Drittel',4:'Viertel',5:'Fünftel',6:'Sechstel',8:'Achtel'}[n]; const Z=g*n+r;
+      return numK(`<p>Wie viele ${name} stecken in ${r?M(g,r,n):g}?</p>`, `Wie viele ${name} in ${g}${r?' '+r+'/'+n:''}?`, Z, name,
+        `Ein Ganzes hat ${n} ${name}.`, `In einem Ganzen stecken ${n} ${name}. In ${g} Ganzen stecken ${g} · ${n} = ${g*n} ${name}.${r?` Dazu kommen noch ${r}. Zusammen ${Z} ${name}.`:''}`); }
+    const n=rnd(3,6), k=rnd(1,n-1), m=rnd(2,4), P=k*m;
+    return numK(`<p>Diese ${P} Stücke sind ${F(k,n)} einer Tafel Schokolade. Wie viele Stücke hat die ganze Tafel?</p><div class="figbox">${svgGrid(Math.ceil(P/m)>0?k:1,m,range(P),{cell:38})}</div>`, `${P} Stücke sind ${k}/${n} einer Tafel, wie viele Stücke insgesamt?`, n*m, 'Stücke',
+      `Überlege zuerst, wie viele Stücke ${F(1,n)} der Tafel sind.`, `<ol><li>${F(k,n)} sind ${P} Stücke.</li><li>${F(1,n)} sind ${P} : ${k} = ${m} Stücke.</li><li>Die ganze Tafel sind ${F(n,n)}: ${m} · ${n} = ${n*m} Stücke.</li></ol>`); }
+  if(L===2){ const v=rnd(0,2);
+    if(v===0){ const [a,b]=pick([[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[1,5],[3,5]]); const k=rnd(2,5), S0=(a+b)*k;
+      return T({q:`<p>Ich denke mir einen Bruch. Er hat den gleichen Wert wie ${F(a,b)}. Zähler und Nenner ergeben zusammen ${S0}. Wie heißt mein Bruch?</p>`, text:`Bruch mit Wert ${a}/${b}, Zähler + Nenner = ${S0}`,
+        check:x=>{ if(x.z*b===a*x.n && x.z+x.n===S0) return {ok:true}; if(x.z*b===a*x.n) return {ok:false,msg:`Der Wert stimmt. Aber Zähler und Nenner ergeben zusammen nicht ${S0}.`}; if(x.z+x.n===S0) return {ok:false,msg:`Die Summe stimmt, aber der Bruch hat nicht den gleichen Wert wie ${F(a,b)}.`}; return {ok:false}; },
+        hint:`Erweitere ${F(a,b)} Schritt für Schritt und addiere jedes Mal Zähler und Nenner.`, sol:`Bei ${F(a,b)} ergeben Zähler und Nenner zusammen ${a+b}. ${S0} : ${a+b} = ${k}. Also wird mit ${k} erweitert: ${F(a,b)}${EQ('·'+k,'top')}${F(a*k,b*k)}. Probe: ${a*k} + ${b*k} = ${S0}.`}); }
+    if(v===1){ const N=pick([6,8,10,12]); let z; do{ z=rnd(2,N-2);}while(gcd(z-1,N)===1&&gcd(z+1,N)===1);
+      const lo=[(z-1)/gcd(z-1,N),N/gcd(z-1,N)], hi=[(z+1)/gcd(z+1,N),N/gcd(z+1,N)];
+      return T({fixed:{n:N}, q:`<p>Der gesuchte Bruch hat den Nenner ${N}. Er ist größer als ${F(lo[0],lo[1])} und kleiner als ${F(hi[0],hi[1])}. Ergänze den Zähler.</p>`, text:`?/${N} zwischen ${lo[0]}/${lo[1]} und ${hi[0]}/${hi[1]}`,
+        check:x=>x.z===z?{ok:true}:{ok:false,msg:(x.z===z-1||x.z===z+1)?'Dieser Bruch ist genau eine der Grenzen. Gesucht ist ein Bruch dazwischen.':null},
+        hint:`Erweitere beide Brüche auf den Nenner ${N}.`, sol:`${F(lo[0],lo[1])} = ${F(z-1,N)} und ${F(hi[0],hi[1])} = ${F(z+1,N)}. Dazwischen liegt ${F(z,N)}.`}); }
+    const m=rnd(2,5), T0=6*m*rnd(1,2), p=pick(names); const a1=T0/2, a2=a1/3*2;
+    return numK(`<p>${p} hat ${T0} Murmeln. ${p} verschenkt die Hälfte. Vom Rest verschenkt ${p} noch ein Drittel. Wie viele Murmeln hat ${p} jetzt noch?</p>`, `${T0} Murmeln, Hälfte weg, dann ein Drittel vom Rest weg`, a2, 'Murmeln',
+      'Rechne Schritt für Schritt. Achte darauf, dass das Drittel vom Rest genommen wird.', `<ol><li>Die Hälfte von ${T0} ist ${a1}. Es bleiben ${a1}.</li><li>Ein Drittel von ${a1} ist ${a1/3}. Es bleiben ${a1} − ${a1/3} = ${a2}.</li></ol>`,
+      v=>v===a2?{ok:true}:{ok:false,msg:v===T0-T0/2-T0/3?'Das Drittel wird vom Rest genommen, nicht von allen Murmeln.':(v===a1/3?'So viele Murmeln werden im zweiten Schritt verschenkt. Wie viele bleiben übrig?':null)}); }
+  const v=rnd(0,2);
+  if(v===0){ const b=pick([3,4,5,7]); let a; do{a=rnd(1,b-2);}while(gcd(a,b)!==1&&gcd(a+1,b)!==1);
+    return T({q:`<p>Welcher Bruch liegt auf dem Zahlenstrahl <b>genau in der Mitte</b> zwischen ${F(a,b)} und ${F(a+1,b)}?</p>`, text:`Mitte zwischen ${a}/${b} und ${a+1}/${b}`,
+      check:x=>chkFrac(x,2*a+1,2*b,'equiv'), hint:'Erweitere beide Brüche mit 2. Dann liegt ein Bruch genau dazwischen.', sol:`${F(a,b)} = ${F(2*a,2*b)} und ${F(a+1,b)} = ${F(2*a+2,2*b)}. Genau in der Mitte liegt ${F(2*a+1,2*b)}.<div class="figbox">${svgLine(0,1,2*b,{marker:(2*a+1)/(2*b)})}</div>`}); }
+  if(v===1){ const n=rnd(3,8), k=rnd(1,n-1), m=rnd(2,9), rest=(n-k)*m, W=n*m, p=pick(names);
+    return numK(`<p>${p} gibt ${F(k,n)} des Taschengeldes für ein Buch aus. Danach hat ${p} noch ${rest} €. Wie viel Taschengeld hatte ${p} am Anfang?</p>`, `${k}/${n} ausgegeben, Rest ${rest} €, Anfang?`, W, '€',
+      `Welcher Anteil ist noch übrig? Dieser Anteil sind ${rest} €.`, `<ol><li>Ausgegeben ${F(k,n)}, übrig ${F(n-k,n)}.</li><li>${F(n-k,n)} sind ${rest} €, also ist ${F(1,n)}: ${rest} : ${n-k} = ${m} €.</li><li>Das Ganze: ${m} € · ${n} = ${W} €.</li></ol>`,
+      x=>x===W?{ok:true}:{ok:false,msg:x===rest/k*n&&k!==n-k?`${rest} € sind nicht ${F(k,n)}, sondern das, was übrig bleibt.`:null}); }
+  const [A,B]=pick([[2,3],[2,4],[3,2],[2,5],[4,2],[3,3]]); const nm={2:'Hälfte',3:'Drittel',4:'Viertel',5:'Fünftel'};
+  const art={2:'die',3:'ein',4:'ein',5:'ein'};
+  return T({q:`<p>Wie viel ist ${art[A]} ${nm[A]} von ${B===2?'einer Hälfte':'einem '+nm[B]}? Gib das Ergebnis als Bruch vom Ganzen an.</p><div class="figbox">${svgBar(B,[0])}</div><p class="small">Gefärbt ist ${F(1,B)}.</p>`, text:`${art[A]} ${nm[A]} von 1/${B}`,
+    check:x=>chkFrac(x,1,A*B,'equiv'), hint:`Teile jeden der ${B} Teile in ${A} gleich große Teile. Wie viele kleine Teile hat dann das Ganze?`, sol:`Teilt man jedes ${nm[B]==='Hälfte'?'Halbe':nm[B]} in ${A} Teile, hat das Ganze ${A} · ${B} = ${A*B} kleine Teile. Ein kleiner Teil ist ${F(1,A*B)}.<div class="figbox">${svgBar(A*B,[0])}</div>`});
+},
+
 mengen(L){
   const numT = (q,text,ans,unit,hint,sol,extra) => T(Object.assign({type:'num', q, text, unit, check:v=>v===ans?{ok:true}:{ok:false}, hint, sol, ansV:ans}, extra||{}));
   if(L===1){ const n=rnd(2,5), m=rnd(2,5), T0=n*m; const k=Math.random()<.6?1:rnd(2,n-1)||1;
@@ -684,9 +739,11 @@ function renderHome(){
   if(st<STAGES.length-1){ const a=STAGES[st].xp,b=STAGES[st+1].xp; $('#xpFill').style.width=Math.round((S.xp-a)/(b-a)*100)+'%'; $('#xpText').textContent=st===0?`Noch ${b-S.xp} Punkte, bis dein Ei schlüpft`:`Noch ${b-S.xp} Punkte bis zur nächsten Stufe`; }
   else { $('#xpFill').style.width='100%'; $('#xpText').textContent='Höchste Stufe erreicht!'; }
   let h='';
-  TOPICS.forEach(t=>{ const s=stars(t.id), tp=S.topics[t.id];
-    h+=`<button class="tile" style="--c:${t.c}" data-topic="${t.id}"><div class="ti" style="--tc:${t.c}">${tileIcon(t.id)}</div><b>${t.name}</b><span class="stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3-s)}</span></span><span class="lvl">Stufe ${tp.level} · ${tp.tasks} Aufgaben</span></button>`; });
+  const tileOf = t=>{ const s=stars(t.id), tp=S.topics[t.id];
+    h+=`<button class="tile" style="--c:${t.c}" data-topic="${t.id}"><div class="ti" style="--tc:${t.c}">${tileIcon(t.id)}</div><b>${t.name}</b><span class="stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3-s)}</span></span><span class="lvl">Stufe ${tp.level} · ${tp.tasks} Aufgaben</span></button>`; };
+  BASIC.forEach(tileOf);
   h+=`<button class="tile" style="--c:#2b2d42" data-topic="mix"><div class="ti" style="--tc:#e8b923">${svgCircle(4,[0,2],{r:24})}</div><b>Bunte Mischung</b><span class="lvl">Aufgaben aus allen Bereichen</span></button>`;
+  TOPICS.filter(t=>t.special).forEach(tileOf);
   $('#tiles').innerHTML=h;
   document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>startPractice(b.dataset.topic));
   updCoins(); drawPets('happy');
@@ -700,6 +757,7 @@ function tileIcon(id){
     case 'erweitern': return `<span style="font-size:1.5em;color:var(--tc)">${F(1,2)}=${F(2,4)}</span>`;
     case 'gemischt': return svgCircles(2,4,6);
     case 'mengen': return svgDots(6,6);
+    case 'knobel': return `<svg viewBox="0 0 120 56" height="56"><path d="M8,8 h22 a8,8 0 1 1 12,0 h22 v18 a8,8 0 1 0 0,12 v14 h-56 Z" fill="#3d348b"/><text x="30" y="44" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle">?</text><path d="M70,8 h42 v44 h-42 v-14 a8,8 0 1 1 0,-12 Z" fill="#e8b923"/><text x="94" y="40" font-size="20" font-weight="bold" fill="#3d348b" text-anchor="middle">${'\u00BD'}</text></svg>`;
   }
 }
 
@@ -708,7 +766,7 @@ let mode=null, cur=null, lastText='';
 function startPractice(m){ mode=m; show('practice'); nextTask(); }
 function setTopicColor(tid){ const t=TOP[tid]; const el=$('#s-practice'); el.style.setProperty('--tc',t.c); el.style.setProperty('--tcl',t.cl); }
 function nextTask(){
-  const tid = mode==='mix' ? pick(TOPICS).id : mode; const tp=S.topics[tid];
+  const tid = mode==='mix' ? pick(BASIC).id : mode; const tp=S.topics[tid];
   let task, tries=0; do{ task=GEN[tid](tp.level); tries++; }while(task.text===lastText && tries<8);
   lastText=task.text;
   cur={tid, task, attempts:0, answers:[], t0:Date.now(), done:false, sel:new Set(), tick:null};
@@ -861,6 +919,10 @@ function download(){
     modal(`<h3>Datei wird gespeichert</h3><p>Die Datei heißt<br><b>${esc(fn)}</b></p><p>Sie liegt meist im Ordner „Downloads“.</p>`); }
   catch(e){ modal(`<h3>Speichern hat nicht geklappt</h3><p>Zeige diesen Bildschirm deiner Pädagogin.</p>`); }
 }
+$('#btnNames').onclick=()=>{ modal(`<h3>Namen ändern</h3><div class="start" style="margin:0 auto"><label for="edName">Dein Vorname</label><input id="edName" maxlength="30" autocomplete="off" value="${esc(S.name)}"><label for="edPet">Name deines Bruchlings</label><input id="edPet" maxlength="20" autocomplete="off" value="${esc(S.pet)}"><p class="small" id="edMsg"></p></div>`);
+  const old=$('#mclose').onclick; $('#mclose').textContent='Speichern';
+  $('#mclose').onclick=()=>{ const n=$('#edName').value.trim(), pt=$('#edPet').value.trim(); if(!n){ $('#edMsg').textContent='Bitte trage deinen Vornamen ein.'; return; }
+    S.name=n; S.pet=pt||S.pet; save(); $('#mclose').textContent='OK'; $('#mclose').onclick=old; $('#modal').classList.add('hidden'); renderHome(); }; };
 $('#btnReport').onclick=()=>{ show('report'); renderReport(); };
 $('#btnRepBack').onclick=()=>{ show('home'); renderHome(); };
 $('#btnDownload').onclick=download;
