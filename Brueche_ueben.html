@@ -133,6 +133,14 @@ input:focus{outline:none;border-color:var(--tc)}
 @media (max-width:760px){.shoplayout{grid-template-columns:1fr}}
 
 /* Report */
+.repstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.stat{background:#faf3e6;border-radius:16px;padding:12px;text-align:center}
+.stat b{display:block;font-size:2em;line-height:1.1}
+.stat span{font-size:.9em;color:var(--muted)}
+.reptopics{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px}
+.reptopics div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:6px 0}
+.repfoot{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+.linkbtn{background:none;border:none;color:var(--muted);font-size:.85em;text-decoration:underline;padding:6px 0}
 table.rep{border-collapse:collapse;width:100%;font-size:.92em}
 table.rep th,table.rep td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:center}
 table.rep th:first-child,table.rep td:first-child{text-align:left}
@@ -187,7 +195,7 @@ table.merk tr:nth-child(odd) td{background:#fcf8f1}
       <div class="small" id="xpText"></div>
       <div class="petbtns">
         <button class="btn gold" id="btnShop">Shop</button>
-        <button class="btn sec" id="btnReport">Rückmeldung</button>
+        <button class="btn sec" id="btnReport">Mein Ergebnis</button>
       </div>
     </div>
     <div>
@@ -239,15 +247,14 @@ table.merk tr:nth-child(odd) td{background:#fcf8f1}
 <section id="s-report" class="screen">
   <div class="topbar">
     <button class="btn sec" id="btnRepBack">◀ Übersicht</button>
-    <h2>Rückmeldung</h2>
+    <h2>Mein Ergebnis</h2>
   </div>
   <div class="card">
-    <p id="repIntro"></p>
-    <div style="overflow-x:auto"><table class="rep" id="repTable"></table></div>
-    <p class="small">Die Datei enthält diese Übersicht und eine Liste deiner Aufgaben mit deinen Eingaben. Gib sie deiner Lehrkraft.</p>
-    <div class="actions">
-      <button class="btn" id="btnDownload">Rückmeldung herunterladen</button>
-      <button class="btn sec" id="btnReset">Neu beginnen</button>
+    <div id="repStats" class="repstats"></div>
+    <div id="repTopics" class="reptopics"></div>
+    <div class="repfoot">
+      <button class="linkbtn" id="btnDownload">Datei speichern</button>
+      <button class="linkbtn" id="btnReset">Neu beginnen</button>
     </div>
   </div>
 </section>
@@ -818,12 +825,9 @@ const fmtMin = ms => Math.round(ms/60000)+' min';
 const fmtDate = t => { const d=new Date(t), p=n=>String(n).padStart(2,'0'); return `${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 function totals(){ const o={tasks:0,first:0,second:0,failed:0,attempts:0,time:0}; TOPICS.forEach(t=>{const s=S.topics[t.id]; for(const k in o) o[k]+=s[k];}); return o; }
 function renderReport(){
-  const tt=totals();
-  $('#repIntro').innerHTML=`<b>${esc(S.name)}</b>, du hast ${tt.tasks} Aufgaben bearbeitet. ${tt.first} davon hast du beim ersten Versuch richtig gelöst. Dein Bruchling <b>${esc(S.pet)}</b> ist auf der Stufe „${STAGES[stageOf(S.xp)].name}“.`;
-  let h='<tr><th>Bereich</th><th>Aufgaben</th><th>1. Versuch richtig</th><th>2. Versuch richtig</th><th>nicht gelöst</th><th>Stufe</th><th>Sterne</th></tr>';
-  TOPICS.forEach(t=>{ const s=S.topics[t.id]; h+=`<tr><td>${t.name}</td><td>${s.tasks}</td><td>${s.first}</td><td>${s.second}</td><td>${s.failed}</td><td>${s.level}</td><td class="stars">${'★'.repeat(stars(t.id))}<span class="off">${'★'.repeat(3-stars(t.id))}</span></td></tr>`; });
-  h+=`<tr><th>Gesamt</th><th>${tt.tasks}</th><th>${tt.first}</th><th>${tt.second}</th><th>${tt.failed}</th><th></th><th></th></tr>`;
-  $('#repTable').innerHTML=h;
+  const tt=totals(), sum=TOPICS.reduce((a,t)=>a+stars(t.id),0), ok=tt.first+tt.second;
+  $('#repStats').innerHTML=`<div class="stat"><b>${tt.tasks}</b><span>Aufgaben bearbeitet</span></div><div class="stat"><b>${ok}</b><span>davon richtig gelöst</span></div><div class="stat"><b style="color:var(--gold)">${sum} ★</b><span>von ${TOPICS.length*3} Sternen</span></div>`;
+  $('#repTopics').innerHTML=TOPICS.map(t=>`<div><span>${t.name}</span><span class="stars">${'★'.repeat(stars(t.id))}<span class="off">${'★'.repeat(3-stars(t.id))}</span></span></div>`).join('');
 }
 function reportText(){
   const tt=totals(), pad=(s,n)=>String(s).padEnd(n), lp=(s,n)=>String(s).padStart(n);
@@ -854,8 +858,8 @@ function download(){
   const d=new Date(), p=n=>String(n).padStart(2,'0');
   const fn=`Rueckmeldung_Brueche_${safe}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.txt`;
   try{ const blob=new Blob(['﻿'+txt],{type:'text/plain;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fn; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
-    modal(`<h3>Datei wird gespeichert</h3><p>Die Datei heißt<br><b>${esc(fn)}</b></p><p>Sie liegt meist im Ordner „Downloads“. Gib sie deiner Lehrkraft.</p>`); }
-  catch(e){ modal(`<h3>Speichern hat nicht geklappt</h3><p>Zeige diesen Bildschirm deiner Lehrkraft.</p>`); }
+    modal(`<h3>Datei wird gespeichert</h3><p>Die Datei heißt<br><b>${esc(fn)}</b></p><p>Sie liegt meist im Ordner „Downloads“.</p>`); }
+  catch(e){ modal(`<h3>Speichern hat nicht geklappt</h3><p>Zeige diesen Bildschirm deiner Pädagogin.</p>`); }
 }
 $('#btnReport').onclick=()=>{ show('report'); renderReport(); };
 $('#btnRepBack').onclick=()=>{ show('home'); renderHome(); };
