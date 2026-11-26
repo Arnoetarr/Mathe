@@ -72,7 +72,8 @@ input{font:inherit}
 .q{font-size:1.1em}
 .q p{margin:.3em 0 .6em}
 .figbox{display:flex;justify-content:center;margin:8px 0}
-.fig{max-width:100%;height:auto}
+.fig{max-width:100%;height:auto;flex:0 1 auto;display:block}
+.figbox>.fig{min-width:0}
 .fig .part{fill:#fff;stroke:#2b2d42;stroke-width:2}
 .fig .part.on{fill:var(--tc)}
 .fig.clickable .part{cursor:pointer}
@@ -342,7 +343,7 @@ const MERKF = () => ({
 /* ---------- SVG-Figuren ---------- */
 function svgBar(n, shaded, o={}){
   const W=o.w||320, H=o.h||64; const ws=o.widths||Array(n).fill(1/n);
-  let x=3, s=`<svg viewBox="0 0 ${W+6} ${H+6}" class="fig${o.click?' clickable':''}" ${o.w?`width="${W+6}"`:''}>`;
+  let x=3, s=`<svg viewBox="0 0 ${W+6} ${H+6}" class="fig${o.click?' clickable':''}" width="${W+6}" height="${H+6}">`;
   ws.forEach((w,i)=>{ const pw=w*W; s+=`<rect data-part="${i}" x="${x.toFixed(2)}" y="3" width="${pw.toFixed(2)}" height="${H}" class="part${shaded.includes(i)?' on':''}"/>`; x+=pw; });
   return s+'</svg>';
 }
@@ -378,7 +379,7 @@ function svgCircles(count, n, filledParts){ // mehrere Kreise, filledParts Teile
 function svgLine(min, max, d, o={}){
   const W=o.w||380, pad=22, H=82, y=40; const units=max-min, steps=units*d;
   const X = v => pad + (v-min)/units*(W-2*pad);
-  let s=`<svg viewBox="0 0 ${W} ${H}" class="fig${o.click?' clickable':''}" ${o.w?`width="${W}"`:''}>`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="fig${o.click?' clickable':''}" width="${W}" height="${H}">`;
   s+=`<line x1="${pad-10}" y1="${y}" x2="${W-pad+12}" y2="${y}" stroke="#2b2d42" stroke-width="3"/>`;
   s+=`<polygon points="${W-pad+14},${y} ${W-pad+4},${y-6} ${W-pad+4},${y+6}" fill="#2b2d42"/>`;
   for(let i=0;i<=steps;i++){ const v=min+i/d, x=X(v), big=(i%d===0);
